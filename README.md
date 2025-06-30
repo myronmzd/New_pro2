@@ -10,7 +10,7 @@ This project allows users to **upload video files to S3**, automatically trigger
 ┌──────────────────────────────────────────────────────┐
 │                   S3 bucket : raw/                   │
 │ • Key: raw/yyyy/mm/dd/video.mp4                      │
-│ • Trigger: ObjectCreated:Put event                   │
+│ • Trigger: ObjectCreated:Put event                   |
 └──────────────┬───────────────────────────────────────┘
                │
                ▼
