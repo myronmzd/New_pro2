@@ -172,3 +172,18 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+
+# Generic Terraform ignores
+*.terraform.lock.hcl
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+*.tfstate
+*.tfstate.backup
+*.tfvars
+*.tfplan
+
+
+# Ignore SSH private keys
+*.pem
