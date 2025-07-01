@@ -28,23 +28,23 @@ This project allows users to **upload video files to S3**, automatically trigger
         └─────────────┬─────────────────┘
                       │ StartExecution({ bucket, key })
                       ▼
-        ┌──────────────────────────────────────────────┐
-        │ Step Functions State Machine (ETL Orchestration) │
-        │                                                │
-        │  1️⃣ startLabelDetection.sync (Rekognition)    │
-        │  2️⃣ getLabelDetection                         │
-        │  3️⃣ startContentModeration.sync (violence/    │
-        │     weapons)                                   │
-        │  4️⃣ ★ Generate-Thumbnail-Lambda (ffmpeg)      │
-        │     • Input : { bucket, key, firstHitTimestamp }│
-        │     • Output: { thumb_key = "results/xyz.jpg"} │
-        │  5️⃣ Save results to S3: results/<video>.json  │
-        │  6️⃣ Invoke Lambda: video-label-email          │
-        └─────────────┬──────────────────────────────────┘
+        ┌─────────────────────────────────────────────────────┐
+        │ Step Functions State Machine (ETL Orchestration)    │
+        │                                                     │
+        │  1️⃣ startLabelDetection.sync (Rekognition)          │
+        │  2️⃣ getLabelDetection                               │
+        │  3️⃣ startContentModeration.sync (violence/          │
+        │     weapons)                                        │
+        │  4️⃣ ★ Generate-Thumbnail-Lambda (ffmpeg)           │
+        │     • Input : { bucket, key, firstHitTimestamp }    │
+        │     • Output: { thumb_key = "results/xyz.jpg"}      │
+        │  5️⃣ Save results to S3: results/<video>.json       │
+        │  6️⃣ Invoke Lambda: video-label-email               │
+        └─────────────┬───────────────────────────────────────┘
                       │
                       ▼
-        ┌──────────────────────────────────────────────┐
-        │ Lambda: video-label-email (Python 3.11)      │
+        ┌───────────────────────────────────────────────┐
+        │ Lambda: video-label-email (Python 3.11)       │
         │  • Loads detection JSON + image from S3       │
         │  • Builds MIME email with inline/attached JPEG│
         │  • Calls Amazon SES → SendRawEmail            │
