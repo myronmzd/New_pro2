@@ -1,37 +1,27 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
-// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 {
 	"name": "Ubuntu",
 	"image": "mcr.microsoft.com/devcontainers/base:noble",
 	"features": {
-	  "ghcr.io/devcontainers/features/aws-cli:1": {},
-	  "ghcr.io/devcontainers/features/terraform:1": {},
-	  "ghcr.io/devcontainers/features/python:latest": {}
+	  "ghcr.io/devcontainers/features/aws-cli:latest": {},
+	  "ghcr.io/devcontainers/features/terraform:latest": {},
+	  "ghcr.io/devcontainers/features/python:latest": {},
+	  "ghcr.io/devcontainers/features/docker-in-docker:latest": {}
 	},
-	"postCreateCommand": "sudo python3 -m venv /workspaces/.venv && . /workspaces/.venv/bin/activate && pip install --upgrade pip && pip install boto3 cfn-lint requests && echo 'source /workspaces/.venv/bin/activate' >> ~/.bashrc && echo 'export AWS_CLI_AUTO_PROMPT=off' >> ~/.bashrc",
+	// "postCreateCommand": "sudo python3 -m venv /workspaces/.venv && . /workspaces/.venv/bin/activate && pip install --upgrade pip && pip install boto3 cfn-lint requests && echo 'source /workspaces/.venv/bin/activate' >> ~/.bashrc && echo 'export AWS_CLI_AUTO_PROMPT=off' >> ~/.bashrc",
 	"customizations": {
-	  "vscode": {
-		"extensions": ["ms-python.python",
-		"hashicorp.terraform",
-      	"aws-toolkit.aws-toolkit-vscode"]
-	  }
-	}
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "hashicorp.terraform",
+        "aws-toolkit.aws-toolkit-vscode",
+        "ms-azuretools.vscode-docker",
+        "redhat.vscode-yaml",
+        "timonwong.shellcheck"
+      ]
+    }
+  },
+//   "forwardPorts": [8080, 3000, 5000],
+  "containerEnv": {
+    "AWS_CLI_AUTO_PROMPT": "off"
   }
-
-	// Features to add to the dev container. More info: https://containers.dev/features.
-	// "features": {},
-
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [],
-
-	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "uname -a",
-
-	// Configure tool-specific properties.
-	// "customizations": {},
-
-	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "root"
-
-
+}
