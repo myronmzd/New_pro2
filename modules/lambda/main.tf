@@ -29,7 +29,8 @@ resource "aws_lambda_function" "function" {
 
   environment {
     variables = {
-      DYNAMODB_TABLE = var.dynamodb_table_name
+      S3_BUCKET = var.s3_bucket // Use a variable for S3 bucket
+      STEP_FUNCTION_ARN = var.stepfunction_arn // Use a variable for Step Function ARN
     }
   }
 
