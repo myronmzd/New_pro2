@@ -17,8 +17,14 @@ module "s3" {
 }
 
 module "lambda" {
-  source = "./modules/lambda"
-  s3_bucket = module.s3.bucket_name
+  source               = "./modules/lambda"
+  lambda_function_name = "Car-crash-app-function"
+  lambda_handler       = "app.handler"
+  lambda_runtime       = "python3.8"
+  lambda_roles         = module.iam.lambda_role_arn
+  dynamodb_table_name  = module.dynamodb.table_name
+  environment          = "Production"
+  project_name         = "CarCrashApp"
 }
 
 module "stepfunctions" {
