@@ -1,12 +1,45 @@
 # 🎥 AWS Offline Video Analysis Pipeline
 
-This project allows users to **upload video files to S3**, automatically trigger **Amazon Rekognition** to detect labels in the video, and finally send an email notification with the results via **SES**.
+This project enables users to **upload video files to S3**, automatically trigger **Amazon Rekognition** for label detection, and receive an email notification with results and a thumbnail via **SES**.
 
 ---
 
 ## 🧭 Architecture Overview
 
+### Workflow
+
+1. **User Uploads Video**
+   - Upload `.mp4` or `.mkv` files to the S3 bucket under the `raw/` prefix.
+
+2. **S3 Event Trigger**
+   - An S3 `ObjectCreated:Put` event triggers an Amazon EventBridge rule.
+
+3. **EventBridge Rule**
+   - Filters for new video uploads and triggers an AWS Step Functions State Machine.
+
+4. **Step Functions Orchestration**
+   - **a. Lambda: Video Splitter**
+     - Splits the video into images (frames) and stores them in a dump S3 bucket.
+   - **b. Rekognition Label Detection**
+     - Runs label detection on the video.
+   - **c. Rekognition Content Moderation**
+     - Checks for car crash or crime using custom labels.
+   - **d. Lambda: Thumbnail Generator**
+     - Uses FFmpeg to generate a thumbnail from the first detection hit.
+   - **e. Save Results**
+     - Stores detection results and thumbnail in S3.
+   - **f. Lambda: Email Notification**
+     - Sends an email with the summary and thumbnail via SES.
+
+5. **Recipient Inbox**
+   - Receives an email with a summary, timestamp, and inline thumbnail.
+
+---
+
+### Diagram
+
 ```text
+<<<<<<< HEAD
         User uploads .mp4 / .mkv
                     │
                     ▼
@@ -58,11 +91,49 @@ This project allows users to **upload video files to S3**, automatically trigger
         │  • Body   : Label summary + timestamp        │
         │  • Image  : Inline thumbnail of detection    │
         └──────────────────────────────────────────────┘
+=======
+┌───────────────┐
+│    User       │
+│ Uploads Video │
+└──────┬────────┘
+       │
+       ▼
+┌─────────────────────────────┐
+│      S3 Bucket (raw/)       │
+│  - Stores uploaded videos   │
+│  - Triggers EventBridge     │
+└──────┬──────────────────────┘
+       │
+       ▼
+┌─────────────────────────────┐
+│   EventBridge Rule          │
+│  - Filters video uploads    │
+│  - Triggers Step Functions  │
+└──────┬──────────────────────┘
+       │
+       ▼
+┌───────────────────────────────────────────────┐
+│ Step Functions State Machine                  │
+│ 1. Lambda: Split video into                   │
+│        frames saves in S3(dump)               │
+│ 2. Rekognition: Label detection               │
+│ 3. Rekognition: Content moderation            │
+│ 4. Lambda: Generate thumbnail (FFmpeg)        │
+│ 5. Lambda: delete the files in S3(dump)       │
+│ 6. Lambda: Send email with SES                │
+└──────┬────────────────────────────────────────┘
+       │
+       ▼
+┌─────────────────────────────┐
+│   Recipient Email Inbox     │
+│  - Receives summary & image │
+└─────────────────────────────┘
+>>>>>>> 1fe2ea9b1c761bfe2368ededb2f40573f5e20291
 ```
 
 ---
 
-## Features
+## 🚀 Features
 
 - Upload video files to S3 (`.mp4`, `.mkv`)
 - Automatic label and moderation detection using Amazon Rekognition
@@ -72,7 +143,7 @@ This project allows users to **upload video files to S3**, automatically trigger
 
 ---
 
-## Requirements
+## 🛠️ Requirements
 
 - AWS Account with S3, Rekognition, SES, Lambda, Step Functions permissions
 - Python 3.11 for Lambda functions
@@ -80,7 +151,7 @@ This project allows users to **upload video files to S3**, automatically trigger
 
 ---
 
-## Usage
+## 📦 Usage
 
 1. Upload a video file to the S3 bucket under the `raw/` prefix.
 2. The pipeline is triggered automatically.
@@ -88,4 +159,7 @@ This project allows users to **upload video files to S3**, automatically trigger
 
 ---
 
-## License
+## 📄 License
+
+
+

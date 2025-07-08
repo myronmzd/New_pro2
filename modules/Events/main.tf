@@ -32,10 +32,3 @@ data "aws_iam_policy_document" "events_assume_role" {
   }
 }
 
-variable "s3_bucket" {
-  type = string
-}
-
-variable "stepfunction_arn" {
-  type = string
-}

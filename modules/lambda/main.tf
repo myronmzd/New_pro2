@@ -13,23 +13,34 @@ data "aws_iam_policy_document" "lambda_assume_role" {
   }
 }
 
-resource "aws_lambda_function" "thumbnail" {
-  function_name = "Generate-Thumbnail"
-  handler       = "handler.lambda_handler"
-  runtime       = "python3.11"
-  role          = aws_iam_role.lambda_exec.arn
-  filename      = "lambda_thumbnail.zip" # You must package and upload this
+resource "archive_file" "fixture" {
+  type        = "zip"
+  source_file = "/workspaces/New_pro2/app.py"
+  output_path = "modules/lambda/app.zip"
+}
+
+resource "aws_lambda_function" "function" {
+  provider      = aws.mumbai
+  function_name = var.lambda_function_name // Use a variable for function name
+  role          = var.lambda_roles
+  handler       = var.lambda_handler // Use a variable for handler
+  runtime       = var.lambda_runtime // Use a variable for runtime
+  filename      = "${path.module}/app.zip"
+
   environment {
     variables = {
-      S3_BUCKET = var.s3_bucket
+      S3_BUCKET = var.s3_bucket // Use a variable for S3 bucket
+      STEP_FUNCTION_ARN = var.stepfunction_arn // Use a variable for Step Function ARN
     }
   }
+
+  tags = merge(
+    var.default_tags, // Use default tags from a variable
+    {
+      Environment = var.environment
+      Project     = var.project_name
+    }
+  )
 }
 
-output "thumbnail_lambda_arn" {
-  value = aws_lambda_function.thumbnail.arn
-}
 
-variable "s3_bucket" {
-  type = string
-}
