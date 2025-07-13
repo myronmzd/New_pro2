@@ -19,7 +19,7 @@ resource "archive_file" "fixture" {
   output_path = "modules/lambda/app.zip"
 }
 
-resource "aws_lambda_function" "function" {
+resource "aws_lambda_function" "function_split" {
   provider      = aws.mumbai
   function_name = var.lambda_function_name // Use a variable for function name
   role          = var.lambda_roles
@@ -44,3 +44,74 @@ resource "aws_lambda_function" "function" {
 }
 
 
+resource "aws_lambda_function" "SplitVideoFrames" {
+  provider      = aws.mumbai
+  function_name = var.lambda_function_name // Use a variable for function name
+  role          = var.lambda_roles
+  handler       = var.lambda_handler // Use a variable for handler
+  runtime       = var.lambda_runtime // Use a variable for runtime
+  filename      = "${path.module}/app.zip"
+
+  environment {
+    variables = {
+      S3_BUCKET = var.s3_bucket // Use a variable for S3 bucket
+      STEP_FUNCTION_ARN = var.stepfunction_arn // Use a variable for Step Function ARN
+    }
+  }
+
+  tags = merge(
+    var.default_tags, // Use default tags from a variable
+    {
+      Environment = var.environment
+      Project     = var.project_name
+    }
+  )
+}
+
+resource "aws_lambda_function" "GenerateThumbnailAndEmail" {
+  provider      = aws.mumbai
+  function_name = var.lambda_function_name // Use a variable for function name
+  role          = var.lambda_roles
+  handler       = var.lambda_handler // Use a variable for handler
+  runtime       = var.lambda_runtime // Use a variable for runtime
+  filename      = "${path.module}/app.zip"
+
+  environment {
+    variables = {
+      S3_BUCKET = var.s3_bucket // Use a variable for S3 bucket
+      STEP_FUNCTION_ARN = var.stepfunction_arn // Use a variable for Step Function ARN
+    }
+  }
+
+  tags = merge(
+    var.default_tags, // Use default tags from a variable
+    {
+      Environment = var.environment
+      Project     = var.project_name
+    }
+  )
+}
+
+resource "aws_lambda_function" "DeleteDumpFiles" {
+  provider      = aws.mumbai
+  function_name = var.lambda_function_name // Use a variable for function name
+  role          = var.lambda_roles
+  handler       = var.lambda_handler // Use a variable for handler
+  runtime       = var.lambda_runtime // Use a variable for runtime
+  filename      = "${path.module}/app.zip"
+
+  environment {
+    variables = {
+      S3_BUCKET = var.s3_bucket // Use a variable for S3 bucket
+      STEP_FUNCTION_ARN = var.stepfunction_arn // Use a variable for Step Function ARN
+    }
+  }
+
+  tags = merge(
+    var.default_tags, // Use default tags from a variable
+    {
+      Environment = var.environment
+      Project     = var.project_name
+    }
+  )
+}
