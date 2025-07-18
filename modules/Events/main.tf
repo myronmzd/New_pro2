@@ -1,3 +1,8 @@
+provider "aws" {
+  region = var.aws_region
+}
+
+
 resource "aws_cloudwatch_event_rule" "s3_object_created" {
   name        = "s3-object-created"
   event_pattern = jsonencode({
