@@ -1,10 +1,4 @@
-variable "lambda_split" {
-  type = string
-}
-variable "lambda_thumbnail" {
-  type = string
-}
-variable "lambda_cleanup" {
+variable "lambda" {
   type = string
 }
 variable "s3_bucket" {

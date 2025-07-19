@@ -23,32 +23,32 @@ resource "archive_file" "app1" {
   output_path = "modules/lambda/app1.zip"
 }
 
-resource "archive_file" "app2" {
-  type        = "zip"
-  source_file = "/workspaces/New_pro2/app2.py"
-  output_path = "modules/lambda/app2.zip"
-}
+# resource "archive_file" "app2" {
+#   type        = "zip"
+#   source_file = "/workspaces/New_pro2/app2.py"
+#   output_path = "modules/lambda/app2.zip"
+# }
 
-resource "archive_file" "app3" {
-  type        = "zip"
-  source_file = "/workspaces/New_pro2/app3.py"
-  output_path = "modules/lambda/app3.zip"
-}
+# resource "archive_file" "app3" {
+#   type        = "zip"
+#   source_file = "/workspaces/New_pro2/app3.py"
+#   output_path = "modules/lambda/app3.zip"
+# }
 
-resource "aws_lambda_function" "funtions" {
-  for_each = var.functions
+resource "aws_lambda_function" "funtion" {
 
-  function_name = each.value.name
-  handler       = each.value.handler
+
+  function_name = var.project_name
+  handler       = var.lambda_handler // Use a variable for handler
   role          = aws_iam_role.lambda_exec.arn
   runtime       = var.lambda_runtime // Use a variable for runtime
-  filename = "${path.module}/${each.key}.zip"
+  filename = "${path.module}/app1.zip"
 
   environment {
     variables = {
       S3_BUCKET_R = var.s3_bucket_raw
       S3_BUCKET_D = var.s3_bucket_dump
-      STEP_FUNCTION_ARN = var.stepfunction_arn // Use a variable for Step Function ARN
+      STEP_FUNCTION_ARN = var.stepfunction_arn 
     }
   }
 

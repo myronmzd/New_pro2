@@ -19,13 +19,10 @@ module "s3" {
 
 module "lambda" {
   source = "./modules/lambda"
-  functions = {
-    split     = { name = "split-video-frames", handler = "app.handler" }
-    thumbnail = { name = "generate-thumbnail-email", handler = "app.handler" }
-    frames    = { name = "delete-dump-files", handler = "app.handler" }
-  }
+  lambda_handler = "app.handler"
   lambda_runtime = "python3.8"
   environment    = "Production"
+  funtion_names = "process-video"
   project_name   = "CarCrashApp"
   aws_region     = var.aws_region
   s3_bucket_raw     = module.s3.raw_bucket_name
@@ -36,9 +33,7 @@ module "lambda" {
 
 module "stepfunctions" {
   source = "./modules/Stepfunctions"
-  lambda_split = module.lambda.function_invoke_arns["split"]
-  lambda_thumbnail = module.lambda.function_invoke_arns["thumbnail"]
-  lambda_cleanup = module.lambda.function_invoke_arns["frames"]
+  lambda = module.lambda.function_invoke_arns
   s3_bucket  = module.s3.raw_bucket_name
   aws_region = var.aws_region
 }

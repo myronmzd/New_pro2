@@ -1,87 +1,20 @@
 {
-  "Comment": "Offline video crash detection using custom Rekognition model – split frames → detectCustomLabels → thumbnail + email → cleanup",
+  "Comment": "Offline video crash detection: single Lambda does split → Rekognition → alert → cleanup",
   "Version": "1.0",
-  "StartAt": "SplitVideoFrames",
+  "StartAt": "ProcessVideo",
   "States": {
-
-
-    "SplitVideoFrames": {
+    "ProcessVideo": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
-        "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:split-video-frames",
+        "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:process-video",
         "Payload": {
-          "video_bucket.$": "$.bucket",        
-          "video_key.$": "$.key"               
-        }
-      },
-
-      "OutputPath": "$.Payload",
-      "Next": "DetectCrashFrames"
-    },
-
-
-    "DetectCrashFrames": {
-      "Type": "Map",
-      "ItemsPath": "$.frames",
-      "MaxConcurrency": 40,                     
-      "Parameters": {
-        "frameKey.$": "$$.Map.Item.Value",
-        "dump_bucket.$": "$.dump_bucket"
-      },
-      "Iterator": {
-        "StartAt": "DetectCustomLabel",
-        "States": {
-          "DetectCustomLabel": {
-            "Type": "Task",
-            "Resource": "arn:aws:states:::aws-sdk:rekognition:detectCustomLabels",
-            "Parameters": {
-              "Image": {
-                "S3Object": {
-                  "Bucket.$": "$.dump_bucket",
-                  "Name.$": "$.frameKey"
-                }
-              },
-              "MinConfidence": 60,
-              "ProjectVersionArn": "arn:aws:rekognition:ap-south-1:236024603923:project/Car_crash/version/Car_crash.2025-07-04T09.57.05/1751603227476"
-            },
-            "ResultPath": "$.Detection",
-            "End": true
-          }
-        }
-      },
-      "ResultPath": "$.CrashDetections",       
-      "Next": "GenerateThumbnailAndEmail"
-    },
-
-
-    "GenerateThumbnailAndEmail": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::lambda:invoke",
-      "Parameters": {
-        "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:generate-thumbnail-email",
-        "Payload": {
-          "video_bucket.$": "$.video_bucket",
-          "video_key.$": "$.video_key",
-          "dump_bucket.$": "$.dump_bucket",
-          "crashDetections.$": "$.CrashDetections"
+          "video_bucket.$": "$.bucket",
+          "video_key.$": "$.key",
+          "dump_bucket.$": "$.dump_bucket"
         }
       },
       "OutputPath": "$.Payload",
-      "Next": "DeleteDumpFiles"
-    },
-
-
-    "DeleteDumpFiles": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::lambda:invoke",
-      "Parameters": {
-        "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:delete-dump-files",
-        "Payload": {
-          "bucket.$": "$.dump_bucket",
-          "frames.$": "$.frames"
-        }
-      },
       "End": true
     }
   }

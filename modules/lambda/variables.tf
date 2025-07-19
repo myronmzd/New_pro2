@@ -1,9 +1,10 @@
-variable "functions" {
-  description = "Map of Lambda function definitions"
-  type = map(object({
-    name    = string
-    handler = string
-  }))
+variable "lambda_handler" {
+  description = "Lambda function handler"
+  type        = string
+}
+variable "funtion_names" {
+  description = "Names of the Lambda functions"
+  type        = string
 }
 
 variable "lambda_runtime" {
