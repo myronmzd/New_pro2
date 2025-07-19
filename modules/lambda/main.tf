@@ -17,96 +17,37 @@ data "aws_iam_policy_document" "lambda_assume_role" {
   }
 }
 
-resource "archive_file" "fixture" {
+resource "archive_file" "app1" {
   type        = "zip"
-  source_file = "/workspaces/New_pro2/app.py"
-  output_path = "modules/lambda/app.zip"
+  source_file = "/workspaces/New_pro2/app1.py"
+  output_path = "modules/lambda/app1.zip"
 }
 
-resource "aws_lambda_function" "function_split" {
-  provider      = aws.mumbai
-  function_name = var.lambda_function_name // Use a variable for function name
-  role          = var.lambda_roles
-  handler       = var.lambda_handler // Use a variable for handler
+resource "archive_file" "app2" {
+  type        = "zip"
+  source_file = "/workspaces/New_pro2/app2.py"
+  output_path = "modules/lambda/app2.zip"
+}
+
+resource "archive_file" "app3" {
+  type        = "zip"
+  source_file = "/workspaces/New_pro2/app3.py"
+  output_path = "modules/lambda/app3.zip"
+}
+
+resource "aws_lambda_function" "funtions" {
+  for_each = var.functions
+
+  function_name = each.value.name
+  handler       = each.value.handler
+  role          = aws_iam_role.lambda_exec.arn
   runtime       = var.lambda_runtime // Use a variable for runtime
-  filename      = "${path.module}/app.zip"
+  filename = "${path.module}/${each.key}.zip"
 
   environment {
     variables = {
-      S3_BUCKET = var.s3_bucket // Use a variable for S3 bucket
-      STEP_FUNCTION_ARN = var.stepfunction_arn // Use a variable for Step Function ARN
-    }
-  }
-
-  tags = merge(
-    var.default_tags, // Use default tags from a variable
-    {
-      Environment = var.environment
-      Project     = var.project_name
-    }
-  )
-}
-
-
-resource "aws_lambda_function" "SplitVideoFrames" {
-  provider      = aws.mumbai
-  function_name = var.lambda_function_name // Use a variable for function name
-  role          = var.lambda_roles
-  handler       = var.lambda_handler // Use a variable for handler
-  runtime       = var.lambda_runtime // Use a variable for runtime
-  filename      = "${path.module}/app.zip"
-
-  environment {
-    variables = {
-      S3_BUCKET = var.s3_bucket // Use a variable for S3 bucket
-      STEP_FUNCTION_ARN = var.stepfunction_arn // Use a variable for Step Function ARN
-    }
-  }
-
-  tags = merge(
-    var.default_tags, // Use default tags from a variable
-    {
-      Environment = var.environment
-      Project     = var.project_name
-    }
-  )
-}
-
-resource "aws_lambda_function" "GenerateThumbnailAndEmail" {
-  provider      = aws.mumbai
-  function_name = var.lambda_function_name // Use a variable for function name
-  role          = var.lambda_roles
-  handler       = var.lambda_handler // Use a variable for handler
-  runtime       = var.lambda_runtime // Use a variable for runtime
-  filename      = "${path.module}/app.zip"
-
-  environment {
-    variables = {
-      S3_BUCKET = var.s3_bucket // Use a variable for S3 bucket
-      STEP_FUNCTION_ARN = var.stepfunction_arn // Use a variable for Step Function ARN
-    }
-  }
-
-  tags = merge(
-    var.default_tags, // Use default tags from a variable
-    {
-      Environment = var.environment
-      Project     = var.project_name
-    }
-  )
-}
-
-resource "aws_lambda_function" "DeleteDumpFiles" {
-  provider      = aws.mumbai
-  function_name = var.lambda_function_name // Use a variable for function name
-  role          = var.lambda_roles
-  handler       = var.lambda_handler // Use a variable for handler
-  runtime       = var.lambda_runtime // Use a variable for runtime
-  filename      = "${path.module}/app.zip"
-
-  environment {
-    variables = {
-      S3_BUCKET = var.s3_bucket // Use a variable for S3 bucket
+      S3_BUCKET_R = var.s3_bucket_raw
+      S3_BUCKET_D = var.s3_bucket_dump
       STEP_FUNCTION_ARN = var.stepfunction_arn // Use a variable for Step Function ARN
     }
   }

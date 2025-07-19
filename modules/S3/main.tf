@@ -12,24 +12,16 @@ resource "random_string" "suffix" {
   upper   = false
 }
 
-locals {
-  suffix = random_string.suffix.result
-}
-
-# --------------------------------------------------------------------
-# Raw & processed (dump) buckets
-# --------------------------------------------------------------------
 
 resource "aws_s3_bucket" "raw" {
-  bucket = "offline-video-raw-${locals.suffix}"
+  bucket        = "offline-video-raw-${random_string.suffix.result}"
   force_destroy = true
 }
 
 resource "aws_s3_bucket" "dump_bucket" {
-  bucket = "dump-video-image-${locals.suffix}"
+  bucket        = "dump-video-image-${random_string.suffix.result}"
   force_destroy = true
 }
-
 
 # --------------------------------------------------------------------
 # Block all public access – strongly recommended for private pipelines
