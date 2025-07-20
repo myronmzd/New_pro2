@@ -51,3 +51,23 @@ variable "default_tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "input_bucket_arn" {
+  description = "ARN of the input video S3 bucket"
+  type        = string
+}
+
+variable "output_bucket_arn" {
+  description = "ARN of the output (dump) bucket for frames"
+  type        = string
+}
+
+variable "rekognition_model_arn" {
+  description = "ARN of the Rekognition Custom Label model"
+  type        = string
+}
+variable "sns_arn" {
+  description = "ARN of the SNS topic for notifications"
+  type        = string
+  default     = ""
+}

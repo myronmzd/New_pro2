@@ -1,10 +1,61 @@
 provider "aws" {
   region = var.aws_region
 }
-
-resource "aws_iam_role" "lambda_exec" {
-  name = "lambda_exec_role"
-  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+resource "aws_iam_policy" "lambda_exec_policy" {
+  name = "lambda_exec_policy"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid    = "S3Access"
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket",
+          "s3:GetBucketLocation"
+        ]
+        Resource = [
+          var.input_bucket_arn,
+          "${var.input_bucket_arn}/*",
+          var.output_bucket_arn,
+          "${var.output_bucket_arn}/*"
+        ]
+      },
+      {
+        Sid    = "SNSPublish"
+        Effect = "Allow"
+        Action = [
+          "sns:Publish"
+        ]
+        Resource = [
+          var.sns_arn
+        ]
+      },
+      {
+        Sid    = "RekognitionAccess"
+        Effect = "Allow"
+        Action = [
+          "rekognition:DetectCustomLabels"
+        ]
+        Resource = [
+          var.rekognition_model_arn
+        ]
+      },
+      {
+        Sid    = "CloudWatchLogs"
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = [
+          "arn:aws:logs:*:*:*"
+        ]
+      }
+    ]
+  })
 }
 
 data "aws_iam_policy_document" "lambda_assume_role" {
@@ -16,6 +67,13 @@ data "aws_iam_policy_document" "lambda_assume_role" {
     }
   }
 }
+
+resource "aws_iam_role" "lambda_exec" {
+  name = "lambda_exec_role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+
 
 resource "archive_file" "app1" {
   type        = "zip"

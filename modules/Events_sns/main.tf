@@ -37,3 +37,17 @@ data "aws_iam_policy_document" "events_assume_role" {
   }
 }
 
+# Create an SNS topic for notifications
+resource "aws_sns_topic" "file_processing_topic" {
+  name = "file-processing-topic"
+}
+
+# Email subscription for SNS topic
+resource "aws_sns_topic_subscription" "email_subscription" {
+  topic_arn = aws_sns_topic.file_processing_topic.arn  
+  protocol  = "email"
+  endpoint  = var.email_endpoint  # Add this variable to your variables.tf
+}
+
+
+
