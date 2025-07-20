@@ -1,7 +1,6 @@
-variable "lambda_arn" {
+variable "lambda" {
   type = string
 }
-
 variable "s3_bucket" {
   type = string
 }

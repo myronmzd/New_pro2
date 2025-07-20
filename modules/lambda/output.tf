@@ -1,7 +1,7 @@
-output "lambda_function_name" {
-  value = aws_lambda_function.function.function_name
+output "lambda_function_names" {
+  value = aws_lambda_function.funtion.function_name
 }
 
-output "function_invoke_arn" {
-  value = aws_lambda_function.function.invoke_arn
+output "function_invoke_arns" {
+  value = aws_lambda_function.funtion.arn
 }

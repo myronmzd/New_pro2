@@ -1,32 +1,20 @@
-variable "lambda_function_name" {
-  description = "Name of the Lambda function"
-  type        = string
-}
-
-variable "lambda_roles" {
-  description = "IAM role ARN for the Lambda function"
-  type        = string
-}
-
 variable "lambda_handler" {
-  description = "Handler for the Lambda function"
+  description = "Lambda function handler"
   type        = string
-  default     = "app.handler"
+}
+variable "funtion_names" {
+  description = "Names of the Lambda functions"
+  type        = string
 }
 
 variable "lambda_runtime" {
-  description = "Runtime for the Lambda function"
+  description = "Lambda runtime"
   type        = string
-  default     = "python3.8"
 }
 
-variable "dynamodb_table_name" {
-  description = "Name of the DynamoDB table"
-  type        = string
-}
 
 variable "environment" {
-  description = "Environment (e.g., Production, Staging)"
+  description = "Deployment environment"
   type        = string
 }
 
@@ -35,13 +23,31 @@ variable "project_name" {
   type        = string
 }
 
-variable "default_tags" {
-  description = "Default tags for all resources"
-  type        = map(string)
-  default     = {}
-}
-
 variable "aws_region" {
   description = "AWS region"
   type        = string
+}
+
+variable "s3_bucket_dump" {
+  description = "S3 bucket name"
+  type        = string
+  default     = ""
+}
+
+variable "s3_bucket_raw" {
+  description = "S3 bucket name"
+  type        = string
+  default     = ""
+}
+
+variable "stepfunction_arn" {
+  description = "Step Function ARN"
+  type        = string
+  default     = ""
+}
+
+variable "default_tags" {
+  description = "Default tags for resources"
+  type        = map(string)
+  default     = {}
 }

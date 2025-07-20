@@ -98,7 +98,6 @@ resource "aws_sfn_state_machine" "video_crash_detection" {
   type       = "STANDARD"
   role_arn   = aws_iam_role.sfn_exec.arn
   definition = local.state_machine_definition
-
   logging_configuration {
     include_execution_data = true
     level                 = "ALL"

@@ -18,27 +18,29 @@ module "s3" {
 }
 
 module "lambda" {
-  source               = "./modules/lambda"
-  lambda_function_name = "Car-crash-app-function"
-  lambda_handler       = "app.handler"
-  lambda_runtime       = "python3.8"
-  lambda_roles         = module.iam.lambda_role_arn
-  dynamodb_table_name  = module.dynamodb.table_name
-  environment          = "Production"
-  project_name         = "CarCrashApp"
-  aws_region          = var.aws_region
+  source = "./modules/lambda"
+  lambda_handler = "app.handler"
+  lambda_runtime = "python3.8"
+  environment    = "Production"
+  funtion_names = "process-video"
+  project_name   = "CarCrashApp"
+  aws_region     = var.aws_region
+  s3_bucket_raw     = module.s3.raw_bucket_name
+  s3_bucket_dump    = module.s3.dump_bucket_name
+  stepfunction_arn = module.stepfunctions.state_machine_arn
+
 }
 
 module "stepfunctions" {
   source = "./modules/Stepfunctions"
-  lambda_arn = module.lambda.thumbnail_lambda_arn
-  s3_bucket  = module.s3.bucket_name
-  aws_region          = var.aws_region
+  lambda = module.lambda.function_invoke_arns
+  s3_bucket  = module.s3.raw_bucket_name
+  aws_region = var.aws_region
 }
 
 module "events" {
   source = "./modules/Events"
-  s3_bucket = module.s3.bucket_name
+  s3_bucket = module.s3.raw_bucket_name
   stepfunction_arn = module.stepfunctions.state_machine_arn
   aws_region          = var.aws_region
 }
