@@ -43,7 +43,7 @@ module "stepfunctions" {
 
 module "events_sns" {
   source = "./modules/Events_sns"
-  s3_bucket = module.s3.raw_bucket_name
+  s3_bucket        = module.s3.raw_bucket_name
   stepfunction_arn = module.stepfunctions.state_machine_arn
   aws_region          = var.aws_region
   email_endpoint      = "myronmzd22@gmail.com"
