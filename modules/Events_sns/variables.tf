@@ -18,7 +18,3 @@ variable "output_bucket_id"{
   description = "Output S3 bucket ID for Lambda environment variable"
   type        = string
 }
-variable "input_bucket_arn" {
-  description = "ARN of the input S3 bucket"
-  type        = string
-}
