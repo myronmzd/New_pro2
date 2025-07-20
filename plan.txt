@@ -1,13 +1,13 @@
 [0m[1mmodule.lambda.data.aws_iam_policy_document.lambda_assume_role: Reading...[0m[0m
+[0m[1mmodule.events_sns.data.aws_iam_policy_document.events_assume_role: Reading...[0m[0m
+[0m[1mmodule.events_sns.data.aws_iam_policy_document.events_assume_role: Read complete after 0s [id=3959961479][0m
 [0m[1mmodule.lambda.data.aws_iam_policy_document.lambda_assume_role: Read complete after 0s [id=2690255455][0m
-[0m[1mmodule.events.data.aws_iam_policy_document.events_assume_role: Reading...[0m[0m
-[0m[1mmodule.events.data.aws_iam_policy_document.events_assume_role: Read complete after 0s [id=3959961479][0m
-[0m[1mmodule.stepfunctions.data.aws_region.current: Reading...[0m[0m
-[0m[1mmodule.stepfunctions.data.aws_iam_policy_document.sfn_assume_role: Reading...[0m[0m
 [0m[1mmodule.stepfunctions.data.aws_caller_identity.current: Reading...[0m[0m
+[0m[1mmodule.stepfunctions.data.aws_iam_policy_document.sfn_assume_role: Reading...[0m[0m
 [0m[1mmodule.stepfunctions.data.aws_iam_policy_document.sfn_policy: Reading...[0m[0m
-[0m[1mmodule.stepfunctions.data.aws_region.current: Read complete after 0s [id=ap-south-1][0m
+[0m[1mmodule.stepfunctions.data.aws_region.current: Reading...[0m[0m
 [0m[1mmodule.stepfunctions.data.aws_iam_policy_document.sfn_assume_role: Read complete after 0s [id=4022981484][0m
+[0m[1mmodule.stepfunctions.data.aws_region.current: Read complete after 0s [id=ap-south-1][0m
 [0m[1mmodule.stepfunctions.data.aws_iam_policy_document.sfn_policy: Read complete after 0s [id=950640121][0m
 [0m[1mmodule.stepfunctions.data.aws_caller_identity.current: Read complete after 0s [id=236024603923][0m
 
@@ -17,7 +17,7 @@ plan. Resource actions are indicated with the following symbols:
 
 Terraform will perform the following actions:
 
-[1m  # module.events.aws_cloudwatch_event_rule.s3_object_created[0m will be created
+[1m  # module.events_sns.aws_cloudwatch_event_rule.s3_object_created[0m will be created
 [0m  [32m+[0m[0m resource "aws_cloudwatch_event_rule" "s3_object_created" {
       [32m+[0m[0m arn            = (known after apply)
       [32m+[0m[0m event_bus_name = "default"
@@ -29,7 +29,7 @@ Terraform will perform the following actions:
       [32m+[0m[0m tags_all       = (known after apply)
     }
 
-[1m  # module.events.aws_cloudwatch_event_target.stepfunction[0m will be created
+[1m  # module.events_sns.aws_cloudwatch_event_target.stepfunction[0m will be created
 [0m  [32m+[0m[0m resource "aws_cloudwatch_event_target" "stepfunction" {
       [32m+[0m[0m arn            = (known after apply)
       [32m+[0m[0m event_bus_name = "default"
@@ -40,7 +40,7 @@ Terraform will perform the following actions:
       [32m+[0m[0m target_id      = (known after apply)
     }
 
-[1m  # module.events.aws_iam_role.events[0m will be created
+[1m  # module.events_sns.aws_iam_role.events[0m will be created
 [0m  [32m+[0m[0m resource "aws_iam_role" "events" {
       [32m+[0m[0m arn                   = (known after apply)
       [32m+[0m[0m assume_role_policy    = jsonencode(
@@ -71,6 +71,39 @@ Terraform will perform the following actions:
       [32m+[0m[0m inline_policy (known after apply)
     }
 
+[1m  # module.events_sns.aws_sns_topic.file_processing_topic[0m will be created
+[0m  [32m+[0m[0m resource "aws_sns_topic" "file_processing_topic" {
+      [32m+[0m[0m arn                         = (known after apply)
+      [32m+[0m[0m beginning_archive_time      = (known after apply)
+      [32m+[0m[0m content_based_deduplication = false
+      [32m+[0m[0m fifo_throughput_scope       = (known after apply)
+      [32m+[0m[0m fifo_topic                  = false
+      [32m+[0m[0m id                          = (known after apply)
+      [32m+[0m[0m name                        = "file-processing-topic"
+      [32m+[0m[0m name_prefix                 = (known after apply)
+      [32m+[0m[0m owner                       = (known after apply)
+      [32m+[0m[0m policy                      = (known after apply)
+      [32m+[0m[0m signature_version           = (known after apply)
+      [32m+[0m[0m tags_all                    = (known after apply)
+      [32m+[0m[0m tracing_config              = (known after apply)
+    }
+
+[1m  # module.events_sns.aws_sns_topic_subscription.email_subscription[0m will be created
+[0m  [32m+[0m[0m resource "aws_sns_topic_subscription" "email_subscription" {
+      [32m+[0m[0m arn                             = (known after apply)
+      [32m+[0m[0m confirmation_timeout_in_minutes = 1
+      [32m+[0m[0m confirmation_was_authenticated  = (known after apply)
+      [32m+[0m[0m endpoint                        = "myronmzd22@gmail.com"
+      [32m+[0m[0m endpoint_auto_confirms          = false
+      [32m+[0m[0m filter_policy_scope             = (known after apply)
+      [32m+[0m[0m id                              = (known after apply)
+      [32m+[0m[0m owner_id                        = (known after apply)
+      [32m+[0m[0m pending_confirmation            = (known after apply)
+      [32m+[0m[0m protocol                        = "email"
+      [32m+[0m[0m raw_message_delivery            = false
+      [32m+[0m[0m topic_arn                       = (known after apply)
+    }
+
 [1m  # module.lambda.archive_file.app1[0m will be created
 [0m  [32m+[0m[0m resource "archive_file" "app1" {
       [32m+[0m[0m id                  = (known after apply)
@@ -84,6 +117,19 @@ Terraform will perform the following actions:
       [32m+[0m[0m output_size         = (known after apply)
       [32m+[0m[0m source_file         = "/workspaces/New_pro2/app1.py"
       [32m+[0m[0m type                = "zip"
+    }
+
+[1m  # module.lambda.aws_iam_policy.lambda_exec_policy[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_policy" "lambda_exec_policy" {
+      [32m+[0m[0m arn              = (known after apply)
+      [32m+[0m[0m attachment_count = (known after apply)
+      [32m+[0m[0m id               = (known after apply)
+      [32m+[0m[0m name             = "lambda_exec_policy"
+      [32m+[0m[0m name_prefix      = (known after apply)
+      [32m+[0m[0m path             = "/"
+      [32m+[0m[0m policy           = (known after apply)
+      [32m+[0m[0m policy_id        = (known after apply)
+      [32m+[0m[0m tags_all         = (known after apply)
     }
 
 [1m  # module.lambda.aws_iam_role.lambda_exec[0m will be created
@@ -525,7 +571,7 @@ Terraform will perform the following actions:
       [32m+[0m[0m tracing_configuration (known after apply)
     }
 
-[1mPlan:[0m 21 to add, 0 to change, 0 to destroy.
+[1mPlan:[0m 24 to add, 0 to change, 0 to destroy.
 [0m[90m
 ─────────────────────────────────────────────────────────────────────────────[0m
 

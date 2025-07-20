@@ -31,7 +31,7 @@ module "lambda" {
   input_bucket_arn = module.s3.raw_bucket_arn
   output_bucket_arn = module.s3.dump_bucket_arn
   rekognition_model_arn = "arn:aws:rekognition:us-east-1:123456789012:project/CarCrashDetection/version/CarCrashDetection.2023-10-01T12.00.00/1700000000"
-  sns_arn = module.Events_sns.aws_sns_topic_arn
+  sns_arn = module.events_sns.aws_sns_topic_arn
 }
 
 module "stepfunctions" {

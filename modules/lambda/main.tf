@@ -93,7 +93,7 @@ resource "archive_file" "app1" {
 #   output_path = "modules/lambda/app3.zip"
 # }
 
-resource "aws_lambda_function" "funtion" {
+resource "aws_lambda_function" "function" {
 
 
   function_name = var.project_name
