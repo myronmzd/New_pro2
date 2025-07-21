@@ -1,4 +1,7 @@
-variable "s3_bucket" {
+variable "s3_bucket_raw" {
+  type = string
+}
+variable "s3_bucket_dump" {
   type = string
 }
 

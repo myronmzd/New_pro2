@@ -37,13 +37,15 @@ module "lambda" {
 module "stepfunctions" {
   source = "./modules/Stepfunctions"
   lambda = module.lambda.function_invoke_arns
-  s3_bucket  = module.s3.raw_bucket_name
+  s3bucket_raw_arn        = module.s3.raw_bucket_arn
+  s3bucket_dump_arn       = module.s3.dump_bucket_arn
   aws_region = var.aws_region
 }
 
 module "events_sns" {
   source = "./modules/Events_sns"
-  s3_bucket        = module.s3.raw_bucket_name
+  s3_bucket_raw        = module.s3.raw_bucket_name
+  s3_bucket_dump       = module.s3.dump_bucket_name
   stepfunction_arn = module.stepfunctions.state_machine_arn
   aws_region          = var.aws_region
   email_endpoint      = "myronmzd22@gmail.com"
