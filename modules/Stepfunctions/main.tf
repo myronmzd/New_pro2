@@ -1,21 +1,14 @@
-terraform {
-  required_version = ">= 1.3"
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
+locals {
+  common_tags = {
+    Application = "video-crash-detector"
+    Owner       = "bob"
   }
 }
 
 provider "aws" {
   region = var.aws_region
-
-  # Make it faster by skipping something
-  skip_metadata_api_check     = true
-  skip_region_validation      = true
-  skip_credentials_validation = true
 }
+
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
@@ -31,12 +24,14 @@ locals {
   )
 }
 
-
+# IAM Role for Step Functions
 resource "aws_iam_role" "sfn_exec" {
-  name = "stepfunctions_exec_role"
+  name               = "stepfunctions_exec_role"
   assume_role_policy = data.aws_iam_policy_document.sfn_assume_role.json
+  tags               = local.common_tags
 }
 
+# Assume Role Policy
 data "aws_iam_policy_document" "sfn_assume_role" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -47,21 +42,22 @@ data "aws_iam_policy_document" "sfn_assume_role" {
   }
 }
 
+# IAM Policy for Step Functions
 data "aws_iam_policy_document" "sfn_policy" {
-  # Allow Step Functions to invoke Lambda functions
   statement {
-    actions   = ["lambda:InvokeFunction", "lambda:InvokeAsync"]
+    sid     = "AllowLambdaInvoke"
+    actions = ["lambda:InvokeFunction", "lambda:InvokeAsync"]
     resources = ["*"]
   }
 
-  # Allow Rekognition access
   statement {
-    actions   = ["rekognition:DetectCustomLabels"]
-    resources = ["*"]
+    sid     = "AllowRekognition"
+    actions = ["rekognition:DetectCustomLabels"]
+    resources = ["arn:aws:rekognition:ap-south-1:236024603923:project/Car_crash/version/Car_crash.2025-07-04T09.57.05/1751603227476"]
   }
 
-  # CloudWatch Log Delivery Permissions (must use "*")
   statement {
+    sid     = "AllowCloudWatchLogDelivery"
     actions = [
       "logs:CreateLogDelivery",
       "logs:GetLogDelivery",
@@ -71,11 +67,14 @@ data "aws_iam_policy_document" "sfn_policy" {
       "logs:PutResourcePolicy",
       "logs:DescribeResourcePolicies"
     ]
-    resources = ["*"]
+    resources = [
+      aws_cloudwatch_log_group.sfn_logs.arn,
+      "${aws_cloudwatch_log_group.sfn_logs.arn}:*"
+    ]
   }
 
-  # CloudWatch Log Group & Stream permissions (optional: restrict to specific ARN)
   statement {
+    sid     = "AllowCloudWatchLogging"
     actions = [
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
@@ -88,39 +87,49 @@ data "aws_iam_policy_document" "sfn_policy" {
     ]
   }
 
-  # S3 permissions for access to video and dump buckets
   statement {
+    sid     = "AllowS3Access"
     actions = [
       "s3:GetObject",
       "s3:PutObject",
       "s3:DeleteObject",
       "s3:ListBucket"
     ]
-    resources = ["*"]
+    resources = [
+  var.s3bucket_raw_arn,
+  "${var.s3bucket_raw_arn}/*",
+  var.s3bucket_dump_arn,
+  "${var.s3bucket_dump_arn}/*"
+    ]
   }
 }
 
-
+# Attach Policy to Role
 resource "aws_iam_role_policy" "sfn_policy" {
   name   = "stepfunctions_policy"
   role   = aws_iam_role.sfn_exec.id
   policy = data.aws_iam_policy_document.sfn_policy.json
 }
 
+# CloudWatch Logs for Step Functions
 resource "aws_cloudwatch_log_group" "sfn_logs" {
   name              = "/aws/stepfunctions/video-crash-detection"
   retention_in_days = 7
+  tags              = local.common_tags
 }
 
+# Step Function State Machine
 resource "aws_sfn_state_machine" "video_crash_detection" {
-  name       = "video-crash-detection"
-  type       = "STANDARD"
-  role_arn   = aws_iam_role.sfn_exec.arn
+  name     = "video-crash-detection"
+  type     = "STANDARD"
+  role_arn = aws_iam_role.sfn_exec.arn
   definition = local.state_machine_definition
 
   logging_configuration {
     include_execution_data = true
     level                  = "ALL"
-    log_destination = "${aws_cloudwatch_log_group.sfn_logs.arn}:*"
+    log_destination        = aws_cloudwatch_log_group.sfn_logs.arn
   }
+  tags = local.common_tags
+  depends_on = [aws_iam_role_policy.sfn_policy]
 }

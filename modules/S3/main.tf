@@ -1,7 +1,12 @@
 provider "aws" {
   region = var.aws_region
 }
-
+locals {
+  common_tags = {
+    Application = "video-crash-detector"
+    Owner       = "bob"
+  }
+}
 # --------------------------------------------------------------------
 # Random suffix to keep bucket names globally unique
 # --------------------------------------------------------------------
@@ -16,11 +21,13 @@ resource "random_string" "suffix" {
 resource "aws_s3_bucket" "raw" {
   bucket        = "offline-video-raw-${random_string.suffix.result}"
   force_destroy = true
+  tags = local.common_tags
 }
 
 resource "aws_s3_bucket" "dump_bucket" {
   bucket        = "dump-video-image-${random_string.suffix.result}"
   force_destroy = true
+  tags = local.common_tags
 }
 
 # --------------------------------------------------------------------
@@ -33,6 +40,7 @@ resource "aws_s3_bucket_public_access_block" "raw" {
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
+  
 }
 
 resource "aws_s3_bucket_public_access_block" "dump" {
@@ -60,6 +68,7 @@ resource "aws_iam_role" "s3_raw_role" {
       }
     }]
   })
+  tags = local.common_tags
 }
 
 resource "aws_iam_role" "s3_dump_role" {
@@ -77,6 +86,7 @@ resource "aws_iam_role" "s3_dump_role" {
       }
     }]
   })
+  tags = local.common_tags
 }
 # ############################################
 #   IAM POLICIES                               #
@@ -100,6 +110,7 @@ resource "aws_iam_policy" "s3_raw_policy" {
       ]
     }]
   })
+  tags = local.common_tags
 } 
 resource "aws_iam_policy" "s3_dump_policy" {
   name        = "s3_dump_policy"
@@ -120,6 +131,7 @@ resource "aws_iam_policy" "s3_dump_policy" {
       ]
     }]
   })
+  tags = local.common_tags
 }
 # ############################################
 #   IAM ROLE POLICIES                          #
@@ -127,6 +139,7 @@ resource "aws_iam_policy" "s3_dump_policy" {
 resource "aws_iam_role_policy_attachment" "s3_raw_role_policy" {
   role       = aws_iam_role.s3_raw_role.name        
   policy_arn = aws_iam_policy.s3_raw_policy.arn
+  
 }
 
 resource "aws_iam_role_policy_attachment" "s3_dump_role_policy" {

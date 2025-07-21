@@ -1,6 +1,14 @@
 provider "aws" {
   region = var.aws_region
 }
+
+locals {
+  common_tags = {
+    Application = "video-crash-detector"
+    Owner       = "bob"
+  }
+}
+
 resource "aws_iam_policy" "lambda_exec_policy" {
   name = "lambda_exec_policy"
   policy = jsonencode({
@@ -56,6 +64,7 @@ resource "aws_iam_policy" "lambda_exec_policy" {
       }
     ]
   })
+  tags = local.common_tags
 }
 
 data "aws_iam_policy_document" "lambda_assume_role" {
@@ -66,11 +75,13 @@ data "aws_iam_policy_document" "lambda_assume_role" {
       identifiers = ["lambda.amazonaws.com"]
     }
   }
+  
 }
 
 resource "aws_iam_role" "lambda_exec" {
   name = "lambda_exec_role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+  tags = local.common_tags
 }
 
 
@@ -79,6 +90,7 @@ resource "archive_file" "app1" {
   type        = "zip"
   source_file = "/workspaces/New_pro2/app1.py"
   output_path = "modules/lambda/app1.zip"
+  
 }
 
 # resource "archive_file" "app2" {
@@ -109,12 +121,12 @@ resource "aws_lambda_function" "function" {
       STEP_FUNCTION_ARN = var.stepfunction_arn 
     }
   }
-
   tags = merge(
-    var.default_tags, // Use default tags from a variable
-    {
-      Environment = var.environment
-      Project     = var.project_name
-    }
+  var.default_tags,
+  local.common_tags,
+  {
+    Environment = var.environment
+    Project     = var.project_name
+  }
   )
 }
