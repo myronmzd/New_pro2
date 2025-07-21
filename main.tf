@@ -28,7 +28,10 @@ module "lambda" {
   s3_bucket_raw     = module.s3.raw_bucket_name
   s3_bucket_dump    = module.s3.dump_bucket_name
   stepfunction_arn = module.stepfunctions.state_machine_arn
-
+  input_bucket_arn = module.s3.raw_bucket_arn
+  output_bucket_arn = module.s3.dump_bucket_arn
+  rekognition_model_arn = "arn:aws:rekognition:us-east-1:123456789012:project/CarCrashDetection/version/CarCrashDetection.2023-10-01T12.00.00/1700000000"
+  sns_arn = module.events_sns.aws_sns_topic_arn
 }
 
 module "stepfunctions" {
@@ -38,9 +41,11 @@ module "stepfunctions" {
   aws_region = var.aws_region
 }
 
-module "events" {
-  source = "./modules/Events"
-  s3_bucket = module.s3.raw_bucket_name
+module "events_sns" {
+  source = "./modules/Events_sns"
+  s3_bucket        = module.s3.raw_bucket_name
   stepfunction_arn = module.stepfunctions.state_machine_arn
   aws_region          = var.aws_region
+  email_endpoint      = "myronmzd22@gmail.com"
+  output_bucket_id    = module.s3.dump_bucket_name
 }

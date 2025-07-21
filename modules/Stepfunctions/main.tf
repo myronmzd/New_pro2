@@ -20,6 +20,7 @@ data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
 
+
 locals {
   state_machine_definition = templatefile(
     "${path.module}/state_machine.json",
@@ -47,30 +48,47 @@ data "aws_iam_policy_document" "sfn_assume_role" {
 }
 
 data "aws_iam_policy_document" "sfn_policy" {
+  # Allow Step Functions to invoke Lambda functions
+  statement {
+    actions   = ["lambda:InvokeFunction", "lambda:InvokeAsync"]
+    resources = ["*"]
+  }
+
+  # Allow Rekognition access
+  statement {
+    actions   = ["rekognition:DetectCustomLabels"]
+    resources = ["*"]
+  }
+
+  # CloudWatch Log Delivery Permissions (must use "*")
   statement {
     actions = [
-      "lambda:InvokeFunction",
-      "lambda:InvokeAsync"
+      "logs:CreateLogDelivery",
+      "logs:GetLogDelivery",
+      "logs:UpdateLogDelivery",
+      "logs:DeleteLogDelivery",
+      "logs:ListLogDeliveries",
+      "logs:PutResourcePolicy",
+      "logs:DescribeResourcePolicies"
     ]
     resources = ["*"]
   }
 
-  statement {
-    actions = [
-      "rekognition:DetectCustomLabels"
-    ]
-    resources = ["*"]
-  }
-
+  # CloudWatch Log Group & Stream permissions (optional: restrict to specific ARN)
   statement {
     actions = [
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
-      "logs:PutLogEvents"
+      "logs:PutLogEvents",
+      "logs:DescribeLogGroups"
     ]
-    resources = ["*"]
+    resources = [
+      aws_cloudwatch_log_group.sfn_logs.arn,
+      "${aws_cloudwatch_log_group.sfn_logs.arn}:*"
+    ]
   }
 
+  # S3 permissions for access to video and dump buckets
   statement {
     actions = [
       "s3:GetObject",
@@ -81,6 +99,7 @@ data "aws_iam_policy_document" "sfn_policy" {
     resources = ["*"]
   }
 }
+
 
 resource "aws_iam_role_policy" "sfn_policy" {
   name   = "stepfunctions_policy"
@@ -98,9 +117,10 @@ resource "aws_sfn_state_machine" "video_crash_detection" {
   type       = "STANDARD"
   role_arn   = aws_iam_role.sfn_exec.arn
   definition = local.state_machine_definition
+
   logging_configuration {
     include_execution_data = true
-    level                 = "ALL"
-    log_destination       = aws_cloudwatch_log_group.sfn_logs.arn
+    level                  = "ALL"
+    log_destination = "${aws_cloudwatch_log_group.sfn_logs.arn}:*"
   }
 }
