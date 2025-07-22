@@ -1,26 +1,45 @@
 {
-  "name": "Ubuntu",
-  "image": "mcr.microsoft.com/devcontainers/base:noble",
+  "name": "Ubuntu DevOps",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",  // Use Jammy for stability: ":ubuntu-22.04"
+
   "features": {
-    "ghcr.io/devcontainers/features/aws-cli:latest": {},
-    "ghcr.io/devcontainers/features/python:latest": {},
-    "ghcr.io/devcontainers/features/docker-in-docker:latest": {}
+    // ✅ Required for DevOps work
+    "ghcr.io/devcontainers/features/terraform": "latest",
+    "ghcr.io/devcontainers/features/python": "latest",     // Optional, but useful for cross-platform scripting
+    "ghcr.io/devcontainers/features/aws-cli": "latest"       // Only if you work with Azure
   },
-  // "postCreateCommand": "sudo python3 -m venv /workspaces/.venv && . /workspaces/.venv/bin/activate && pip install --upgrade pip && pip install boto3 cfn-lint requests && echo 'source /workspaces/.venv/bin/activate' >> ~/.bashrc && echo 'export AWS_CLI_AUTO_PROMPT=off' >> ~/.bashrc",
+
+  // ✅ Automatically run these after attach
+  "postAttachCommand": {
+    "git-safe-directory": "git config --global --add safe.directory ${containerWorkspaceFolder}",
+    "ansible_cfg_permissions": "sudo chmod o-w ${containerWorkspaceFolder}"
+  },
+
+  // ✅ Set up Python, Ansible, Terraform helpers
+  "postCreateCommand": [
+    "sudo apt update && sudo apt install -y python3-pip postgresql-client",
+    "sudo python3 -m pip install --upgrade pip",
+    "pip3 install ansible python-hcl2 psycopg2-binary",
+    "ansible-galaxy collection install azure.azcollection",
+    "echo 'ansible-playbook ansible/playbooks/netbox.yml' >> ~/.bash_history",
+    "echo 'terraform apply' >> ~/.bash_history",
+    "echo 'az login' >> ~/.bash_history"
+  ],
+
+  // ✅ VSCode extensions tailored for DevOps
   "customizations": {
     "vscode": {
       "extensions": [
-        "ms-python.python",
+        "GitHub.copilot",
+        "GitHub.copilot-labs",
+        "GitHub.vscode-pull-request-github",
+        "redhat.ansible",
         "hashicorp.terraform",
-        "aws-toolkit.aws-toolkit-vscode",
-        "ms-azuretools.vscode-docker",
-        "redhat.vscode-yaml",
-        "timonwong.shellcheck"
+        "ms-toolsai.jupyter",
+        "ms-vscode.powershell",
+        "eamodio.gitlens",
+        "GitHub.copilot-chat"
       ]
     }
-  },
-  // "forwardPorts": [8080, 3000, 5000],
-  "containerEnv": {
-    "AWS_CLI_AUTO_PROMPT": "off"
   }
 }
