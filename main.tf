@@ -19,7 +19,7 @@ module "s3" {
 
 module "lambda" {
   source = "./modules/lambda"
-  lambda_handler = "app.handler"
+  lambda_handler = "app1.handler"
   lambda_runtime = "python3.8"
   environment    = "Production"
   funtion_names = "process-video"

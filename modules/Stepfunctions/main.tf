@@ -59,33 +59,29 @@ data "aws_iam_policy_document" "sfn_policy" {
   statement {
     sid     = "AllowCloudWatchLogDelivery"
     actions = [
-      "logs:CreateLogDelivery",
-      "logs:GetLogDelivery",
-      "logs:UpdateLogDelivery",
-      "logs:DeleteLogDelivery",
-      "logs:ListLogDeliveries",
-      "logs:PutResourcePolicy",
-      "logs:DescribeResourcePolicies"
+        "logs:CreateLogDelivery",
+        "logs:GetLogDelivery",
+        "logs:UpdateLogDelivery",
+        "logs:DeleteLogDelivery",
+        "logs:ListLogDeliveries",
+        "logs:PutResourcePolicy",
+        "logs:DescribeResourcePolicies",
+        "logs:DescribeLogGroups",
+        "logs:GetResourcePolicy"
     ]
-    resources = [
-      aws_cloudwatch_log_group.sfn_logs.arn,
-      "${aws_cloudwatch_log_group.sfn_logs.arn}:*"
-    ]
+    resources = ["*"]
   }
-
   statement {
     sid     = "AllowCloudWatchLogging"
     actions = [
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
-      "logs:PutLogEvents",
-      "logs:DescribeLogGroups"
+      "logs:PutLogEvents"
     ]
     resources = [
-      aws_cloudwatch_log_group.sfn_logs.arn,
-      "${aws_cloudwatch_log_group.sfn_logs.arn}:*"
-    ]
-  }
+      "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/stepfunctions/video-crash-detection:*"
+  ]
+}
 
   statement {
     sid     = "AllowS3Access"
@@ -128,7 +124,7 @@ resource "aws_sfn_state_machine" "video_crash_detection" {
   logging_configuration {
     include_execution_data = true
     level                  = "ALL"
-    log_destination        = aws_cloudwatch_log_group.sfn_logs.arn
+    log_destination        = "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${aws_cloudwatch_log_group.sfn_logs.name}:*"
   }
   tags = local.common_tags
   depends_on = [aws_iam_role_policy.sfn_policy]

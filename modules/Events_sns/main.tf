@@ -11,16 +11,21 @@ locals {
 
 resource "aws_cloudwatch_event_rule" "s3_object_created" {
   name        = "s3-object-created"
+  description = "Capture S3 object creation events"
   event_pattern = jsonencode({
     "source": ["aws.s3"],
     "detail-type": ["Object Created"],
     "detail": {
       "bucket": {
         "name": [var.s3_bucket_raw]
+      },
+      "object": {
+        "key": [{
+          "prefix": "raw/"
+        }]
       }
     }
   })
-  
 }
 
 resource "aws_cloudwatch_event_target" "stepfunction" {
@@ -28,6 +33,19 @@ resource "aws_cloudwatch_event_target" "stepfunction" {
   arn       = var.stepfunction_arn
   role_arn  = aws_iam_role.events.arn
   
+  # Transform the S3 event into the format expected by Step Functions
+  input_transformer {
+    input_paths = {
+      bucket = "$.detail.bucket.name",
+      key    = "$.detail.object.key"
+    }
+    input_template = <<EOF
+{
+  "bucket": "<bucket>",
+  "key": "<key>"
+}
+EOF
+  }
 }
 
 resource "aws_iam_role" "events" {

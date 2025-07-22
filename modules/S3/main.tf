@@ -24,6 +24,13 @@ resource "aws_s3_bucket" "raw" {
   tags = local.common_tags
 }
 
+# Enable EventBridge notifications for the raw bucket
+resource "aws_s3_bucket_notification" "raw_bucket_notification" {
+  bucket = aws_s3_bucket.raw.id
+
+  eventbridge = true
+}
+
 resource "aws_s3_bucket" "dump_bucket" {
   bucket        = "dump-video-image-${random_string.suffix.result}"
   force_destroy = true

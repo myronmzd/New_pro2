@@ -1,5 +1,5 @@
 {
-  "Comment": "Offline video crash detection: single Lambda does split → Rekognition → alert → cleanup",
+  "Comment": "Video → frames pipeline: Step Function triggers Lambda to split and dump",
   "Version": "1.0",
   "StartAt": "ProcessVideo",
   "States": {
@@ -7,11 +7,20 @@
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
-        "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:process-video",
+        "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:CarCrashApp",
         "Payload": {
-          "video_bucket.$": "$.bucket",
-          "video_key.$": "$.key",
-          "dump_bucket.$": "$.dump_bucket"
+          "Records": [
+            {
+              "s3": {
+                "bucket": {
+                  "name.$": "$.bucket"
+                },
+                "object": {
+                  "key.$": "$.key"
+                }
+              }
+            }
+          ]
         }
       },
       "OutputPath": "$.Payload",
