@@ -1,12 +1,12 @@
 {
   "name": "Ubuntu DevOps",
-  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",  // Use Jammy for stability: ":ubuntu-22.04"
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",  // Use Jammy for stability: ":ubuntu-22.04"
 
   "features": {
     // ✅ Required for DevOps work
-    "ghcr.io/devcontainers/features/terraform": "latest",
     "ghcr.io/devcontainers/features/python": "latest",     // Optional, but useful for cross-platform scripting
-    "ghcr.io/devcontainers/features/aws-cli": "latest"       // Only if you work with Azure
+    "ghcr.io/devcontainers/features/aws-cli": "latest",
+    // "ghcr.io/devcontainers/features/azure-cli": "latest",  // Azure CLI for cloud management
   },
 
   // ✅ Automatically run these after attach
@@ -16,15 +16,7 @@
   },
 
   // ✅ Set up Python, Ansible, Terraform helpers
-  "postCreateCommand": [
-    "sudo apt update && sudo apt install -y python3-pip postgresql-client",
-    "sudo python3 -m pip install --upgrade pip",
-    "pip3 install ansible python-hcl2 psycopg2-binary",
-    "ansible-galaxy collection install azure.azcollection",
-    "echo 'ansible-playbook ansible/playbooks/netbox.yml' >> ~/.bash_history",
-    "echo 'terraform apply' >> ~/.bash_history",
-    "echo 'az login' >> ~/.bash_history"
-  ],
+  "postCreateCommand": ".devcontainer/setup.sh",
 
   // ✅ VSCode extensions tailored for DevOps
   "customizations": {
