@@ -4,9 +4,10 @@
 
   "features": {
     // ✅ Required for DevOps work
-    "ghcr.io/devcontainers/features/python": "latest",     // Optional, but useful for cross-platform scripting
+    // Optional, but useful for cross-platform scripting
     "ghcr.io/devcontainers/features/aws-cli": "latest",
-    // "ghcr.io/devcontainers/features/azure-cli": "latest",  // Azure CLI for cloud management
+    // AWS CLI for cloud management
+    "ghcr.io/devcontainers/features/azure-cli": "latest"  // Azure CLI for cloud management
   },
 
   // ✅ Automatically run these after attach
@@ -16,7 +17,7 @@
   },
 
   // ✅ Set up Python, Ansible, Terraform helpers
-  "postCreateCommand": ".devcontainer/setup.sh",
+  "postCreateCommand": ".devcontainer/setup.sh",  
 
   // ✅ VSCode extensions tailored for DevOps
   "customizations": {
