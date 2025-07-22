@@ -25,3 +25,5 @@ pip3 install ansible python-hcl2 psycopg2-binary
 echo "[Setup] Cleaning up..."
 sudo apt-get clean
 sudo rm -rf /var/lib/apt/lists/* /var/tmp/*
+
+sudo chown -R vscode:vscode /workspaces/New_pro2
