@@ -113,7 +113,8 @@ resource "archive_file" "app2" {
 }
 
 resource "aws_lambda_function" "function1" {
-
+  
+  // This lambda funtion take the video and split them into images and then put it into a dump bucket
 
   function_name = var.project_name
   handler       = var.lambda_handler // Use a variable for handler
@@ -144,11 +145,11 @@ resource "aws_lambda_function" "function1" {
 
 resource "aws_lambda_function" "function2" {
 
-
+  // This lambda funtion take the those image in the bucket and run them to aws rekognition and dectects car crash so the se that image to sns and then delete the other images
   function_name = var.project_name  
-  handler       = var.lambda_handler // Use a variable for handler
+  handler       = var.lambda_handler 
   role          = aws_iam_role.lambda_exec.arn
-  runtime       = var.lambda_runtime // Use a variable for runtime
+  runtime       = var.lambda_runtime 
   filename = "${path.module}/app1.zip"
 
   environment {
