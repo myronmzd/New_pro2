@@ -5,10 +5,10 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -28,7 +28,7 @@ var (
 	dumpBucket    = os.Getenv("S3_BUCKET_D")
 	modelArn      = os.Getenv("MODEL_ARN")
 	snsTopicArn   = os.Getenv("SNS_TOPIC_ARN")
-	minConfidence = os.Getenv("MIN_CONFIDENCE")
+	minConfidence = stringToFloat(os.Getenv("MIN_CONFIDENCE"))
 )
 
 func handler(ctx context.Context, s3Event events.S3Event) error {
@@ -58,7 +58,7 @@ func handler(ctx context.Context, s3Event events.S3Event) error {
 			Image: &rekognition.Image{
 				Bytes: imgBuf.Bytes(),
 			},
-			MinConfidence:     aws.Float64(stringToFloat(minConfidence)),
+			MinConfidence:     aws.Float64(minConfidence),
 			ProjectVersionArn: aws.String(modelArn),
 		})
 		if err != nil {
@@ -68,7 +68,7 @@ func handler(ctx context.Context, s3Event events.S3Event) error {
 
 		hasCrash := false
 		for _, label := range detectRes.CustomLabels {
-			if strings.ToLower(*label.Name) == "carcrash" && *label.Confidence >= stringToFloat(minConfidence) {
+			if strings.ToLower(*label.Name) == "carcrash" && *label.Confidence >= minConfidence {
 				hasCrash = true
 				break
 			}
@@ -80,7 +80,7 @@ func handler(ctx context.Context, s3Event events.S3Event) error {
 
 			log.Printf("Crash detected in image: %s", imgKey)
 
-			// Step 3: Send to SNS (Base64 or URL)
+			// Step 3: Send to SNS
 			imgB64 := base64.StdEncoding.EncodeToString(imgBuf.Bytes())
 
 			msg := map[string]string{
@@ -101,7 +101,7 @@ func handler(ctx context.Context, s3Event events.S3Event) error {
 		}
 	}
 
-	// Step 4: Delete all images except the crash image
+	// Step 4: Delete all non-crash images
 	if crashDetected {
 		log.Printf("Cleaning up all non-crash frames...")
 		for _, record := range s3Event.Records {
@@ -124,8 +124,12 @@ func handler(ctx context.Context, s3Event events.S3Event) error {
 }
 
 func stringToFloat(s string) float64 {
-	f, _ := fmt.Sscanf(s, "%f", new(float64))
-	return *new(float64)
+	f, err := strconv.ParseFloat(s, 64)
+	if err != nil {
+		log.Printf("Failed to convert MIN_CONFIDENCE to float: %v", err)
+		return 80.0
+	}
+	return f
 }
 
 func main() {

@@ -187,3 +187,47 @@ terraform.tfstate.backup
 
 # Ignore SSH private keys
 *.pem
+
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Output of go build
+/main
+/bootstrap
+
+# Test binary
+*.test
+
+# Local IDE/editor settings
+.vscode/
+.idea/
+*.swp
+
+# Go build cache
+/tmp/
+*.tmp
+
+# Dependency directories (if using vendoring)
+vendor/
+
+# Log files
+*.log
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Go module files (optional)
+# Uncomment if you don’t want to commit these
+# go.sum
+
+# Lambda zip packages
+*.zip
+# AWS SAM build artifacts
+.aws-sam/   
