@@ -5,7 +5,18 @@ echo "[Setup] Updating packages..."
 sudo apt-get update && sudo apt-get upgrade -y
 
 echo "[Setup] Installing basic tools..."
-sudo apt-get install -y gnupg software-properties-common curl unzip postgresql-client python3-pip
+sudo apt-get install -y gnupg software-properties-common curl unzip postgresql-client python3-pip jq
+
+echo "[Setup] Installing latest Go..."
+LATEST_GO_VERSION=$(curl -s https://go.dev/dl/?mode=json | jq -r '.[0].version')
+GO_TARBALL=${LATEST_GO_VERSION}.linux-amd64.tar.gz
+curl -OL "https://go.dev/dl/${GO_TARBALL}"
+sudo rm -rf /usr/local/go
+sudo tar -C /usr/local -xzf "${GO_TARBALL}"
+echo "export PATH=\$PATH:/usr/local/go/bin" >> ~/.bashrc
+export PATH=$PATH:/usr/local/go/bin
+go version
+rm "${GO_TARBALL}"
 
 echo "[Setup] Installing Terraform..."
 sudo install -o root -g root -m 0755 -d /etc/apt/keyrings
