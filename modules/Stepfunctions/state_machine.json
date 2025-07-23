@@ -1,5 +1,5 @@
 {
-  "Comment": "Video → frames pipeline: Step Function triggers Lambda to split and dump",
+  "Comment": "Video → frames pipeline: Step Function triggers Lambda to split and dump, then Rekognition",
   "Version": "1.0",
   "StartAt": "ProcessVideo",
   "States": {
@@ -22,6 +22,16 @@
             }
           ]
         }
+      },
+      "OutputPath": "$.Payload",
+      "Next": "DetectCrash"
+    },
+    "DetectCrash": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:DetectCrashLambda",
+        "Payload.$": "$"
       },
       "OutputPath": "$.Payload",
       "End": true
