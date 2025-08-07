@@ -1,25 +1,21 @@
 {
   "name": "Ubuntu DevOps",
-  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",  // Use Jammy for stability: ":ubuntu-22.04"
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
 
   "features": {
-    // ✅ Required for DevOps work
-    // Optional, but useful for cross-platform scripting
     "ghcr.io/devcontainers/features/aws-cli": "latest",
-    // AWS CLI for cloud management
-    "ghcr.io/devcontainers/features/azure-cli": "latest"  // Azure CLI for cloud management
+    "ghcr.io/devcontainers/features/azure-cli": "latest"
   },
 
-  // ✅ Automatically run these after attach
-  "postAttachCommand": {
-    "git-safe-directory": "git config --global --add safe.directory ${containerWorkspaceFolder}",
-    "ansible_cfg_permissions": "sudo chmod o-w ${containerWorkspaceFolder}"
-  },
+  "remoteUser": "root",
 
-  // ✅ Set up Python, Ansible, Terraform helpers
-  "postCreateCommand": ".devcontainer/setup.sh",  
+  "postCreateCommand": ".devcontainer/setup.sh",
 
-  // ✅ VSCode extensions tailored for DevOps
+  "postAttachCommand": [
+    "git config --global --add safe.directory ${containerWorkspaceFolder}",
+    "chmod o-w ${containerWorkspaceFolder}"
+  ],
+
   "customizations": {
     "vscode": {
       "extensions": [
@@ -27,9 +23,9 @@
         "GitHub.vscode-pull-request-github",
         "redhat.ansible",
         "hashicorp.terraform",
-        "ms-toolsai.jupyter",
-        "eamodio.gitlens"
-    ]
+        "eamodio.gitlens",
+        "AmazonWebServices.aws-toolkit-vscode"  // ✅ Amazon Q extension
+      ]
     }
   }
 }
