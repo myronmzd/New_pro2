@@ -9,13 +9,11 @@
 
   "remoteUser": "root",
 
-  "postCreateCommand": "bash .devcontainer/setup.sh",
+  "postAttachCommand": "git config --global --add safe.directory ${containerWorkspaceFolder} && sudo chmod o-w ${containerWorkspaceFolder}",
 
-  "postAttachCommand": [
-    "git config --global --add safe.directory ${containerWorkspaceFolder}",
-    "chmod o-w ${containerWorkspaceFolder}"
-  ],
+  "postCreateCommand": "/bin/bash /workspaces/New_pro3/.devcontainer/setup.sh",
 
+  
   "customizations": {
     "vscode": {
       "extensions": [
