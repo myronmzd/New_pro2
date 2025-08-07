@@ -1,6 +1,6 @@
 # 🎥 AWS Offline Video Analysis Pipeline
 
-This project enables users to **upload video files to S3**, automatically trigger **Amazon Rekognition** for label detection, and receive an email notification with results and a thumbnail via **SES**.
+This project enables users to **upload video files to S3**, automatically trigger **YOLOv8 on Fargate** for crash/crime detection, and receive an email notification with results and a thumbnail via **SES**.
 
 ---
 
@@ -18,18 +18,14 @@ This project enables users to **upload video files to S3**, automatically trigge
    - Filters for new video uploads and triggers an AWS Step Functions State Machine.
 
 4. **Step Functions Orchestration**
-   - **a. Lambda: Video Splitter**
-     - Splits the video into images (frames) and stores them in a dump S3 bucket.
-   - **b. Rekognition Label Detection**
-     - Runs label detection on the video.
-   - **c. Rekognition Content Moderation**
-     - Checks for car crash or crime using custom labels.
-   - **d. Lambda: Thumbnail Generator**
-     - Uses FFmpeg to generate a thumbnail from the first detection hit.
-   - **e. Save Results**
-     - Stores detection results and thumbnail in S3.
-   - **f. Lambda: Email Notification**
+   - **a. Fargate Task (Python + YOLOv8)**
+     - Loads video from S3 and detects crash/crime events.
+     - Generates thumbnail and JSON results.
+     - Uploads processed data to S3 (processed/).
+   - **b. Lambda: Email Notification**
      - Sends an email with the summary and thumbnail via SES.
+   - **c. SNS Topic**
+     - Publishes alert/summary message.
 
 5. **Recipient Inbox**
    - Receives an email with a summary, timestamp, and inline thumbnail.
@@ -39,42 +35,54 @@ This project enables users to **upload video files to S3**, automatically trigge
 ### Diagram
 
 ```text
-        ┌───────────────┐
-        │    User       │
-        │ Uploads Video │
-        └──────┬────────┘
-               │
-               ▼
-┌─────────────────────────────┐
-│      S3 Bucket (raw/)       │
-│  - Stores uploaded videos   │
-│  - Triggers EventBridge     │
-└──────┬──────────────────────┘
+┌───────────────┐
+│    User       │
+│ Uploads Video │
+└──────┬────────┘
        │
        ▼
-┌─────────────────────────────┐
-│   EventBridge Rule          │
-│  - Filters video uploads    │
-│  - Triggers Step Functions  │
-└──────┬──────────────────────┘
+┌──────────────────────────────┐
+│ S3 Bucket (raw/)             │
+│ - Stores uploaded videos     │
+│ - Triggers EventBridge       │
+└──────┬───────────────────────┘
+       │
+       ▼
+┌──────────────────────────────┐
+│ EventBridge Rule             │
+│ - Filters object create      │
+│ - Triggers Step Functions    │
+└──────┬───────────────────────┘
        │
        ▼
 ┌────────────────────────────────────────────┐
-│ Step Functions State Machine               │
-│ 1. Video Processing & Analysis             │
-│    - Rekognition label detection           │
-│    - Content moderation                    │
-│    - Thumbnail generation                  │
-│    - Save results to S3                    │
-│ 2. Email Notification via SES             │
+│ Step Functions                             │
+│                                            │
+│  ┌──────────────────────────────────────┐  │
+│  │ Fargate Task (Python + YOLOv8)       │  │
+│  │ - Loads video from S3                │  │
+│  │ - Detects crash/crime events         │  │
+│  │ - Generates thumbnail + JSON         │  │
+│  │ - Uploads to S3 (processed/)         │  │
+│  └──────────────────────────────────────┘  │
+│                                            │
+│  ┌──────────────────────────────────────┐  │
+│  │ Lambda Function (Python)            │  │
+│  │ - Sends Email via SES               │  │
+│  └──────────────────────────────────────┘  │
+│                                            │
+│  ┌──────────────────────────────────────┐  │
+│  │ SNS Topic                            │  │
+│  │ - Publishes alert/summary message    │  │
+│  └──────────────────────────────────────┘  │
 └────────────────────────────────────────────┘
 ```
 
 ## 🚀 Features
 
 - Upload video files to S3 (`.mp4`, `.mkv`)
-- Automatic label and moderation detection using Amazon Rekognition
-- Thumbnail generation using Lambda (FFmpeg)
+- Crash/crime detection using YOLOv8 on Fargate
+- Thumbnail generation using Fargate task
 - Results and thumbnail saved to S3
 - Email notification with summary and thumbnail via SES
 
@@ -82,9 +90,9 @@ This project enables users to **upload video files to S3**, automatically trigge
 
 ## 🛠️ Requirements
 
-- AWS Account with S3, Rekognition, SES, Lambda, Step Functions permissions
-- Python 3.11 for Lambda functions
-- FFmpeg for thumbnail generation
+- AWS Account with S3, Fargate, SES, Lambda, Step Functions, SNS permissions
+- Python 3.11 for Lambda functions and Fargate tasks
+- YOLOv8 for video analysis
 
 ---
 

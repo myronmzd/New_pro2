@@ -11,7 +11,7 @@
 
   "postAttachCommand": "git config --global --add safe.directory ${containerWorkspaceFolder} && sudo chmod o-w ${containerWorkspaceFolder}",
 
-  "postCreateCommand": "/bin/bash /workspaces/New_pro3/.devcontainer/setup.sh",
+  "postCreateCommand": "/bin/bash /workspaces/New_pro2/.devcontainer/setup.sh",
 
   
   "customizations": {

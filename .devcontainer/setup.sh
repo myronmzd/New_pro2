@@ -43,4 +43,4 @@ sudo apt-get clean
 sudo rm -rf /var/lib/apt/lists/* /var/tmp/*
 
 echo "[Setup] Setting correct permissions..."
-sudo chown -R vscode:vscode /workspaces/New_pro3
+sudo chown -R vscode:vscode /workspaces/New_pro2
