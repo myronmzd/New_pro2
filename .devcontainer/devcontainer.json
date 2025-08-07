@@ -9,7 +9,7 @@
 
   "remoteUser": "root",
 
-  "postCreateCommand": ".devcontainer/setup.sh",
+  "postCreateCommand": "bash .devcontainer/setup.sh",
 
   "postAttachCommand": [
     "git config --global --add safe.directory ${containerWorkspaceFolder}",
