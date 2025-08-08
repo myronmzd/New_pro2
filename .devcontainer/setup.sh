@@ -14,6 +14,10 @@ sudo apt install -y \
   wget \
   jq \
   python3-pip \
+  docker.io \
+  docker-compose \
+  git \
+  build-essential \
 
 
 echo "[Setup] Installing Terraform..."
