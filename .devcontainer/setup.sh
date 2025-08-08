@@ -14,7 +14,7 @@ sudo apt install -y \
   wget \
   jq \
   python3-pip \
-  postgresql-client
+
 
 echo "[Setup] Installing Terraform..."
 sudo install -o root -g root -m 0755 -d /etc/apt/keyrings
@@ -29,14 +29,7 @@ terraform -version
 
 echo "[Setup] Installing Python packages..."
 pip3 install --upgrade pip
-pip3 install ansible python-hcl2 psycopg2-binary
-
-echo "[Setup] Installing latest Go..."
-GO_VERSION=1.22.0
-wget https://golang.org/dl/go${GO_VERSION}.linux-amd64.tar.gz
-sudo tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
-echo "export PATH=\$PATH:/usr/local/go/bin" >> ~/.bashrc
-rm go${GO_VERSION}.linux-amd64.tar.gz
+pip3 install ansible python-hcl2 psycopg2-binary boto3
 
 echo "[Setup] Cleaning up..."
 sudo apt-get clean
