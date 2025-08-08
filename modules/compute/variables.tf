@@ -1,23 +1,3 @@
-variable "lambda_handler" {
-  description = "Lambda function handler"
-  type        = string
-}
-variable "funtion_names" {
-  description = "Names of the Lambda functions"
-  type        = string
-}
-
-variable "lambda_runtime" {
-  description = "Lambda runtime"
-  type        = string
-}
-
-
-variable "environment" {
-  description = "Deployment environment"
-  type        = string
-}
-
 variable "project_name" {
   description = "Project name"
   type        = string
@@ -33,7 +13,6 @@ variable "s3_bucket_dump" {
   type        = string
   default     = ""
 }
-
 variable "s3_bucket_raw" {
   description = "S3 bucket name"
   type        = string
@@ -45,11 +24,9 @@ variable "stepfunction_arn" {
   type        = string
   default     = ""
 }
-
 variable "default_tags" {
-  description = "Default tags for resources"
-  type        = map(string)
-  default     = {}
+  description = "value"
+  type = string
 }
 
 variable "input_bucket_arn" {
@@ -61,25 +38,12 @@ variable "output_bucket_arn" {
   description = "ARN of the output (dump) bucket for frames"
   type        = string
 }
-
-variable "rekognition_model_arn" {
-  description = "ARN of the Rekognition Custom Label model"
+variable "lambda_function_name" {
   type        = string
-}
-variable "sns_arn" {
-  description = "ARN of the SNS topic for notifications"
+}   
+variable "function_invoke_arns" {
+  description = ""
   type        = string
-  default     = ""
-}
-
-variable "vpc_id" {
-  description = "VPC ID for Fargate tasks"
-  type        = string
-}
-
-variable "subnet_ids" {
-  description = "Subnet IDs for Fargate tasks"
-  type        = list(string)
 }
 
 variable "ecr_repository_url" {

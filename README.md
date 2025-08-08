@@ -104,6 +104,60 @@ This project enables users to **upload video files to S3**, automatically trigge
 
 ---
 
+## Terraform
+
+   # 1. Initialize the working directory
+   terraform init
+
+   # 2. Validate configuration syntax
+   terraform validate
+
+   # 3. Show what Terraform will do (plan the changes)
+   terraform plan
+
+   # 4. Save plan to a file (optional)
+   terraform plan -out=tfplan
+
+   # 5. Apply the planned changes
+   terraform apply
+
+   # 6. Apply changes automatically without approval prompt
+   terraform apply -auto-approve
+
+   # 7. Apply from a saved plan
+   terraform apply tfplan
+
+   # 8. Destroy all resources managed by Terraform
+   terraform destroy
+
+   # 9. Destroy with auto-approve
+   terraform destroy -auto-approve
+
+   # 10. Format Terraform code (HCL)
+   terraform fmt
+
+   # 11. Show Terraform state
+   terraform show
+
+   # 12. List the current workspace
+   terraform workspace show
+
+   # 13. Create a new workspace
+   terraform workspace new dev
+
+   # 14. Switch workspace
+   terraform workspace select dev
+
+   # 15. List all workspaces
+   terraform workspace list
+
+   # 16. Output values defined in the configuration
+   terraform output
+
+   # 17. Output value for a specific key
+   terraform output <key>
+
+
 ## 📄 License
 
 MIT License - See LICENSE file for details.

@@ -1,40 +1,80 @@
 {
-  "Comment": "Video → frames pipeline: Step Function triggers Lambda to split and dump, then Rekognition",
-  "Version": "1.0",
-  "StartAt": "ProcessVideo",
+  "Comment": "Video Analysis Workflow",
+  "StartAt": "Run Fargate Task",
   "States": {
-    "ProcessVideo": {
+    "Run Fargate Task": {
       "Type": "Task",
-      "Resource": "arn:aws:states:::lambda:invoke",
+      "Resource": "arn:aws:states:::ecs:runTask.sync",
       "Parameters": {
-        "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:CarCrashApp",
-        "Payload": {
-          "Records": [
+        "LaunchType": "FARGATE",
+        "Cluster": "your-ecs-cluster-name",
+        "TaskDefinition": "your-task-definition-name",
+        "NetworkConfiguration": {
+          "awsvpcConfiguration": {
+            "Subnets": [
+              "subnet-xxxxxxxx"
+            ],
+            "SecurityGroups": [
+              "sg-xxxxxxxx"
+            ],
+            "AssignPublicIp": "ENABLED"
+          }
+        },
+        "Overrides": {
+          "ContainerOverrides": [
             {
-              "s3": {
-                "bucket": {
-                  "name.$": "$.bucket"
+              "Name": "your-container-name",
+              "Environment": [
+                {
+                  "Name": "INPUT_S3_BUCKET",
+                  "Value.$": "$.input_bucket"
                 },
-                "object": {
-                  "key.$": "$.key"
+                {
+                  "Name": "INPUT_S3_KEY",
+                  "Value.$": "$.input_key"
                 }
-              }
+              ]
             }
           ]
         }
       },
-      "OutputPath": "$.Payload",
-      "Next": "DetectCrash"
+      "Next": "Send Email via Lambda",
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "ResultPath": "$.error",
+          "Next": "Fail State"
+        }
+      ]
     },
-    "DetectCrash": {
+    "Send Email via Lambda": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
-        "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:DetectCrashLambda",
-        "Payload.$": "$"
+        "FunctionName": "arn:aws:lambda:region:account-id:function:your-ses-lambda",
+        "Payload": {
+          "video_key.$": "$.input_key",
+          "bucket.$": "$.input_bucket",
+          "details.$": "$"
+        }
       },
-      "OutputPath": "$.Payload",
+      "Next": "Publish SNS"
+    },
+    "Publish SNS": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "TopicArn": "arn:aws:sns:region:account-id:your-topic-name",
+        "Message.$": "$"
+      },
       "End": true
+    },
+    "Fail State": {
+      "Type": "Fail",
+      "Error": "FargateTaskFailed",
+      "Cause": "Error running ECS Fargate Task"
     }
   }
 }

@@ -48,16 +48,6 @@ resource "aws_iam_policy" "lambda_exec_policy" {
         ]
       },
       {
-        Sid    = "RekognitionAccess"
-        Effect = "Allow"
-        Action = [
-          "rekognition:DetectCustomLabels"
-        ]
-        Resource = [
-          var.rekognition_model_arn
-        ]
-      },
-      {
         Sid    = "CloudWatchLogs"
         Effect = "Allow"
         Action = [
@@ -105,12 +95,7 @@ resource "archive_file" "app1" {
   output_path = "modules/lambda/app1.zip"
   output_file_mode = "0644"
 }
-resource "archive_file" "app2" {
-  type        = "zip"
-  source_file = "/workspaces/New_pro2/app2.go"
-  output_path = "modules/lambda/app2.zip"
-  output_file_mode = "0644"
-}
+
 
 resource "aws_lambda_function" "function1" {
   
@@ -127,36 +112,6 @@ resource "aws_lambda_function" "function1" {
     S3_BUCKET_R     = var.s3_bucket_raw
     S3_BUCKET_D     = var.s3_bucket_dump
     STEP_FUNCTION_ARN = var.stepfunction_arn
-    SNS_TOPIC_ARN   = var.sns_arn
-    FRAME_RATE      = "1"
-    MIN_CONFIDENCE  = "80"
-  }
-  }
-  tags = merge(
-  var.default_tags,
-  local.common_tags,
-  {
-    Environment = var.environment
-    Project     = var.project_name
-  }
-  )
-}
-
-
-resource "aws_lambda_function" "function2" {
-
-  // This lambda funtion take the those image in the bucket and run them to aws rekognition and dectects car crash so the se that image to sns and then delete the other images
-  function_name = var.project_name  
-  handler       = var.lambda_handler 
-  role          = aws_iam_role.lambda_exec.arn
-  runtime       = var.lambda_runtime 
-  filename = "${path.module}/app1.zip"
-
-  environment {
-  variables = {
-    S3_BUCKET_D     = var.s3_bucket_dump
-    STEP_FUNCTION_ARN = var.stepfunction_arn
-    MODEL_ARN       = var.rekognition_model_arn
     SNS_TOPIC_ARN   = var.sns_arn
     FRAME_RATE      = "1"
     MIN_CONFIDENCE  = "80"

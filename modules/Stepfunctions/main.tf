@@ -51,11 +51,24 @@ data "aws_iam_policy_document" "sfn_policy" {
   }
 
   statement {
-    sid     = "AllowRekognition"
-    actions = ["rekognition:DetectCustomLabels"]
-    resources = ["arn:aws:rekognition:ap-south-1:236024603923:project/Car_crash/version/Car_crash.2025-07-04T09.57.05/1751603227476"]
+    sid     = "AllowFargateRunOnly"
+    actions = [
+      "ecs:RunTask",
+      "ecs:DescribeTasks"
+    ]
+    resources = [
+      "arn:aws:ecs:ap-south-1:${data.aws_caller_identity.current.account_id}:task-definition/your-task-definition-name:*"
+    ]
   }
 
+  statement {
+    sid     = "AllowPassExecutionRole"
+    actions = ["iam:PassRole"]
+    resources = [
+      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/your-ecsTaskExecutionRole"
+    ]
+  }
+  
   statement {
     sid     = "AllowCloudWatchLogDelivery"
     actions = [
@@ -86,10 +99,10 @@ data "aws_iam_policy_document" "sfn_policy" {
   statement {
     sid     = "AllowS3Access"
     actions = [
-      "s3:GetObject",
-      "s3:PutObject",
-      "s3:DeleteObject",
-      "s3:ListBucket"
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject",
+        "s3:ListBucket"
     ]
     resources = [
   var.s3bucket_raw_arn,
@@ -126,6 +139,7 @@ resource "aws_sfn_state_machine" "video_crash_detection" {
     level                  = "ALL"
     log_destination        = "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:${aws_cloudwatch_log_group.sfn_logs.name}:*"
   }
+  
   tags = local.common_tags
   depends_on = [aws_iam_role_policy.sfn_policy]
 }

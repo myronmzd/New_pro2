@@ -62,10 +62,6 @@ variable "output_bucket_arn" {
   type        = string
 }
 
-variable "rekognition_model_arn" {
-  description = "ARN of the Rekognition Custom Label model"
-  type        = string
-}
 variable "sns_arn" {
   description = "ARN of the SNS topic for notifications"
   type        = string
