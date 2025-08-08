@@ -9,7 +9,6 @@ import numpy as np
 class VideoProcessor:
     def __init__(self):
         self.s3 = boto3.client('s3')
-        self.rekognition = boto3.client('rekognition')
         self.input_bucket = os.environ['INPUT_BUCKET']
         self.output_bucket = os.environ['OUTPUT_BUCKET']
         self.model = YOLO('yolov8n.pt')  # Load YOLOv8 model
@@ -24,11 +23,11 @@ class VideoProcessor:
         results = []
         frame_count = 0
         
-        while cap.read()[0]:
+        while True:
             ret, frame = cap.read()
             if not ret:
                 break
-                
+            
             # Run YOLO detection
             detections = self.model(frame)
             
