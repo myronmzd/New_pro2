@@ -1,0 +1,931 @@
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+ <= read (data resources)
+
+Terraform will perform the following actions:
+
+  # module.compute.aws_cloudwatch_log_group.fargate_logs will be created
+  + resource "aws_cloudwatch_log_group" "fargate_logs" {
+      + arn               = (known after apply)
+      + id                = (known after apply)
+      + log_group_class   = (known after apply)
+      + name              = "/ecs/CarCrashApp-video-processor"
+      + name_prefix       = (known after apply)
+      + retention_in_days = 7
+      + skip_destroy      = false
+      + tags_all          = (known after apply)
+    }
+
+  # module.compute.aws_ecs_cluster.video_processing will be created
+  + resource "aws_ecs_cluster" "video_processing" {
+      + arn      = (known after apply)
+      + id       = (known after apply)
+      + name     = "CarCrashApp-video-processing"
+      + tags     = {
+          + "Application" = "video-crash-detector"
+          + "Environment" = "Dev"
+          + "Owner"       = "bob"
+          + "Project"     = "CarCrashApp"
+        }
+      + tags_all = {
+          + "Application" = "video-crash-detector"
+          + "Environment" = "Dev"
+          + "Owner"       = "bob"
+          + "Project"     = "CarCrashApp"
+        }
+
+      + setting (known after apply)
+    }
+
+  # module.compute.aws_ecs_task_definition.video_processor will be created
+  + resource "aws_ecs_task_definition" "video_processor" {
+      + arn                      = (known after apply)
+      + arn_without_revision     = (known after apply)
+      + container_definitions    = (known after apply)
+      + cpu                      = "2048"
+      + enable_fault_injection   = (known after apply)
+      + execution_role_arn       = (known after apply)
+      + family                   = "CarCrashApp-video-processor"
+      + id                       = (known after apply)
+      + memory                   = "4096"
+      + network_mode             = "awsvpc"
+      + requires_compatibilities = [
+          + "FARGATE",
+        ]
+      + revision                 = (known after apply)
+      + skip_destroy             = false
+      + tags_all                 = (known after apply)
+      + task_role_arn            = (known after apply)
+      + track_latest             = false
+    }
+
+  # module.compute.aws_iam_role.fargate_execution_role will be created
+  + resource "aws_iam_role" "fargate_execution_role" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action    = "sts:AssumeRole"
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + Service = "ecs-tasks.amazonaws.com"
+                        }
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + create_date           = (known after apply)
+      + force_detach_policies = false
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = "CarCrashApp-fargate-execution-role"
+      + name_prefix           = (known after apply)
+      + path                  = "/"
+      + tags_all              = (known after apply)
+      + unique_id             = (known after apply)
+
+      + inline_policy (known after apply)
+    }
+
+  # module.compute.aws_iam_role.fargate_task_role will be created
+  + resource "aws_iam_role" "fargate_task_role" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action    = "sts:AssumeRole"
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + Service = "ecs-tasks.amazonaws.com"
+                        }
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + create_date           = (known after apply)
+      + force_detach_policies = false
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = "CarCrashApp-fargate-task-role"
+      + name_prefix           = (known after apply)
+      + path                  = "/"
+      + tags_all              = (known after apply)
+      + unique_id             = (known after apply)
+
+      + inline_policy (known after apply)
+    }
+
+  # module.compute.aws_iam_role_policy.fargate_task_policy will be created
+  + resource "aws_iam_role_policy" "fargate_task_policy" {
+      + id          = (known after apply)
+      + name        = "CarCrashApp-fargate-task-policy"
+      + name_prefix = (known after apply)
+      + policy      = (known after apply)
+      + role        = (known after apply)
+    }
+
+  # module.compute.aws_iam_role_policy_attachment.fargate_execution_role_policy will be created
+  + resource "aws_iam_role_policy_attachment" "fargate_execution_role_policy" {
+      + id         = (known after apply)
+      + policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+      + role       = "CarCrashApp-fargate-execution-role"
+    }
+
+  # module.events_sns.aws_cloudwatch_event_rule.s3_object_created will be created
+  + resource "aws_cloudwatch_event_rule" "s3_object_created" {
+      + arn            = (known after apply)
+      + description    = "Capture S3 object creation events"
+      + event_bus_name = "default"
+      + event_pattern  = (known after apply)
+      + force_destroy  = false
+      + id             = (known after apply)
+      + name           = "s3-object-created"
+      + name_prefix    = (known after apply)
+      + tags_all       = (known after apply)
+    }
+
+  # module.events_sns.aws_cloudwatch_event_target.stepfunction will be created
+  + resource "aws_cloudwatch_event_target" "stepfunction" {
+      + arn            = (known after apply)
+      + event_bus_name = "default"
+      + force_destroy  = false
+      + id             = (known after apply)
+      + role_arn       = (known after apply)
+      + rule           = "s3-object-created"
+      + target_id      = (known after apply)
+
+      + input_transformer {
+          + input_paths    = {
+              + "bucket" = "$.detail.bucket.name"
+              + "key"    = "$.detail.object.key"
+            }
+          + input_template = jsonencode(
+                {
+                  + bucket = "<bucket>"
+                  + key    = "<key>"
+                }
+            )
+        }
+    }
+
+  # module.events_sns.aws_iam_role.events will be created
+  + resource "aws_iam_role" "events" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action    = "sts:AssumeRole"
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + Service = "events.amazonaws.com"
+                        }
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + create_date           = (known after apply)
+      + force_detach_policies = false
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = "events_invoke_stepfunctions"
+      + name_prefix           = (known after apply)
+      + path                  = "/"
+      + tags                  = {
+          + "Application" = "video-crash-detector"
+          + "Owner"       = "bob"
+        }
+      + tags_all              = {
+          + "Application" = "video-crash-detector"
+          + "Owner"       = "bob"
+        }
+      + unique_id             = (known after apply)
+
+      + inline_policy (known after apply)
+    }
+
+  # module.events_sns.aws_iam_role_policy.allow_step_function will be created
+  + resource "aws_iam_role_policy" "allow_step_function" {
+      + id          = (known after apply)
+      + name        = "allow_start_execution"
+      + name_prefix = (known after apply)
+      + policy      = (known after apply)
+      + role        = (known after apply)
+    }
+
+  # module.events_sns.aws_sns_topic.file_processing_topic will be created
+  + resource "aws_sns_topic" "file_processing_topic" {
+      + arn                         = (known after apply)
+      + beginning_archive_time      = (known after apply)
+      + content_based_deduplication = false
+      + fifo_throughput_scope       = (known after apply)
+      + fifo_topic                  = false
+      + id                          = (known after apply)
+      + name                        = "file-processing-topic"
+      + name_prefix                 = (known after apply)
+      + owner                       = (known after apply)
+      + policy                      = (known after apply)
+      + signature_version           = (known after apply)
+      + tags                        = {
+          + "Application" = "video-crash-detector"
+          + "Owner"       = "bob"
+        }
+      + tags_all                    = {
+          + "Application" = "video-crash-detector"
+          + "Owner"       = "bob"
+        }
+      + tracing_config              = (known after apply)
+    }
+
+  # module.events_sns.aws_sns_topic_subscription.email_subscription will be created
+  + resource "aws_sns_topic_subscription" "email_subscription" {
+      + arn                             = (known after apply)
+      + confirmation_timeout_in_minutes = 1
+      + confirmation_was_authenticated  = (known after apply)
+      + endpoint                        = "myronmzd22@gmail.com"
+      + endpoint_auto_confirms          = false
+      + filter_policy_scope             = (known after apply)
+      + id                              = (known after apply)
+      + owner_id                        = (known after apply)
+      + pending_confirmation            = (known after apply)
+      + protocol                        = "email"
+      + raw_message_delivery            = false
+      + topic_arn                       = (known after apply)
+    }
+
+  # module.lambda.archive_file.app1 will be created
+  + resource "archive_file" "app1" {
+      + id                  = (known after apply)
+      + output_base64sha256 = (known after apply)
+      + output_base64sha512 = (known after apply)
+      + output_file_mode    = "0644"
+      + output_md5          = (known after apply)
+      + output_path         = "modules/lambda/app1.zip"
+      + output_sha          = (known after apply)
+      + output_sha256       = (known after apply)
+      + output_sha512       = (known after apply)
+      + output_size         = (known after apply)
+      + source_file         = "/workspaces/New_pro2/app1.go"
+      + type                = "zip"
+    }
+
+  # module.lambda.aws_iam_policy.lambda_exec_policy will be created
+  + resource "aws_iam_policy" "lambda_exec_policy" {
+      + arn              = (known after apply)
+      + attachment_count = (known after apply)
+      + id               = (known after apply)
+      + name             = "lambda_exec_policy"
+      + name_prefix      = (known after apply)
+      + path             = "/"
+      + policy           = (known after apply)
+      + policy_id        = (known after apply)
+      + tags             = {
+          + "Application" = "video-crash-detector"
+          + "Owner"       = "bob"
+        }
+      + tags_all         = {
+          + "Application" = "video-crash-detector"
+          + "Owner"       = "bob"
+        }
+    }
+
+  # module.lambda.aws_iam_role.lambda_exec will be created
+  + resource "aws_iam_role" "lambda_exec" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action    = "sts:AssumeRole"
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + Service = "lambda.amazonaws.com"
+                        }
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + create_date           = (known after apply)
+      + force_detach_policies = false
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = "lambda_exec_role"
+      + name_prefix           = (known after apply)
+      + path                  = "/"
+      + tags                  = {
+          + "Application" = "video-crash-detector"
+          + "Owner"       = "bob"
+        }
+      + tags_all              = {
+          + "Application" = "video-crash-detector"
+          + "Owner"       = "bob"
+        }
+      + unique_id             = (known after apply)
+
+      + inline_policy (known after apply)
+    }
+
+  # module.lambda.aws_iam_role_policy_attachment.lambda_policy_attachment will be created
+  + resource "aws_iam_role_policy_attachment" "lambda_policy_attachment" {
+      + id         = (known after apply)
+      + policy_arn = (known after apply)
+      + role       = "lambda_exec_role"
+    }
+
+  # module.lambda.aws_lambda_function.function1 will be created
+  + resource "aws_lambda_function" "function1" {
+      + architectures                  = (known after apply)
+      + arn                            = (known after apply)
+      + code_sha256                    = (known after apply)
+      + filename                       = "modules/lambda/app1.zip"
+      + function_name                  = "CarCrashApp"
+      + handler                        = "app1.handler"
+      + id                             = (known after apply)
+      + invoke_arn                     = (known after apply)
+      + last_modified                  = (known after apply)
+      + memory_size                    = 128
+      + package_type                   = "Zip"
+      + publish                        = false
+      + qualified_arn                  = (known after apply)
+      + qualified_invoke_arn           = (known after apply)
+      + reserved_concurrent_executions = -1
+      + role                           = (known after apply)
+      + runtime                        = "go1.x"
+      + signing_job_arn                = (known after apply)
+      + signing_profile_version_arn    = (known after apply)
+      + skip_destroy                   = false
+      + source_code_hash               = (known after apply)
+      + source_code_size               = (known after apply)
+      + tags                           = {
+          + "Application" = "video-crash-detector"
+          + "Environment" = "Production"
+          + "Owner"       = "bob"
+          + "Project"     = "CarCrashApp"
+        }
+      + tags_all                       = {
+          + "Application" = "video-crash-detector"
+          + "Environment" = "Production"
+          + "Owner"       = "bob"
+          + "Project"     = "CarCrashApp"
+        }
+      + timeout                        = 3
+      + version                        = (known after apply)
+
+      + environment {
+          + variables = (known after apply)
+        }
+
+      + ephemeral_storage (known after apply)
+
+      + logging_config (known after apply)
+
+      + tracing_config (known after apply)
+    }
+
+  # module.s3.aws_iam_policy.s3_dump_policy will be created
+  + resource "aws_iam_policy" "s3_dump_policy" {
+      + arn              = (known after apply)
+      + attachment_count = (known after apply)
+      + description      = "Policy for accessing dump S3 bucket"
+      + id               = (known after apply)
+      + name             = "s3_dump_policy"
+      + name_prefix      = (known after apply)
+      + path             = "/"
+      + policy           = (known after apply)
+      + policy_id        = (known after apply)
+      + tags             = {
+          + "Application" = "video-crash-detector"
+          + "Owner"       = "bob"
+        }
+      + tags_all         = {
+          + "Application" = "video-crash-detector"
+          + "Owner"       = "bob"
+        }
+    }
+
+  # module.s3.aws_iam_policy.s3_raw_policy will be created
+  + resource "aws_iam_policy" "s3_raw_policy" {
+      + arn              = (known after apply)
+      + attachment_count = (known after apply)
+      + description      = "Policy for accessing raw S3 bucket"
+      + id               = (known after apply)
+      + name             = "s3_raw_policy"
+      + name_prefix      = (known after apply)
+      + path             = "/"
+      + policy           = (known after apply)
+      + policy_id        = (known after apply)
+      + tags             = {
+          + "Application" = "video-crash-detector"
+          + "Owner"       = "bob"
+        }
+      + tags_all         = {
+          + "Application" = "video-crash-detector"
+          + "Owner"       = "bob"
+        }
+    }
+
+  # module.s3.aws_iam_role.s3_dump_role will be created
+  + resource "aws_iam_role" "s3_dump_role" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action    = "sts:AssumeRole"
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + Service = [
+                              + "lambda.amazonaws.com",
+                              + "states.amazonaws.com",
+                            ]
+                        }
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + create_date           = (known after apply)
+      + force_detach_policies = false
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = "s3_dump_role"
+      + name_prefix           = (known after apply)
+      + path                  = "/"
+      + tags                  = {
+          + "Application" = "video-crash-detector"
+          + "Owner"       = "bob"
+        }
+      + tags_all              = {
+          + "Application" = "video-crash-detector"
+          + "Owner"       = "bob"
+        }
+      + unique_id             = (known after apply)
+
+      + inline_policy (known after apply)
+    }
+
+  # module.s3.aws_iam_role.s3_raw_role will be created
+  + resource "aws_iam_role" "s3_raw_role" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action    = "sts:AssumeRole"
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + Service = "ec2.amazonaws.com"
+                        }
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + create_date           = (known after apply)
+      + force_detach_policies = false
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = "s3_raw_role"
+      + name_prefix           = (known after apply)
+      + path                  = "/"
+      + tags                  = {
+          + "Application" = "video-crash-detector"
+          + "Owner"       = "bob"
+        }
+      + tags_all              = {
+          + "Application" = "video-crash-detector"
+          + "Owner"       = "bob"
+        }
+      + unique_id             = (known after apply)
+
+      + inline_policy (known after apply)
+    }
+
+  # module.s3.aws_iam_role_policy_attachment.s3_dump_role_policy will be created
+  + resource "aws_iam_role_policy_attachment" "s3_dump_role_policy" {
+      + id         = (known after apply)
+      + policy_arn = (known after apply)
+      + role       = "s3_dump_role"
+    }
+
+  # module.s3.aws_iam_role_policy_attachment.s3_raw_role_policy will be created
+  + resource "aws_iam_role_policy_attachment" "s3_raw_role_policy" {
+      + id         = (known after apply)
+      + policy_arn = (known after apply)
+      + role       = "s3_raw_role"
+    }
+
+  # module.s3.aws_s3_bucket.dump_bucket will be created
+  + resource "aws_s3_bucket" "dump_bucket" {
+      + acceleration_status         = (known after apply)
+      + acl                         = (known after apply)
+      + arn                         = (known after apply)
+      + bucket                      = (known after apply)
+      + bucket_domain_name          = (known after apply)
+      + bucket_prefix               = (known after apply)
+      + bucket_regional_domain_name = (known after apply)
+      + force_destroy               = true
+      + hosted_zone_id              = (known after apply)
+      + id                          = (known after apply)
+      + object_lock_enabled         = (known after apply)
+      + policy                      = (known after apply)
+      + region                      = (known after apply)
+      + request_payer               = (known after apply)
+      + tags                        = {
+          + "Application" = "video-crash-detector"
+          + "Owner"       = "bob"
+        }
+      + tags_all                    = {
+          + "Application" = "video-crash-detector"
+          + "Owner"       = "bob"
+        }
+      + website_domain              = (known after apply)
+      + website_endpoint            = (known after apply)
+
+      + cors_rule (known after apply)
+
+      + grant (known after apply)
+
+      + lifecycle_rule (known after apply)
+
+      + logging (known after apply)
+
+      + object_lock_configuration (known after apply)
+
+      + replication_configuration (known after apply)
+
+      + server_side_encryption_configuration (known after apply)
+
+      + versioning (known after apply)
+
+      + website (known after apply)
+    }
+
+  # module.s3.aws_s3_bucket.raw will be created
+  + resource "aws_s3_bucket" "raw" {
+      + acceleration_status         = (known after apply)
+      + acl                         = (known after apply)
+      + arn                         = (known after apply)
+      + bucket                      = (known after apply)
+      + bucket_domain_name          = (known after apply)
+      + bucket_prefix               = (known after apply)
+      + bucket_regional_domain_name = (known after apply)
+      + force_destroy               = true
+      + hosted_zone_id              = (known after apply)
+      + id                          = (known after apply)
+      + object_lock_enabled         = (known after apply)
+      + policy                      = (known after apply)
+      + region                      = (known after apply)
+      + request_payer               = (known after apply)
+      + tags                        = {
+          + "Application" = "video-crash-detector"
+          + "Owner"       = "bob"
+        }
+      + tags_all                    = {
+          + "Application" = "video-crash-detector"
+          + "Owner"       = "bob"
+        }
+      + website_domain              = (known after apply)
+      + website_endpoint            = (known after apply)
+
+      + cors_rule (known after apply)
+
+      + grant (known after apply)
+
+      + lifecycle_rule (known after apply)
+
+      + logging (known after apply)
+
+      + object_lock_configuration (known after apply)
+
+      + replication_configuration (known after apply)
+
+      + server_side_encryption_configuration (known after apply)
+
+      + versioning (known after apply)
+
+      + website (known after apply)
+    }
+
+  # module.s3.aws_s3_bucket_notification.raw_bucket_notification will be created
+  + resource "aws_s3_bucket_notification" "raw_bucket_notification" {
+      + bucket      = (known after apply)
+      + eventbridge = true
+      + id          = (known after apply)
+    }
+
+  # module.s3.aws_s3_bucket_public_access_block.dump will be created
+  + resource "aws_s3_bucket_public_access_block" "dump" {
+      + block_public_acls       = true
+      + block_public_policy     = true
+      + bucket                  = (known after apply)
+      + id                      = (known after apply)
+      + ignore_public_acls      = true
+      + restrict_public_buckets = true
+    }
+
+  # module.s3.aws_s3_bucket_public_access_block.raw will be created
+  + resource "aws_s3_bucket_public_access_block" "raw" {
+      + block_public_acls       = true
+      + block_public_policy     = true
+      + bucket                  = (known after apply)
+      + id                      = (known after apply)
+      + ignore_public_acls      = true
+      + restrict_public_buckets = true
+    }
+
+  # module.s3.random_string.suffix will be created
+  + resource "random_string" "suffix" {
+      + id          = (known after apply)
+      + length      = 8
+      + lower       = true
+      + min_lower   = 0
+      + min_numeric = 0
+      + min_special = 0
+      + min_upper   = 0
+      + number      = true
+      + numeric     = true
+      + result      = (known after apply)
+      + special     = false
+      + upper       = false
+    }
+
+  # module.stepfunctions.data.aws_iam_policy_document.sfn_policy will be read during apply
+  # (config refers to values not yet known)
+ <= data "aws_iam_policy_document" "sfn_policy" {
+      + id            = (known after apply)
+      + json          = (known after apply)
+      + minified_json = (known after apply)
+
+      + statement {
+          + actions   = [
+              + "lambda:InvokeAsync",
+              + "lambda:InvokeFunction",
+            ]
+          + resources = [
+              + "*",
+            ]
+          + sid       = "AllowLambdaInvoke"
+        }
+      + statement {
+          + actions   = [
+              + "ecs:DescribeTasks",
+              + "ecs:RunTask",
+            ]
+          + resources = [
+              + "arn:aws:ecs:ap-south-1:236024603923:task-definition/your-task-definition-name:*",
+            ]
+          + sid       = "AllowFargateRunOnly"
+        }
+      + statement {
+          + actions   = [
+              + "iam:PassRole",
+            ]
+          + resources = [
+              + "arn:aws:iam::236024603923:role/your-ecsTaskExecutionRole",
+            ]
+          + sid       = "AllowPassExecutionRole"
+        }
+      + statement {
+          + actions   = [
+              + "logs:CreateLogDelivery",
+              + "logs:DeleteLogDelivery",
+              + "logs:DescribeLogGroups",
+              + "logs:DescribeResourcePolicies",
+              + "logs:GetLogDelivery",
+              + "logs:GetResourcePolicy",
+              + "logs:ListLogDeliveries",
+              + "logs:PutResourcePolicy",
+              + "logs:UpdateLogDelivery",
+            ]
+          + resources = [
+              + "*",
+            ]
+          + sid       = "AllowCloudWatchLogDelivery"
+        }
+      + statement {
+          + actions   = [
+              + "logs:CreateLogGroup",
+              + "logs:CreateLogStream",
+              + "logs:PutLogEvents",
+            ]
+          + resources = [
+              + "arn:aws:logs:ap-south-1:236024603923:log-group:/aws/stepfunctions/video-crash-detection:*",
+            ]
+          + sid       = "AllowCloudWatchLogging"
+        }
+      + statement {
+          + actions   = [
+              + "s3:DeleteObject",
+              + "s3:GetObject",
+              + "s3:ListBucket",
+              + "s3:PutObject",
+            ]
+          + resources = [
+              + (known after apply),
+              + (known after apply),
+              + (known after apply),
+              + (known after apply),
+            ]
+          + sid       = "AllowS3Access"
+        }
+    }
+
+  # module.stepfunctions.aws_cloudwatch_log_group.sfn_logs will be created
+  + resource "aws_cloudwatch_log_group" "sfn_logs" {
+      + arn               = (known after apply)
+      + id                = (known after apply)
+      + log_group_class   = (known after apply)
+      + name              = "/aws/stepfunctions/video-crash-detection"
+      + name_prefix       = (known after apply)
+      + retention_in_days = 7
+      + skip_destroy      = false
+      + tags              = {
+          + "Application" = "video-crash-detector"
+          + "Owner"       = "bob"
+        }
+      + tags_all          = {
+          + "Application" = "video-crash-detector"
+          + "Owner"       = "bob"
+        }
+    }
+
+  # module.stepfunctions.aws_iam_role.sfn_exec will be created
+  + resource "aws_iam_role" "sfn_exec" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action    = "sts:AssumeRole"
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + Service = "states.amazonaws.com"
+                        }
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + create_date           = (known after apply)
+      + force_detach_policies = false
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = "stepfunctions_exec_role"
+      + name_prefix           = (known after apply)
+      + path                  = "/"
+      + tags                  = {
+          + "Application" = "video-crash-detector"
+          + "Owner"       = "bob"
+        }
+      + tags_all              = {
+          + "Application" = "video-crash-detector"
+          + "Owner"       = "bob"
+        }
+      + unique_id             = (known after apply)
+
+      + inline_policy (known after apply)
+    }
+
+  # module.stepfunctions.aws_iam_role_policy.sfn_policy will be created
+  + resource "aws_iam_role_policy" "sfn_policy" {
+      + id          = (known after apply)
+      + name        = "stepfunctions_policy"
+      + name_prefix = (known after apply)
+      + policy      = (known after apply)
+      + role        = (known after apply)
+    }
+
+  # module.stepfunctions.aws_sfn_state_machine.video_crash_detection will be created
+  + resource "aws_sfn_state_machine" "video_crash_detection" {
+      + arn                       = (known after apply)
+      + creation_date             = (known after apply)
+      + definition                = jsonencode(
+            {
+              + Comment = "Video Analysis Workflow"
+              + StartAt = "Run Fargate Task"
+              + States  = {
+                  + "Fail State"            = {
+                      + Cause = "Error running ECS Fargate Task"
+                      + Error = "FargateTaskFailed"
+                      + Type  = "Fail"
+                    }
+                  + "Publish SNS"           = {
+                      + End        = true
+                      + Parameters = {
+                          + "Message.$" = "$"
+                          + TopicArn    = "arn:aws:sns:region:account-id:your-topic-name"
+                        }
+                      + Resource   = "arn:aws:states:::sns:publish"
+                      + Type       = "Task"
+                    }
+                  + "Run Fargate Task"      = {
+                      + Catch      = [
+                          + {
+                              + ErrorEquals = [
+                                  + "States.ALL",
+                                ]
+                              + Next        = "Fail State"
+                              + ResultPath  = "$.error"
+                            },
+                        ]
+                      + Next       = "Send Email via Lambda"
+                      + Parameters = {
+                          + Cluster              = "your-ecs-cluster-name"
+                          + LaunchType           = "FARGATE"
+                          + NetworkConfiguration = {
+                              + AwsvpcConfiguration = {
+                                  + AssignPublicIp = "ENABLED"
+                                  + SecurityGroups = [
+                                      + "sg-xxxxxxxx",
+                                    ]
+                                  + Subnets        = [
+                                      + "subnet-xxxxxxxx",
+                                    ]
+                                }
+                            }
+                          + Overrides            = {
+                              + ContainerOverrides = [
+                                  + {
+                                      + Environment = [
+                                          + {
+                                              + Name      = "INPUT_S3_BUCKET"
+                                              + "Value.$" = "$.input_bucket"
+                                            },
+                                          + {
+                                              + Name      = "INPUT_S3_KEY"
+                                              + "Value.$" = "$.input_key"
+                                            },
+                                        ]
+                                      + Name        = "your-container-name"
+                                    },
+                                ]
+                            }
+                          + TaskDefinition       = "your-task-definition-name"
+                        }
+                      + Resource   = "arn:aws:states:::ecs:runTask.sync"
+                      + Type       = "Task"
+                    }
+                  + "Send Email via Lambda" = {
+                      + Next       = "Publish SNS"
+                      + Parameters = {
+                          + FunctionName = "arn:aws:lambda:region:account-id:function:your-ses-lambda"
+                          + Payload      = {
+                              + "bucket.$"    = "$.input_bucket"
+                              + "details.$"   = "$"
+                              + "video_key.$" = "$.input_key"
+                            }
+                        }
+                      + Resource   = "arn:aws:states:::lambda:invoke"
+                      + Type       = "Task"
+                    }
+                }
+            }
+        )
+      + description               = (known after apply)
+      + id                        = (known after apply)
+      + name                      = "video-crash-detection"
+      + name_prefix               = (known after apply)
+      + publish                   = false
+      + revision_id               = (known after apply)
+      + role_arn                  = (known after apply)
+      + state_machine_version_arn = (known after apply)
+      + status                    = (known after apply)
+      + tags                      = {
+          + "Application" = "video-crash-detector"
+          + "Owner"       = "bob"
+        }
+      + tags_all                  = {
+          + "Application" = "video-crash-detector"
+          + "Owner"       = "bob"
+        }
+      + type                      = "STANDARD"
+      + version_description       = (known after apply)
+
+      + encryption_configuration (known after apply)
+
+      + logging_configuration {
+          + include_execution_data = true
+          + level                  = "ALL"
+          + log_destination        = "arn:aws:logs:ap-south-1:236024603923:log-group:/aws/stepfunctions/video-crash-detection:*"
+        }
+
+      + tracing_configuration (known after apply)
+    }
+
+Plan: 34 to add, 0 to change, 0 to destroy.

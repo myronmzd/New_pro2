@@ -10,7 +10,7 @@
         "Cluster": "your-ecs-cluster-name",
         "TaskDefinition": "your-task-definition-name",
         "NetworkConfiguration": {
-          "awsvpcConfiguration": {
+          "AwsvpcConfiguration": {
             "Subnets": [
               "subnet-xxxxxxxx"
             ],

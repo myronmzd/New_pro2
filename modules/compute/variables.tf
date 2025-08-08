@@ -25,10 +25,9 @@ variable "stepfunction_arn" {
   default     = ""
 }
 variable "default_tags" {
-  description = "value"
-  type = string
+  type = map(string)
+  description = "Default tags to apply to all compute resources"
 }
-
 variable "input_bucket_arn" {
   description = "ARN of the input video S3 bucket"
   type        = string
