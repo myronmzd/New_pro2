@@ -15,17 +15,14 @@ sudo apt install -y \
   python3-pip \
   git \
   build-essential \
-  docker.io \
-  docker-compose \
-  docker-ce \
-  docker-ce-cli \
-  docker-buildx-plugin \
-  docker-compose-plugin
+
 
 echo "[Setup] Starting Docker..."
 sudo groupadd docker || true
 sudo service docker start || true
 sudo usermod -aG docker $USER
+
+sudo apt-get install -y docker.io docker-compose
 
 docker --version
 docker compose version
