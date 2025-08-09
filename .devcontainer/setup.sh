@@ -18,6 +18,22 @@ sudo apt install -y \
   docker-compose \
   git \
   build-essential \
+  docker.io \
+  docker-compose \
+  docker-ce \
+  docker-ce-cli \
+  docker-buildx-plugin \
+  docker-compose-plugin
+
+# Enable and start Docker
+sudo systemctl enable docker
+sudo systemctl start docker
+
+# Add current user to docker group (so you can run without sudo)
+sudo usermod -aG docker $USER
+
+docker --version
+docker compose version
 
 
 echo "[Setup] Installing Terraform..."
