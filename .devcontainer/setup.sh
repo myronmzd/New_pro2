@@ -5,7 +5,6 @@ echo "[Setup] Updating packages..."
 sudo apt-get update && sudo apt-get upgrade -y
 
 echo "[Setup] Installing base tools..."
-sudo apt update
 sudo apt install -y \
   gnupg \
   software-properties-common \
@@ -14,8 +13,6 @@ sudo apt install -y \
   wget \
   jq \
   python3-pip \
-  docker.io \
-  docker-compose \
   git \
   build-essential \
   docker.io \
@@ -25,16 +22,13 @@ sudo apt install -y \
   docker-buildx-plugin \
   docker-compose-plugin
 
-# Enable and start Docker
-sudo systemctl enable docker
-sudo systemctl start docker
-
-# Add current user to docker group (so you can run without sudo)
+echo "[Setup] Starting Docker..."
+sudo groupadd docker || true
+sudo service docker start || true
 sudo usermod -aG docker $USER
 
 docker --version
 docker compose version
-
 
 echo "[Setup] Installing Terraform..."
 sudo install -o root -g root -m 0755 -d /etc/apt/keyrings
