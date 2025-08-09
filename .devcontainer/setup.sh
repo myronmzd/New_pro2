@@ -14,15 +14,20 @@ sudo apt install -y \
   jq \
   python3-pip \
   git \
-  build-essential \
+  build-essential
 
+echo "[Setup] Installing Docker..."
+sudo apt-get install -y docker.io
 
-echo "[Setup] Starting Docker..."
+# Enable docker group usage
 sudo groupadd docker || true
-sudo service docker start || true
 sudo usermod -aG docker $USER
 
-sudo apt-get install -y docker.io docker-compose
+# Install Docker Compose v2 plugin
+mkdir -p ~/.docker/cli-plugins/
+curl -SL https://github.com/docker/compose/releases/download/v2.29.2/docker-compose-linux-x86_64 \
+    -o ~/.docker/cli-plugins/docker-compose
+chmod +x ~/.docker/cli-plugins/docker-compose
 
 docker --version
 docker compose version
