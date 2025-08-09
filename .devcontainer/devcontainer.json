@@ -4,7 +4,8 @@
 
   "features": {
     "ghcr.io/devcontainers/features/aws-cli": "latest",
-    "ghcr.io/devcontainers/features/azure-cli": "latest"
+    "ghcr.io/devcontainers/features/azure-cli": "latest",
+    "ghcr.io/devcontainers/features/docker-in-docker": "latest"
   },
 
   "remoteUser": "root",
@@ -13,7 +14,6 @@
 
   "postCreateCommand": "/bin/bash /workspaces/New_pro2/.devcontainer/setup.sh",
 
-  
   "customizations": {
     "vscode": {
       "extensions": [
@@ -22,7 +22,7 @@
         "redhat.ansible",
         "hashicorp.terraform",
         "eamodio.gitlens",
-        "AmazonWebServices.aws-toolkit-vscode"  // ✅ Amazon Q extension
+        "AmazonWebServices.aws-toolkit-vscode"
       ]
     }
   }
