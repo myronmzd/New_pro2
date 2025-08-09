@@ -1,8 +1,6 @@
 #!/bin/bash
 set -e
 
-echo "[Setup] Updating packages..."
-sudo apt-get update && sudo apt-get upgrade -y
 
 echo "[Setup] Installing base tools..."
 sudo apt install -y \
@@ -16,21 +14,37 @@ sudo apt install -y \
   git \
   build-essential
 
+
+echo "[Setup] Updating packages..."
+apt-get update && apt-get install -y \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release
+
+echo "[Setup] Adding Docker's GPG key..."
+mkdir -m 0755 -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
+    | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+echo "[Setup] Adding Docker repository..."
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" \
+    > /etc/apt/sources.list.d/docker.list
+
 echo "[Setup] Installing Docker..."
-sudo apt-get install -y docker.io
+apt-get update && apt-get install -y \
+    docker-ce \
+    docker-ce-cli \
+    containerd.io \
+    docker-buildx-plugin \
+    docker-compose-plugin
 
-# Enable docker group usage
-sudo groupadd docker || true
-sudo usermod -aG docker $USER
+echo "[Setup] Starting Docker daemon..."
+dockerd &
 
-# Install Docker Compose v2 plugin
-mkdir -p ~/.docker/cli-plugins/
-curl -SL https://github.com/docker/compose/releases/download/v2.29.2/docker-compose-linux-x86_64 \
-    -o ~/.docker/cli-plugins/docker-compose
-chmod +x ~/.docker/cli-plugins/docker-compose
-
+echo "[Setup] Docker installation complete."
 docker --version
-docker compose version
 
 echo "[Setup] Installing Terraform..."
 sudo install -o root -g root -m 0755 -d /etc/apt/keyrings
@@ -53,3 +67,6 @@ sudo rm -rf /var/lib/apt/lists/* /var/tmp/*
 
 echo "[Setup] Setting correct permissions..."
 sudo chown -R vscode:vscode /workspaces/New_pro2
+
+echo "[Setup] Updating packages..."
+sudo apt-get update && sudo apt-get upgrade -y
