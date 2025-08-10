@@ -1,0 +1,376 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  Fargate YOLOv8 Video Processor - Creates VPC, ECS Cluster, ECR Repo,
+  S3 buckets (raw + processed), Lambda that triggers ECS RunTask on S3 upload,
+  TaskRole and ExecutionRole, LogGroup and necessary permissions.
+
+Parameters:
+  ContainerImage:
+    Type: String
+    Description: ECR Image URI (e.g. <aws_account>.dkr.ecr.<region>.amazonaws.com/yolov8:latest)
+  VpcCidr:
+    Type: String
+    Default: 10.0.0.0/16
+  PublicSubnet1Cidr:
+    Type: String
+    Default: 10.0.1.0/24
+  PublicSubnet2Cidr:
+    Type: String
+    Default: 10.0.2.0/24
+  RawBucketName:
+    Type: String
+    Default: fargate-yolov8-raw-${AWS::AccountId}
+  ProcessedBucketName:
+    Type: String
+    Default: fargate-yolov8-processed-${AWS::AccountId}
+  AwsRegion:
+    Type: String
+    Default: !Ref "AWS::Region"
+
+Resources:
+
+  # VPC
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCidr
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: fargate-yolov8-vpc
+
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref PublicSubnet1Cidr
+      AvailabilityZone: !Select [ 0, !GetAZs "" ]
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: fargate-yolov8-subnet-a
+
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref PublicSubnet2Cidr
+      AvailabilityZone: !Select [ 1, !GetAZs "" ]
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: fargate-yolov8-subnet-b
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: fargate-yolov8-igw
+
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref InternetGateway
+
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: fargate-yolov8-rt
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId: !Ref RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  Subnet1RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      RouteTableId: !Ref RouteTable
+
+  Subnet2RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PublicSubnet2
+      RouteTableId: !Ref RouteTable
+
+  # Security Group for Fargate containers (allow outbound)
+  FargateSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow outbound access for Fargate task
+      VpcId: !Ref VPC
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: fargate-yolov8-sg
+
+  # ECR Repo
+  ECRRepo:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: yolov8-video-processor
+      ImageScanningConfiguration:
+        scanOnPush: true
+      LifecyclePolicy:
+        LifecyclePolicyText: |
+          {
+            "rules": [
+              {
+                "rulePriority": 1,
+                "description": "Keep last 10 images",
+                "selection": {
+                  "tagStatus": "any",
+                  "countType": "imageCountMoreThan",
+                  "countNumber": 10
+                },
+                "action": { "type": "expire" }
+              }
+            ]
+          }
+
+  # LogGroup for ECS tasks
+  ECSLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /ecs/yolov8-video-processor
+      RetentionInDays: 14
+
+  # ECS Cluster
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: yolov8-cluster
+
+  # IAM Roles for Task Execution and Task (task role for app permissions)
+  ECSExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "ecsTaskExecutionRole-${AWS::StackName}"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+
+  ECSAppTaskRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "ECSAppTaskRole-${AWS::StackName}"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: S3AccessForTask
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:ListBucket
+                Resource:
+                  - !Sub "arn:aws:s3:::${RawBucketName}"
+                  - !Sub "arn:aws:s3:::${RawBucketName}/*"
+                  - !Sub "arn:aws:s3:::${ProcessedBucketName}"
+                  - !Sub "arn:aws:s3:::${ProcessedBucketName}/*"
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "*"
+
+  # Task Definition
+  YOLOTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: yolov8-video-task
+      Cpu: "2048"     # 2 vCPU (adjust as you like)
+      Memory: "4096"  # 4GB (adjust as you like)
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      ExecutionRoleArn: !GetAtt ECSExecutionRole.Arn
+      TaskRoleArn: !GetAtt ECSAppTaskRole.Arn
+      ContainerDefinitions:
+        - Name: yolov8-worker
+          Image: !Ref ContainerImage
+          Essential: true
+          EntryPoint: ["python","/app/main.py"]
+          Environment:
+            - Name: RAW_BUCKET
+              Value: !Ref RawBucketName
+            - Name: PROCESSED_BUCKET
+              Value: !Ref ProcessedBucketName
+            - Name: AWS_REGION
+              Value: !Ref AwsRegion
+            - Name: INPUT_S3_KEY
+              Value: ""   # overridden by Lambda at run time
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref ECSLogGroup
+              awslogs-region: !Ref AwsRegion
+              awslogs-stream-prefix: yolov8
+
+  # S3 buckets
+  RawBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref RawBucketName
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: s3:ObjectCreated:*
+            Function: !GetAtt S3EventLambda.Arn
+
+  ProcessedBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref ProcessedBucketName
+
+  # Lambda role for invoking ECS RunTask
+  LambdaInvokeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "LambdaInvokeECSRole-${AWS::StackName}"
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: AllowECSRunTaskAndPassRole
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ecs:RunTask
+                  - iam:PassRole
+                Resource: "*"
+
+  # Lambda function that triggers ECS run_task on S3 object creation
+  S3EventLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub "s3-to-ecs-run-task-${AWS::StackName}"
+      Handler: index.handler
+      Runtime: python3.11
+      Role: !GetAtt LambdaInvokeRole.Arn
+      Timeout: 60
+      MemorySize: 256
+      Environment:
+        Variables:
+          CLUSTER: !Ref ECSCluster
+          TASK_DEFINITION: !Ref YOLOTaskDefinition
+          SUBNETS: !Join [ ",", [ !Ref PublicSubnet1, !Ref PublicSubnet2 ] ]
+          SECURITY_GROUPS: !Ref FargateSecurityGroup
+      Code:
+        ZipFile: |
+          import json
+          import boto3
+          import os
+
+          ecs = boto3.client("ecs")
+          def handler(event, context):
+              # Handle S3 event (ObjectCreated)
+              detail = event.get("Records",[{}])[0]
+              s3 = detail.get("s3",{})
+              bucket = s3.get("bucket",{}).get("name")
+              key = s3.get("object",{}).get("key")
+              if not bucket or not key:
+                  print("No bucket/key found in event:", event)
+                  return {"statusCode":400, "body":"no key"}
+              print("Received event for", bucket, key)
+
+              cluster = os.environ.get("CLUSTER")
+              task_def = os.environ.get("TASK_DEFINITION")
+              subnets = os.environ.get("SUBNETS").split(",")
+              sg = os.environ.get("SECURITY_GROUPS").split(",")
+
+              overrides = {
+                  "containerOverrides": [
+                      {
+                          "name": "yolov8-worker",
+                          "environment": [
+                              {"name":"INPUT_S3_KEY", "value": key},
+                              {"name":"RAW_BUCKET", "value": bucket}
+                          ]
+                      }
+                  ]
+              }
+
+              resp = ecs.run_task(
+                  cluster=cluster,
+                  taskDefinition=task_def,
+                  launchType="FARGATE",
+                  platformVersion="LATEST",
+                  networkConfiguration={
+                      "awsvpcConfiguration":{
+                          "subnets": subnets,
+                          "securityGroups": sg,
+                          "assignPublicIp":"ENABLED"
+                      }
+                  },
+                  overrides=overrides,
+                  count=1
+              )
+              print("RunTask response:", json.dumps(resp, default=str))
+              return {"statusCode":200, "body":"ok"}
+
+  # Permission for S3 to invoke the Lambda (Lambda permission resource)
+  AllowS3InvokeLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref S3EventLambda
+      Principal: s3.amazonaws.com
+      Action: lambda:InvokeFunction
+      SourceAccount: !Ref "AWS::AccountId"
+
+Outputs:
+  ECRRepoUri:
+    Description: ECR repo URI
+    Value: !GetAtt ECRRepo.RepositoryUri
+
+  RawBucketName:
+    Description: Raw input S3 bucket
+    Value: !Ref RawBucket
+
+  ProcessedBucketName:
+    Description: Processed S3 bucket
+    Value: !Ref ProcessedBucket
+
+  ECSCluster:
+    Description: ECS cluster name
+    Value: !Ref ECSCluster
+
+  TaskDefinition:
+    Description: ECS task family
+    Value: !Ref YOLOTaskDefinition

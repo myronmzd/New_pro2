@@ -1,0 +1,19 @@
+{
+  "Records": [
+    {
+      "eventVersion": "2.1",
+      "eventSource": "aws:s3",
+      "awsRegion": "us-east-1",
+      "eventTime": "2025-08-10T00:00:00.000Z",
+      "eventName": "ObjectCreated:Put",
+      "s3": {
+        "bucket": {
+          "name": "your-raw-bucket-name"
+        },
+        "object": {
+          "key": "example-videos/test.mp4"
+        }
+      }
+    }
+  ]
+}
