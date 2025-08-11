@@ -18,11 +18,18 @@ locals {
   state_machine_definition = templatefile(
     "${path.module}/state_machine.json",
     {
-      Region    = data.aws_region.current.name
-      AccountId = data.aws_caller_identity.current.account_id
+      Region               = data.aws_region.current.name
+      AccountId            = data.aws_caller_identity.current.account_id
+      EcsClusterName       = var.ecs_cluster_name
+      TaskDefinitionFamily = var.task_definition_family
+      SnsTopicArn          = var.sns_topic_arn
+      LambdaFunctionName   = var.lambda_function_name
+      Subnets              = jsonencode(var.default_subnets)
+      SecurityGroupId      = var.fargate_security_group_id
     }
   )
 }
+
 
 # IAM Role for Step Functions
 resource "aws_iam_role" "sfn_exec" {
@@ -54,19 +61,21 @@ data "aws_iam_policy_document" "sfn_policy" {
     sid     = "AllowFargateRunOnly"
     actions = [
       "ecs:RunTask",
-      "ecs:DescribeTasks"
+      "ecs:DescribeTasks",
+      "ecs:StopTask"
     ]
-    resources = [
-      "${var.fargate_task_arn}:*"
-    ]
+    resources = ["*"]
   }
 
   statement {
     sid     = "AllowPassExecutionRole"
     actions = ["iam:PassRole"]
-    resources = [
-      "${var.fargete_role_arn}:*"
-    ]
+    resources = ["*"]
+    condition {
+      test     = "StringLike"
+      variable = "iam:PassedToService"
+      values   = ["ecs-tasks.amazonaws.com"]
+    }
   }
   
   statement {

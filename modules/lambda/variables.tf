@@ -40,12 +40,6 @@ variable "s3_bucket_raw" {
   default     = ""
 }
 
-variable "stepfunction_arn" {
-  description = "Step Function ARN"
-  type        = string
-  default     = ""
-}
-
 variable "default_tags" {
   description = "Default tags for resources"
   type        = map(string)

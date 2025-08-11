@@ -27,7 +27,6 @@ module "lambda" {
   aws_region     = var.aws_region
   s3_bucket_raw     = module.s3.raw_bucket_name
   s3_bucket_dump    = module.s3.dump_bucket_name
-  stepfunction_arn = module.stepfunctions.state_machine_arn
   input_bucket_arn = module.s3.raw_bucket_arn
   output_bucket_arn = module.s3.dump_bucket_arn
   sns_arn = module.events_sns.aws_sns_topic_arn
@@ -36,12 +35,17 @@ module "lambda" {
 module "stepfunctions" {
   source = "./modules/Stepfunctions"
   lambda = module.lambda.function_invoke_arns
-  s3bucket_raw_arn        = module.s3.raw_bucket_arn
-  s3bucket_dump_arn       = module.s3.dump_bucket_arn
-  aws_region = var.aws_region
-  fargate_task_arn = module.compute.fargate_task_definition_arn
-  fargete_role_arn =  module.compute.fargate_task_role_arn
-  
+  s3bucket_raw_arn    = module.s3.raw_bucket_arn
+  s3bucket_dump_arn   = module.s3.dump_bucket_arn
+  aws_region          = var.aws_region
+  fargate_task_arn    = module.compute.fargate_task_definition_arn
+  fargete_role_arn    =  module.compute.fargate_task_role_arn
+  ecs_cluster_name    = module.compute.ecs_cluster_name
+  task_definition_family = module.compute.fargate_task_definition_family
+  sns_topic_arn     = module.events_sns.aws_sns_topic_arn
+  lambda_function_name = module.lambda.lambda_function_name
+  default_subnets     = module.compute.default_subnets
+  fargate_security_group_id = module.compute.fargate_security_group_id
 }
 
 module "events_sns" {

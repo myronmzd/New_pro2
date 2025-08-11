@@ -41,8 +41,8 @@ resource "aws_cloudwatch_event_target" "stepfunction" {
     }
     input_template = <<EOF
 {
-  "bucket": "<bucket>",
-  "key": "<key>"
+  "input_bucket": "<bucket>",
+  "input_key": "<key>"
 }
 EOF
   }

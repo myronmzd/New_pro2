@@ -111,7 +111,6 @@ resource "aws_lambda_function" "function1" {
   variables = {
     S3_BUCKET_R     = var.s3_bucket_raw
     S3_BUCKET_D     = var.s3_bucket_dump
-    STEP_FUNCTION_ARN = var.stepfunction_arn
     SNS_TOPIC_ARN   = var.sns_arn
     FRAME_RATE      = "1"
     MIN_CONFIDENCE  = "80"

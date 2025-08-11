@@ -9,6 +9,34 @@ locals {
   }
 }
 
+# Get default VPC
+data "aws_vpc" "default" {
+  default = true
+}
+
+# Get default subnets
+data "aws_subnets" "default" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.default.id]
+  }
+}
+
+# Security group for Fargate tasks
+resource "aws_security_group" "fargate_sg" {
+  name_prefix = "${var.project_name}-fargate-"
+  vpc_id      = data.aws_vpc.default.id
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = merge(var.default_tags, local.common_tags)
+}
+
 # ECS Cluster
 resource "aws_ecs_cluster" "video_processing" {
   name = "${var.project_name}-video-processing"
