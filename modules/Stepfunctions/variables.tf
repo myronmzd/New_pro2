@@ -27,7 +27,7 @@ variable "task_definition_family" {
   description = "Family name of the task definition"
   type        = string
 }
-variable "sns_topic_arn" {
+variable "sns_stepfunctions" {
   description = "Name of the SNS topic"
   type        = string
 }
@@ -37,10 +37,6 @@ variable "default_subnets" {
 }
 variable "fargate_security_group_id" {
   description = "Security group ID for Fargate tasks"
-  type        = string
-}
-variable "sns_topic_arn" {
-  description = "ARN of the SNS topic"
   type        = string
 }
 variable "lambda_function_name" {

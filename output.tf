@@ -18,11 +18,6 @@ output "lambda_function_name" {
   value       = module.lambda.lambda_function_name
 }
 
-output "sns_topic_arn" {
-  description = "ARN of the SNS topic"
-  value       = module.events_sns.aws_sns_topic_arn
-}
-
 output "ecs_cluster_name" {
   description = "Name of the ECS cluster"
   value       = module.compute.ecs_cluster_name

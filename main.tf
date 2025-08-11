@@ -42,7 +42,7 @@ module "stepfunctions" {
   fargete_role_arn    =  module.compute.fargate_task_role_arn
   ecs_cluster_name    = module.compute.ecs_cluster_name
   task_definition_family = module.compute.fargate_task_definition_family
-  sns_topic_arn     = module.events_sns.aws_sns_topic_arn
+  sns_stepfunctions  = module.events_sns.aws_sns_topic_arn
   lambda_function_name = module.lambda.lambda_function_name
   default_subnets     = module.compute.default_subnets
   fargate_security_group_id = module.compute.fargate_security_group_id

@@ -22,7 +22,7 @@ locals {
       AccountId            = data.aws_caller_identity.current.account_id
       EcsClusterName       = var.ecs_cluster_name
       TaskDefinitionFamily = var.task_definition_family
-      SnsTopicArn          = var.sns_topic_arn
+      SnsTopicArn          = var.sns_stepfunctions
       LambdaFunctionName   = var.lambda_function_name
       Subnets              = jsonencode(var.default_subnets)
       SecurityGroupId      = var.fargate_security_group_id
