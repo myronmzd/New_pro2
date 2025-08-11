@@ -57,7 +57,7 @@ data "aws_iam_policy_document" "sfn_policy" {
       "ecs:DescribeTasks"
     ]
     resources = [
-      "arn:aws:ecs:ap-south-1:${data.aws_caller_identity.current.account_id}:task-definition/your-task-definition-name:*"
+      "${var.fargate_task_arn}:*"
     ]
   }
 
@@ -65,25 +65,26 @@ data "aws_iam_policy_document" "sfn_policy" {
     sid     = "AllowPassExecutionRole"
     actions = ["iam:PassRole"]
     resources = [
-      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/your-ecsTaskExecutionRole"
+      "${var.fargete_role_arn}:*"
     ]
   }
   
   statement {
     sid     = "AllowCloudWatchLogDelivery"
     actions = [
-        "logs:CreateLogDelivery",
-        "logs:GetLogDelivery",
-        "logs:UpdateLogDelivery",
-        "logs:DeleteLogDelivery",
-        "logs:ListLogDeliveries",
-        "logs:PutResourcePolicy",
-        "logs:DescribeResourcePolicies",
-        "logs:DescribeLogGroups",
-        "logs:GetResourcePolicy"
+      "logs:CreateLogDelivery",
+      "logs:GetLogDelivery",
+      "logs:UpdateLogDelivery",
+      "logs:DeleteLogDelivery",
+      "logs:ListLogDeliveries",
+      "logs:PutResourcePolicy",
+      "logs:DescribeResourcePolicies",
+      "logs:DescribeLogGroups",
+      "logs:GetResourcePolicy"
     ]
     resources = ["*"]
   }
+
   statement {
     sid     = "AllowCloudWatchLogging"
     actions = [
@@ -93,23 +94,35 @@ data "aws_iam_policy_document" "sfn_policy" {
     ]
     resources = [
       "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/stepfunctions/video-crash-detection:*"
-  ]
-}
+    ]
+  }
 
   statement {
     sid     = "AllowS3Access"
     actions = [
-        "s3:GetObject",
-        "s3:PutObject",
-        "s3:DeleteObject",
-        "s3:ListBucket"
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject",
+      "s3:ListBucket"
     ]
     resources = [
-  var.s3bucket_raw_arn,
-  "${var.s3bucket_raw_arn}/*",
-  var.s3bucket_dump_arn,
-  "${var.s3bucket_dump_arn}/*"
+      var.s3bucket_raw_arn,
+      "${var.s3bucket_raw_arn}/*",
+      var.s3bucket_dump_arn,
+      "${var.s3bucket_dump_arn}/*"
     ]
+  }
+
+  statement {
+    sid     = "AllowCloudWatchEvents"
+    actions = [
+      "events:PutRule",
+      "events:PutTargets",
+      "events:DescribeRule",
+      "events:DeleteRule",
+      "events:RemoveTargets"
+    ]
+    resources = ["*"]
   }
 }
 

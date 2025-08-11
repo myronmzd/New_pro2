@@ -1,5 +1,3 @@
-
-
 output "ecs_cluster_arn" {
   value = aws_ecs_cluster.video_processing.arn
 }

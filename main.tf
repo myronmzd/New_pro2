@@ -20,7 +20,7 @@ module "s3" {
 module "lambda" {
   source = "./modules/lambda"
   lambda_handler = "app1.handler"
-  lambda_runtime = "go1.x"
+  lambda_runtime = "python3.9"
   environment    = "Production"
   funtion_names = "process-video"
   project_name   = "CarCrashApp"
@@ -39,13 +39,16 @@ module "stepfunctions" {
   s3bucket_raw_arn        = module.s3.raw_bucket_arn
   s3bucket_dump_arn       = module.s3.dump_bucket_arn
   aws_region = var.aws_region
+  fargate_task_arn = module.compute.fargate_task_definition_arn
+  fargete_role_arn =  module.compute.fargate_task_role_arn
+  
 }
 
 module "events_sns" {
   source = "./modules/Events_sns"
   s3_bucket_raw        = module.s3.raw_bucket_name
   s3_bucket_dump       = module.s3.dump_bucket_name
-  stepfunction_arn = module.stepfunctions.state_machine_arn
+  stepfunction_arn    = module.stepfunctions.state_machine_arn
   aws_region          = var.aws_region
   email_endpoint      = "myronmzd22@gmail.com"
   output_bucket_id    = module.s3.dump_bucket_name
@@ -61,7 +64,7 @@ module "compute" {
   s3_bucket_dump       = module.s3.dump_bucket_name
   input_bucket_arn     = module.s3.raw_bucket_arn
   output_bucket_arn    = module.s3.dump_bucket_arn
-  ecr_repository_url   = "123456789012.dkr.ecr.us-east-1.amazonaws.com/my-app"
+  ecr_repository_url   = "236024603923.dkr.ecr.ap-south-1.amazonaws.com/yolov8-video-processor:bob"
   
   default_tags = {
     Project     = "CarCrashApp"

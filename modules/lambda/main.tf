@@ -91,7 +91,7 @@ resource "aws_iam_role_policy_attachment" "lambda_policy_attachment" {
 
 resource "archive_file" "app1" {
   type        = "zip"
-  source_file = "/workspaces/New_pro2/app1.go"
+  source_file = "/workspaces/New_pro2/app1.py" // Path to your Lambda function code
   output_path = "modules/lambda/app1.zip"
   output_file_mode = "0644"
 }
