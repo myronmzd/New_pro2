@@ -68,7 +68,7 @@ module "compute" {
   s3_bucket_dump       = module.s3.dump_bucket_name
   input_bucket_arn     = module.s3.raw_bucket_arn
   output_bucket_arn    = module.s3.dump_bucket_arn
-  ecr_repository_url   = "236024603923.dkr.ecr.ap-south-1.amazonaws.com/yolov8-video-processor:bob"
+  ecr_repository_url   = "236024603923.dkr.ecr.ap-south-1.amazonaws.com/yolov8-video-processor:lateset"
   
   default_tags = {
     Project     = "CarCrashApp"
