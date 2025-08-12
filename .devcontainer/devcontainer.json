@@ -7,11 +7,8 @@
     "ghcr.io/devcontainers/features/azure-cli": "latest"
   },
 
-  "mounts": [
-    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
-  ],
-
-  "remoteUser": "vscode",
+  "remoteUser": "root",
+  "workspaceFolder": "/workspaces/New_pro2",
 
   "postAttachCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}",
 
