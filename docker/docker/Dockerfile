@@ -1,10 +1,9 @@
-# multi-stage is possible, but keep it simple for reliability
 FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# system deps for opencv and ffmpeg
+# Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     ffmpeg \
@@ -17,15 +16,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 
-# copy and install pip deps
-COPY app/requirements.txt /app/requirements.txt
-RUN pip install --no-cache-dir -r /app/requirements.txt
+# Copy requirements and install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# copy app
-COPY app /app
+# Copy application code
+COPY main.py .
 
-# set a non-root user (optional)
-RUN useradd -ms /bin/bash appuser || true
-USER appuser
+# Expose port for health checks (optional)
+EXPOSE 8080
 
-ENTRYPOINT ["python", "/app/main.py"]
+# Run as root for Fargate compatibility
+ENTRYPOINT ["python", "main.py"]

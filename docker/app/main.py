@@ -4,6 +4,9 @@ import json
 import tempfile
 import boto3
 import traceback
+import threading
+import time
+from http.server import HTTPServer, BaseHTTPRequestHandler
 from ultralytics import YOLO
 import cv2
 
@@ -66,7 +69,27 @@ def run_yolo(video_path, output_json_path):
         json.dump({"detections": all_dets, "video": os.path.basename(video_path)}, fh, indent=2)
     print("Wrote JSON:", output_json_path)
 
-def main():
+class HealthHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        if self.path == '/health':
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({"status": "healthy"}).encode())
+        else:
+            self.send_response(404)
+            self.end_headers()
+    
+    def log_message(self, format, *args):
+        pass  # Suppress default logging
+
+def start_health_server():
+    """Start health check server in background thread"""
+    server = HTTPServer(('0.0.0.0', 8080), HealthHandler)
+    server.serve_forever()
+
+def process_video():
+    """Main video processing function"""
     try:
         with tempfile.TemporaryDirectory() as tmp:
             local_video = os.path.join(tmp, "input_video")
@@ -80,13 +103,30 @@ def main():
 
             # upload outputs under processed/<original-key>/
             base_prefix = f"processed/{INPUT_KEY}"
-            # ensure directories in key name
             upload_s3(PROCESSED_BUCKET, f"{base_prefix}/thumbnail.jpg", thumb_path, content_type="image/jpeg")
             upload_s3(PROCESSED_BUCKET, f"{base_prefix}/results.json", results_json, content_type="application/json")
             print("Processing complete.")
+            return True
     except Exception:
         traceback.print_exc()
-        sys.exit(1)
+        return False
+
+def main():
+    # Start health check server in background
+    health_thread = threading.Thread(target=start_health_server, daemon=True)
+    health_thread.start()
+    print("Health check server started on port 8080")
+    
+    # Check if this is a one-time processing job or long-running service
+    if INPUT_KEY:
+        # One-time processing
+        success = process_video()
+        sys.exit(0 if success else 1)
+    else:
+        # Long-running service mode (for Fargate services)
+        print("Running in service mode - waiting for tasks...")
+        while True:
+            time.sleep(30)  # Keep container alive
 
 if __name__ == "__main__":
     main()

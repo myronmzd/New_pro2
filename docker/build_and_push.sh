@@ -14,8 +14,9 @@ aws ecr describe-repositories --repository-names "${REPO_NAME}" --region "${AWS_
 # login
 aws ecr get-login-password --region "${AWS_REGION}" | docker login --username AWS --password-stdin "${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 
-# build and push
-docker build -t "${REPO_NAME}:${TAG}" -f docker/Dockerfile .
+# build from the app directory with correct context
+cd docker/app
+docker build -t "${REPO_NAME}:${TAG}" -f ../docker/Dockerfile .
 docker tag "${REPO_NAME}:${TAG}" "${IMAGE_URI}"
 docker push "${IMAGE_URI}"
 
