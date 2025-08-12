@@ -7,13 +7,16 @@
     "ghcr.io/devcontainers/features/azure-cli": "latest"
   },
 
+  "mounts": [
+    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+  ],
+
   "remoteUser": "root",
 
   "postAttachCommand": "git config --global --add safe.directory ${containerWorkspaceFolder} && sudo chmod o-w ${containerWorkspaceFolder}",
 
-  "postCreateCommand": "/bin/bash /workspaces/New_pro2/.devcontainer/setup.sh",
+  "postCreateCommand": "apt-get update && apt-get install -y docker.io && /bin/bash /workspaces/New_pro2/.devcontainer/setup.sh",
 
-  
   "customizations": {
     "vscode": {
       "extensions": [
@@ -22,7 +25,7 @@
         "redhat.ansible",
         "hashicorp.terraform",
         "eamodio.gitlens",
-        "AmazonWebServices.aws-toolkit-vscode"  // ✅ Amazon Q extension
+        "AmazonWebServices.aws-toolkit-vscode"
       ]
     }
   }

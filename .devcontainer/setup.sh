@@ -17,7 +17,7 @@ sudo apt install -y \
   docker.io \
   docker-compose \
   git \
-  build-essential \
+  build-essential 
 
 
 echo "[Setup] Installing Terraform..."
