@@ -158,6 +158,14 @@ This project enables users to **upload video files to S3**, automatically trigge
    terraform output <key>
 
 
+## Same error to resolve againa 
+
+Option 1 — Using dos2unix
+
+```bash
+sudo apt-get update && sudo apt-get install -y dos2unix
+dos2unix /workspaces/New_pro2/.devcontainer/setup.sh
+```
 ## 📄 License
 
 MIT License - See LICENSE file for details.
