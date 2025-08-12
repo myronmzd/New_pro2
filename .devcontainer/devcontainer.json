@@ -11,11 +11,11 @@
     "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
   ],
 
-  "remoteUser": "root",
+  "remoteUser": "vscode",
 
-  "postAttachCommand": "git config --global --add safe.directory ${containerWorkspaceFolder} && sudo chmod o-w ${containerWorkspaceFolder}",
+  "postAttachCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}",
 
-  "postCreateCommand": "apt-get update && apt-get install -y docker.io && /bin/bash /workspaces/New_pro2/.devcontainer/setup.sh",
+  "postCreateCommand": "/bin/bash /workspaces/New_pro2/.devcontainer/setup.sh",
 
   "customizations": {
     "vscode": {
