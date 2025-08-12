@@ -14,10 +14,8 @@ sudo apt-get install -y \
   jq \
   python3-pip \
   git \
-  build-essential
+  build-essential \
 
-echo "[Setup] Adding user to docker group..."
-sudo usermod -aG docker vscode
 
 echo "[Setup] Installing Terraform..."
 sudo install -o root -g root -m 0755 -d /etc/apt/keyrings
