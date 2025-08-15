@@ -1,5 +1,0 @@
-boto3==1.34.0                         # AWS SDK for Python (S3 access, etc.)
-opencv-python-headless==4.8.1.78     # OpenCV without GUI (saves image size)
-ultralytics==8.0.196                 # YOLOv8 core library
-Pillow==10.1.0                       # For image I/O (if needed)
-numpy==1.24.3                        # Math operations, essential for OpenCV & YOLO

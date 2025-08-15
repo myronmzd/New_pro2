@@ -59,37 +59,27 @@ This project enables users to **upload video files to S3**, automatically trigge
 └────────┬────────────────────────┘
          │ Triggers
          ▼
-┌─────────────────────────────────┐
-│      Step Functions             │
-│                                 │
-│  ┌─────────────────────────────┐│
-│  │    ECS Fargate Task         ││
-│  │  ┌─────────────────────────┐││
-│  │  │ Docker Container        │││
-│  │  │ - Python 3.11           │││
-│  │  │ - YOLOv8 Model          │││
-│  │  │ - OpenCV                │││
-│  │  │ - AWS SDK               │││
-│  │  └─────────────────────────┘││
-│  │  • Downloads video from S3  ││
-│  │  • Runs crash/crime detect  ││
-│  │  • Generates thumbnail      ││
-│  │  • Uploads results to S3    ││
-│  └─────────────────────────────┘│
-│                ↓                │
-│  ┌─────────────────────────────┐│
-│  │    Lambda Function          ││
-│  │  - Reads processing results ││
-│  │  - Formats email content    ││
-│  │  - Sends via SES            ││
-│  └─────────────────────────────┘│
-│                ↓                │
-│  ┌─────────────────────────────┐│
-│  │      SNS Topic              ││
-│  │  - Publishes notification   ││
-│  │  - Alert subscribers        ││
-│  └─────────────────────────────┘│
-└─────────────────────────────────┘
+┌─────────────────────────────────────────┐
+│      Step Functions                     │
+│                                         │
+│  ┌─────────────────────────────────────┐│
+│  │  Lambda Function                    ││
+│  │  • Downloads video from S3          ││
+│  │  • lmabda to split video in images  ││
+│  │  • calling Rekognition on images    ││
+│  │  • Uploads results to S3            ││
+│  │    Lambda Function                  ││
+│  │  - Reads processing results         ││
+│  │  - Formats email content            ││
+│  │  - Sends via SES                    ││
+│  └─────────────────────────────────────┘│
+│                ↓                        │
+│  ┌─────────────────────────────┐│       │
+│  │      SNS Topic              │        │
+│  │  - Publishes notification   │        │
+│  │  - Alert subscribers        │        │
+│  └─────────────────────────────┘        │
+└─────────────────────────────────────────┘
          │
          ▼
 ┌─────────────────────────────────┐
