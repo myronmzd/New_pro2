@@ -96,6 +96,13 @@ resource "archive_file" "app1" {
   output_file_mode = "0644"
 }
 
+resource "archive_file" "app2" {
+  type        = "zip"
+  source_file = "/workspaces/New_pro2/app2.py" // Path to your Lambda function code
+  output_path = "modules/lambda/app2.zip"
+  output_file_mode = "0644"
+}
+
 
 resource "aws_lambda_function" "function1" {
   
@@ -106,6 +113,36 @@ resource "aws_lambda_function" "function1" {
   role          = aws_iam_role.lambda_exec.arn
   runtime       = var.lambda_runtime // Use a variable for runtime
   filename = "${path.module}/app1.zip"
+
+  environment {
+  variables = {
+    S3_BUCKET_R     = var.s3_bucket_raw
+    S3_BUCKET_D     = var.s3_bucket_dump
+    SNS_TOPIC_ARN   = var.sns_arn
+    FRAME_RATE      = "1"
+    MIN_CONFIDENCE  = "80"
+  }
+  }
+  tags = merge(
+  var.default_tags,
+  local.common_tags,
+  {
+    Environment = var.environment
+    Project     = var.project_name
+  }
+  )
+}
+
+
+resource "aws_lambda_function" "function2" {
+  
+  // This lambda funtion take the video and split them into images and then put it into a dump bucket
+
+  function_name = var.project_name
+  handler       = var.lambda_handler // Use a variable for handler
+  role          = aws_iam_role.lambda_exec.arn
+  runtime       = var.lambda_runtime // Use a variable for runtime
+  filename = "${path.module}/app2.zip"
 
   environment {
   variables = {

@@ -1,76 +1,115 @@
 {
-  "Comment": "Video Analysis Workflow",
-  "StartAt": "Run Fargate Task",
+  "Comment": "Video pipeline with Rekognition + SES + SNS",
+  "StartAt": "CheckBucketContents",
   "States": {
-    "Run Fargate Task": {
+    "CheckBucketContents": {
       "Type": "Task",
-      "Resource": "arn:aws:states:::ecs:runTask.sync",
+      "Resource": "arn:aws:states:::aws-sdk:s3:listObjectsV2",
       "Parameters": {
-        "LaunchType": "FARGATE",
-        "Cluster": "${EcsClusterName}",
-        "TaskDefinition": "${TaskDefinitionFamily}",
-        "NetworkConfiguration": {
-          "AwsvpcConfiguration": {
-            "Subnets": ${Subnets},
-            "SecurityGroups": ["${SecurityGroupId}"],
-            "AssignPublicIp": "ENABLED"
-          }
-        },
-        "Overrides": {
-          "ContainerOverrides": [
-            {
-              "Name": "video-processor",
-              "Environment": [
-                {
-                  "Name": "INPUT_S3_BUCKET",
-                  "Value.$": "$.input_bucket"
-                },
-                {
-                  "Name": "INPUT_S3_KEY",
-                  "Value.$": "$.input_key"
-                }
-              ]
-            }
-          ]
-        }
+        "Bucket.$": "$.input_bucket",
+        "Prefix": "raw/",
+        "MaxKeys": 1
       },
-      "Next": "Send Email via Lambda",
-      "Catch": [
-        {
-          "ErrorEquals": [
-            "States.ALL"
-          ],
-          "ResultPath": "$.error",
-          "Next": "Fail State"
-        }
-      ]
+      "ResultPath": "$.s3ListResult",
+      "Next": "Choice"
     },
-    "Send Email via Lambda": {
+    "Choice": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.s3ListResult.Contents[0].Key",
+          "StringMatches": "*.mp4",
+          "Next": "LambdaSplitVideo"
+        }
+      ],
+      "Default": "Fail"
+    },
+    "Fail": {
+      "Type": "Fail",
+      "Error": "NotVideoFormat",
+      "Cause": "Only .mp4 and .avi allowed"
+    },
+    "LambdaSplitVideo": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
-        "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:${LambdaFunctionName}",
+        "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:${LambdaFunctionName1}",
         "Payload": {
-          "video_key.$": "$.input_key",
           "bucket.$": "$.input_bucket",
-          "details.$": "$"
+          "key.$": "$.s3ListResult.Contents[0].Key"
         }
       },
-      "Next": "Publish SNS"
+      "ResultPath": "$.lambda1Result",
+      "Next": "PutProcessingImages"
     },
-    "Publish SNS": {
+    "PutProcessingImages": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:s3:putObject",
+      "Parameters": {
+        "Bucket": "${dump_bucket}",
+        "Key": "processing/status.txt",
+        "Body": "processing"
+      },
+      "Next": "RekognitionLambda"
+    },
+    "RekognitionLambda": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:${LambdaFunctionName2}",
+        "Payload": {
+          "images.$": "$.lambda1Result"
+        }
+      },
+      "ResultPath": "$.rekognitionResult",
+      "Next": "SaveResults"
+    },
+    "SaveResults": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:s3:putObject",
+      "Parameters": {
+        "Bucket": "MyData",
+        "Key": "results/detection.json",
+        "Body.$": "$.rekognitionResult"
+      },
+      "Next": "SESsendEmail"
+    },
+    "SESsendEmail": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:ses:sendEmail",
+      "Parameters": {
+        "Destination": {
+          "ToAddresses": ["alerts@example.com"]
+        },
+        "Message": {
+          "Subject": { "Data": "Detection Results" },
+          "Body": {
+            "Text": {
+              "Data": "Rekognition results stored in S3"
+            }
+          }
+        },
+        "Source": "noreply@example.com"
+      },
+      "Next": "SNSPublish"
+    },
+    "SNSPublish": {
       "Type": "Task",
       "Resource": "arn:aws:states:::sns:publish",
       "Parameters": {
         "TopicArn": "${SnsTopicArn}",
-        "Message.$": "$"
+        "Message": "Detection complete. Results stored in S3."
+      },
+      "Next": "Cleanup"
+    },
+    "Cleanup": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:s3:deleteObject",
+      "Parameters": {
+        "Bucket": "MyData",
+        "Key": "processing/status.txt"
       },
       "End": true
-    },
-    "Fail State": {
-      "Type": "Fail",
-      "Error": "FargateTaskFailed",
-      "Cause": "Error running ECS Fargate Task"
     }
   }
 }
