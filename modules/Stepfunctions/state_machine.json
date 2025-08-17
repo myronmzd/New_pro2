@@ -50,18 +50,25 @@
         "Key": "processing/status.txt",
         "Body": "processing"
       },
-      "Next": "RekognitionLambda"
+      "Next": "Choice (1)"
     },
-    "RekognitionLambda": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::lambda:invoke",
-      "Parameters": {
-        "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:${LambdaFunctionName2}",
-        "Payload": {
-          "images.$": "$.lambda1Result"
+    "Choice (1)": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "End": true
         }
+      ],
+      "Default": "ECS RunTask (1)"
+    },
+    "ECS RunTask (1)": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::ecs:runTask",
+      "Parameters": {
+        "LaunchType": "FARGATE",
+        "Cluster": "arn:aws:ecs:REGION:ACCOUNT_ID:cluster/MyECSCluster",
+        "TaskDefinition": "arn:aws:ecs:REGION:ACCOUNT_ID:task-definition/MyTaskDefinition:1"
       },
-      "ResultPath": "$.rekognitionResult",
       "Next": "SaveResults"
     },
     "SaveResults": {
@@ -72,34 +79,29 @@
         "Key": "results/detection.json",
         "Body.$": "$.rekognitionResult"
       },
-      "Next": "SESsendEmail"
+      "Next": "Lambda Invoke"
     },
-    "SESsendEmail": {
+    "Lambda Invoke": {
       "Type": "Task",
-      "Resource": "arn:aws:states:::aws-sdk:ses:sendEmail",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
       "Parameters": {
-        "Destination": {
-          "ToAddresses": ["alerts@example.com"]
-        },
-        "Message": {
-          "Subject": { "Data": "Detection Results" },
-          "Body": {
-            "Text": {
-              "Data": "Rekognition results stored in S3"
-            }
-          }
-        },
-        "Source": "noreply@example.com"
+        "Payload.$": "$"
       },
-      "Next": "SNSPublish"
-    },
-    "SNSPublish": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::sns:publish",
-      "Parameters": {
-        "TopicArn": "${SnsTopicArn}",
-        "Message": "Detection complete. Results stored in S3."
-      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2,
+          "JitterStrategy": "FULL"
+        }
+      ],
       "Next": "Cleanup"
     },
     "Cleanup": {
