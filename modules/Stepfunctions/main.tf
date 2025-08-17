@@ -21,9 +21,9 @@ locals {
       Region               = data.aws_region.current.name
       AccountId            = data.aws_caller_identity.current.account_id
       SnsTopicArn          = var.sns_stepfunctions
-      LambdaFunction1Name  = var.lambda_function1_name
+      LambdaFunction1Name  = var.LambdaFunction1Name
       Function1InvokeArns  = var.function1_invoke_arns  
-      LambdaFunction2Name  = var.lambda_function2_name
+      LambdaFunction2Name  = var.LambdaFunction2Name
       Function2InvokeArns  = var.function2_invoke_arns
     }
   )

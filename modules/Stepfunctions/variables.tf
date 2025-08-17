@@ -1,6 +1,4 @@
-variable "lambda" {
-  type = string
-}
+
 variable "s3bucket_raw_arn" {
   type = string
 }
@@ -15,12 +13,7 @@ variable "sns_stepfunctions" {
   description = "Name of the SNS topic"
   type        = string
 }
-variable "default_subnets" {
-  description = "List of default subnet IDs"
-  type        = list(string)
-}
-
-variable "lambda_function1_name" {
+variable "LambdaFunction1Name" {
   description = "Name of the first Lambda function"
   type        = string
 }
@@ -30,7 +23,7 @@ variable "function1_invoke_arns" {
   type        = string
 }
 
-variable "lambda_function2_name" {
+variable "LambdaFunction2Name" {
   description = "Name of the second Lambda function"
   type        = string
 }

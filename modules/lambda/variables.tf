@@ -2,7 +2,7 @@ variable "lambda_handler" {
   description = "Lambda function handler"
   type        = string
 }
-variable "funtion_names" {
+variable "function_names" {
   description = "Names of the Lambda functions"
   type        = string
 }
@@ -28,13 +28,13 @@ variable "aws_region" {
   type        = string
 }
 
-variable "s3_bucket_dump" {
+variable "s3_bucket_dump_name" {
   description = "S3 bucket name"
   type        = string
   default     = ""
 }
 
-variable "s3_bucket_raw" {
+variable "s3_bucket_raw_name" {
   description = "S3 bucket name"
   type        = string
   default     = ""

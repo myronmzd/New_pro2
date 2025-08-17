@@ -91,33 +91,30 @@ resource "aws_iam_role_policy_attachment" "lambda_policy_attachment" {
 
 resource "archive_file" "app1" {
   type        = "zip"
-  source_file = "/workspaces/New_pro2/app1.py" // Path to your Lambda function code
+  source_file = "/workspaces/New_pro2/app1.py"
   output_path = "modules/lambda/app1.zip"
   output_file_mode = "0644"
 }
 
 resource "archive_file" "app2" {
   type        = "zip"
-  source_file = "/workspaces/New_pro2/app2.py" // Path to your Lambda function code
+  source_file = "/workspaces/New_pro2/app2.py"
   output_path = "modules/lambda/app2.zip"
   output_file_mode = "0644"
 }
 
 
 resource "aws_lambda_function" "function1" {
-  
-  // This lambda funtion take the video and split them into images and then put it into a dump bucket
-
-  function_name = var.project_name
-  handler       = var.lambda_handler // Use a variable for handler
+  function_name = "${var.project_name}-function1"
+  handler       = var.lambda_handler
   role          = aws_iam_role.lambda_exec.arn
-  runtime       = var.lambda_runtime // Use a variable for runtime
-  filename = "${path.module}/app1.zip"
+  runtime       = var.lambda_runtime
+  filename      = "${path.module}/app1.zip"
 
   environment {
   variables = {
-    S3_BUCKET_R     = var.s3_bucket_raw
-    S3_BUCKET_D     = var.s3_bucket_dump
+    S3_BUCKET_R     = var.s3_bucket_raw_name
+    S3_BUCKET_D     = var.s3_bucket_dump_name
     SNS_TOPIC_ARN   = var.sns_arn
     FRAME_RATE      = "1"
     MIN_CONFIDENCE  = "80"
@@ -135,19 +132,16 @@ resource "aws_lambda_function" "function1" {
 
 
 resource "aws_lambda_function" "function2" {
-  
-  // This lambda funtion take the video and split them into images and then put it into a dump bucket
-
-  function_name = var.project_name
-  handler       = var.lambda_handler // Use a variable for handler
+  function_name = "${var.project_name}-function2"
+  handler       = "app2.handler"
   role          = aws_iam_role.lambda_exec.arn
-  runtime       = var.lambda_runtime // Use a variable for runtime
-  filename = "${path.module}/app2.zip"
+  runtime       = var.lambda_runtime
+  filename      = "${path.module}/app2.zip"
 
   environment {
   variables = {
-    S3_BUCKET_R     = var.s3_bucket_raw
-    S3_BUCKET_D     = var.s3_bucket_dump
+    S3_BUCKET_R     = var.s3_bucket_raw_name
+    S3_BUCKET_D     = var.s3_bucket_dump_name
     SNS_TOPIC_ARN   = var.sns_arn
     FRAME_RATE      = "1"
     MIN_CONFIDENCE  = "80"

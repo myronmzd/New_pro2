@@ -22,11 +22,11 @@ module "lambda" {
   lambda_handler = "app1.handler"
   lambda_runtime = "python3.9"
   environment    = "Production"
-  funtion_names = "process-video"
+  function_names = "process-video"
   project_name   = "CarCrashApp"
   aws_region     = var.aws_region
-  s3_bucket_raw     = module.s3.raw_bucket_name
-  s3_bucket_dump    = module.s3.dump_bucket_name
+  s3_bucket_raw_name     = module.s3.raw_bucket_name
+  s3_bucket_dump_name    = module.s3.dump_bucket_name
   input_bucket_arn = module.s3.raw_bucket_arn
   output_bucket_arn = module.s3.dump_bucket_arn
   sns_arn = module.events_sns.aws_sns_topic_arn
@@ -36,8 +36,8 @@ module "stepfunctions" {
   source = "./modules/Stepfunctions"
   s3bucket_raw_arn    = module.s3.raw_bucket_arn
   s3bucket_dump_arn   = module.s3.dump_bucket_arn
-  aws_region          = var.aws_regionfamily
-  sns_stepfunctions   = module.events_sns.aws_sns_topic_arnity_group_id
+  aws_region          = var.aws_region
+  sns_stepfunctions   =  module.events_sns.aws_sns_topic_arn
   LambdaFunction1Name  = module.lambda.lambda_function1_name
   function1_invoke_arns    = module.lambda.function1_invoke_arns
   LambdaFunction2Name  = module.lambda.lambda_function2_name
@@ -55,21 +55,3 @@ module "events_sns" {
 }
 
 
-module "compute" {
-  source = "./modules/compute"
-  aws_region           = var.aws_region
-  project_name         = "CarCrashApp"
-  s3_bucket_raw        = module.s3.raw_bucket_name
-  s3_bucket_dump       = module.s3.dump_bucket_name
-  input_bucket_arn     = module.s3.raw_bucket_arn
-  output_bucket_arn    = module.s3.dump_bucket_arn
-  ecr_repository_url   = "236024603923.dkr.ecr.ap-south-1.amazonaws.com/yolov8-video-processor:lateset"
-  
-  default_tags = {
-    Project     = "CarCrashApp"
-    Environment = "Dev"
-  }
-
-  lambda_function_name = module.lambda.lambda_function_name
-  function_invoke_arns = module.lambda.function_invoke_arns
-}
