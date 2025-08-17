@@ -11,22 +11,6 @@ variable "aws_region" {
   description = "AWS region"
   type        = string
 }
-variable "fargate_task_arn" {
-  description = "ARN of the Fargate task definition"
-  type        = string
-}
-variable "fargete_role_arn" {
-  description = "ARN of the Fargate task role"
-  type        = string
-}
-variable "ecs_cluster_name" {
-  description = "Name of the ECS cluster"
-  type        = string
-}
-variable "task_definition_family" {
-  description = "Family name of the task definition"
-  type        = string
-}
 variable "sns_stepfunctions" {
   description = "Name of the SNS topic"
   type        = string
@@ -35,11 +19,23 @@ variable "default_subnets" {
   description = "List of default subnet IDs"
   type        = list(string)
 }
-variable "fargate_security_group_id" {
-  description = "Security group ID for Fargate tasks"
+
+variable "lambda_function1_name" {
+  description = "Name of the first Lambda function"
   type        = string
 }
-variable "lambda_function_name" {
-  description = "Name of the Lambda function"
+
+variable "function1_invoke_arns" {
+  description = "ARN of the first Lambda function for invocation"
+  type        = string
+}
+
+variable "lambda_function2_name" {
+  description = "Name of the second Lambda function"
+  type        = string
+}
+
+variable "function2_invoke_arns" {
+  description = "ARN of the second Lambda function for invocation"
   type        = string
 }

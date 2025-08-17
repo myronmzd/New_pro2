@@ -20,12 +20,11 @@ locals {
     {
       Region               = data.aws_region.current.name
       AccountId            = data.aws_caller_identity.current.account_id
-      EcsClusterName       = var.ecs_cluster_name
-      TaskDefinitionFamily = var.task_definition_family
       SnsTopicArn          = var.sns_stepfunctions
-      LambdaFunctionName   = var.lambda_function_name
-      Subnets              = jsonencode(var.default_subnets)
-      SecurityGroupId      = var.fargate_security_group_id
+      LambdaFunction1Name  = var.lambda_function1_name
+      Function1InvokeArns  = var.function1_invoke_arns  
+      LambdaFunction2Name  = var.lambda_function2_name
+      Function2InvokeArns  = var.function2_invoke_arns
     }
   )
 }

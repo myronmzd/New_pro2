@@ -34,18 +34,14 @@ module "lambda" {
 
 module "stepfunctions" {
   source = "./modules/Stepfunctions"
-  lambda = module.lambda.function_invoke_arns
   s3bucket_raw_arn    = module.s3.raw_bucket_arn
   s3bucket_dump_arn   = module.s3.dump_bucket_arn
-  aws_region          = var.aws_region
-  fargate_task_arn    = module.compute.fargate_task_definition_arn
-  fargete_role_arn    =  module.compute.fargate_task_role_arn
-  ecs_cluster_name    = module.compute.ecs_cluster_name
-  task_definition_family = module.compute.fargate_task_definition_family
-  sns_stepfunctions  = module.events_sns.aws_sns_topic_arn
-  lambda_function_name = module.lambda.lambda_function_name
-  default_subnets     = module.compute.default_subnets
-  fargate_security_group_id = module.compute.fargate_security_group_id
+  aws_region          = var.aws_regionfamily
+  sns_stepfunctions   = module.events_sns.aws_sns_topic_arnity_group_id
+  LambdaFunction1Name  = module.lambda.lambda_function1_name
+  function1_invoke_arns    = module.lambda.function1_invoke_arns
+  LambdaFunction2Name  = module.lambda.lambda_function2_name
+  function2_invoke_arns    = module.lambda.function2_invoke_arns
 }
 
 module "events_sns" {
@@ -61,7 +57,6 @@ module "events_sns" {
 
 module "compute" {
   source = "./modules/compute"
-
   aws_region           = var.aws_region
   project_name         = "CarCrashApp"
   s3_bucket_raw        = module.s3.raw_bucket_name
