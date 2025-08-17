@@ -27,9 +27,9 @@ module "lambda" {
   aws_region     = var.aws_region
   s3_bucket_raw_name     = module.s3.raw_bucket_name
   s3_bucket_dump_name    = module.s3.dump_bucket_name
-  input_bucket_arn = module.s3.raw_bucket_arn
-  output_bucket_arn = module.s3.dump_bucket_arn
-  sns_arn = module.events_sns.aws_sns_topic_arn
+  input_bucket_arn       = module.s3.raw_bucket_arn
+  output_bucket_arn      = module.s3.dump_bucket_arn
+  sns_arn                = module.events_sns.aws_sns_topic_arn
 }
 
 module "stepfunctions" {
@@ -37,7 +37,7 @@ module "stepfunctions" {
   s3bucket_raw_arn    = module.s3.raw_bucket_arn
   s3bucket_dump_arn   = module.s3.dump_bucket_arn
   aws_region          = var.aws_region
-  sns_stepfunctions   =  module.events_sns.aws_sns_topic_arn
+  sns_stepfunctions   = module.events_sns.aws_sns_topic_arn
   LambdaFunction1Name  = module.lambda.lambda_function1_name
   function1_invoke_arns    = module.lambda.function1_invoke_arns
   LambdaFunction2Name  = module.lambda.lambda_function2_name

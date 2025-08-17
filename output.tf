@@ -12,13 +12,3 @@ output "stepfunction_arn" {
   description = "ARN of the Step Function state machine"
   value       = module.stepfunctions.state_machine_arn
 }
-
-output "lambda_function_name" {
-  description = "Name of the Lambda function"
-  value       = module.lambda.lambda_function_name
-}
-
-output "ecs_cluster_name" {
-  description = "Name of the ECS cluster"
-  value       = module.compute.ecs_cluster_name
-}

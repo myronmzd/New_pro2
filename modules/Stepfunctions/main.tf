@@ -21,9 +21,11 @@ locals {
       Region               = data.aws_region.current.name
       AccountId            = data.aws_caller_identity.current.account_id
       SnsTopicArn          = var.sns_stepfunctions
-      LambdaFunction1Name  = var.LambdaFunction1Name
+      dump_bucket          = var.s3bucket_dump_arn 
+      input_bucket         = var.s3bucket_raw_arn
+      LambdaFunctionName1  = var.LambdaFunction1Name
       Function1InvokeArns  = var.function1_invoke_arns  
-      LambdaFunction2Name  = var.LambdaFunction2Name
+      LambdaFunctionName2  = var.LambdaFunction2Name
       Function2InvokeArns  = var.function2_invoke_arns
     }
   )

@@ -35,7 +35,8 @@
       "Parameters": {
         "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:${LambdaFunctionName1}",
         "Payload": {
-          "bucket.$": "$.input_bucket",
+          "bucket_Input.$": "$.input_bucket",
+          "bucket_Output.$": "$.dump_bucket",
           "key.$": "$.s3ListResult.Contents[0].Key"
         }
       },
@@ -119,6 +120,7 @@
       "Resource": "arn:aws:states:::lambda:invoke",
       "OutputPath": "$.Payload",
       "Parameters": {
+        "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:${LambdaFunctionName2}",
         "Payload.$": "$"
       },
       "Retry": [
