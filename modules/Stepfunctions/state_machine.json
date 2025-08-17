@@ -11,9 +11,9 @@
         "MaxKeys": 1
       },
       "ResultPath": "$.s3ListResult",
-      "Next": "Choice"
+      "Next": "Choice1"
     },
-    "Choice": {
+    "Choice1": {
       "Type": "Choice",
       "Choices": [
         {
@@ -22,12 +22,12 @@
           "Next": "LambdaSplitVideo"
         }
       ],
-      "Default": "Fail"
+      "Default": "FailVideo"
     },
-    "Fail": {
+    "FailVideo": {
       "Type": "Fail",
       "Error": "NotVideoFormat",
-      "Cause": "Only .mp4 and .avi allowed"
+      "Cause": "Only .mp4 allowed"
     },
     "LambdaSplitVideo": {
       "Type": "Task",
@@ -40,28 +40,35 @@
         }
       },
       "ResultPath": "$.lambda1Result",
-      "Next": "PutProcessingImages"
+      "Next": "CheckProcessingImages"
     },
-    "PutProcessingImages": {
+    "CheckProcessingImages": {
       "Type": "Task",
-      "Resource": "arn:aws:states:::aws-sdk:s3:putObject",
+      "Resource": "arn:aws:states:::aws-sdk:s3:listObjectsV2",
       "Parameters": {
         "Bucket": "${dump_bucket}",
-        "Key": "processing/status.txt",
-        "Body": "processing"
+        "Prefix": "processing/"
       },
-      "Next": "Choice (1)"
+      "ResultPath": "$.processingResult",
+      "Next": "Choice2"
     },
-    "Choice (1)": {
+    "Choice2": {
       "Type": "Choice",
       "Choices": [
         {
-          "End": true
+          "Variable": "$.processingResult.Contents",
+          "IsPresent": true,
+          "Next": "ECS RunTask"
         }
       ],
-      "Default": "ECS RunTask (1)"
+      "Default": "FailProcessing"
     },
-    "ECS RunTask (1)": {
+    "FailProcessing": {
+      "Type": "Fail",
+      "Error": "NoProcessingImages",
+      "Cause": "LambdaSplitVideo did not generate images"
+    },
+    "ECS RunTask": {
       "Type": "Task",
       "Resource": "arn:aws:states:::ecs:runTask",
       "Parameters": {
@@ -75,11 +82,37 @@
       "Type": "Task",
       "Resource": "arn:aws:states:::aws-sdk:s3:putObject",
       "Parameters": {
-        "Bucket": "MyData",
+        "Bucket": "${dump_bucket}",
         "Key": "results/detection.json",
-        "Body.$": "$.rekognitionResult"
+        "Body.$": "$.Results"
       },
-      "Next": "Lambda Invoke"
+      "Next": "CheckResultsFiles"
+    },
+    "CheckResultsFiles": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::aws-sdk:s3:listObjectsV2",
+      "Parameters": {
+        "Bucket": "${dump_bucket}",
+        "Prefix": "results/"
+      },
+      "ResultPath": "$.resultsList",
+      "Next": "Choice3"
+    },
+    "Choice3": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.resultsList.Contents",
+          "IsPresent": true,
+          "Next": "Lambda Invoke"
+        }
+      ],
+      "Default": "FailResults"
+    },
+    "FailResults": {
+      "Type": "Fail",
+      "Error": "NoResultsFiles",
+      "Cause": "Second stage did not generate results"
     },
     "Lambda Invoke": {
       "Type": "Task",
