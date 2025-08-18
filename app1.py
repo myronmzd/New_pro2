@@ -6,7 +6,6 @@ import tempfile
 # AWS clients
 s3 = boto3.client("s3")
 
-
 # Read env variables
 INPUT_BUCKET = os.environ.get("S3_BUCKET_R")   # Raw bucket (video source)
 OUTPUT_BUCKET = os.environ.get("S3_BUCKET_D")  # Dump bucket (frames)
@@ -17,16 +16,23 @@ def lambda_handler(event, context):
     Lambda handler triggered by S3 upload (new video).
     Splits video into frames and stores them in output bucket.
     """
-    # Get S3 event info
-    input_key = event['Records'][0]['s3']['object']['key']
-    print(f"Processing video: s3://{INPUT_BUCKET}/raw/{input_key}")
+
+    # Get bucket & key from event (Step Function or S3 trigger)
+    input_bucket = event.get("input_bucket", INPUT_BUCKET)  # from step funtion "input-bucket-77wmhh3q"
+    key = event.get("key")  # from step funtion "raw/Untitled.mp4"
+
+    if not input_bucket or not key:
+        return {"statusCode": 400, "body": "Missing input_bucket or key"}
+
+    print(f"Processing video: s3://{input_bucket}/{key}")
 
     # Temp file to store video
     tmp_video = tempfile.NamedTemporaryFile(delete=False)
     local_video_path = tmp_video.name
+    tmp_video.close()
 
     # Download from input bucket
-    s3.download_file(INPUT_BUCKET, input_key, local_video_path)
+    s3.download_file(input_bucket, key, local_video_path)
 
     # Process video with OpenCV
     cap = cv2.VideoCapture(local_video_path)
@@ -42,7 +48,7 @@ def lambda_handler(event, context):
             break
 
         if frame_count % interval == 0:
-            frame_filename = f"{os.path.splitext(os.path.basename(input_key))[0]}_frame_{saved_count:05d}.jpg"
+            frame_filename = f"{os.path.splitext(os.path.basename(key))[0]}_frame_{saved_count:05d}.jpg"
             local_frame_path = os.path.join(tempfile.gettempdir(), frame_filename)
             cv2.imwrite(local_frame_path, frame)
 
@@ -50,6 +56,7 @@ def lambda_handler(event, context):
             s3.upload_file(local_frame_path, OUTPUT_BUCKET, frame_filename)
             print(f"Uploaded {frame_filename} to {OUTPUT_BUCKET}")
 
+            os.remove(local_frame_path)  # ✅ cleanup frame
             saved_count += 1
 
         frame_count += 1
@@ -59,5 +66,5 @@ def lambda_handler(event, context):
 
     return {
         "statusCode": 200,
-        "body": f"Processed {saved_count} frames from {input_key}"
+        "body": f"Processed {saved_count} frames from {key}"
     }

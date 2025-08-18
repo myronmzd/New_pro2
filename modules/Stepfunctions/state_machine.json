@@ -1,5 +1,5 @@
 {
-  "Comment": "Video pipeline with Rekognition + SES + SNS",
+  "Comment": "Video analysis step function",
   "StartAt": "CheckBucketContents",
   "States": {
     "CheckBucketContents": {
@@ -36,7 +36,8 @@
         "Payload": {
           "bucket_Input.$": "$.input_bucket",
           "bucket_Output.$": "$.dump_bucket",
-          "key.$": "$.s3ListResult.Contents[0].Key"
+          "key.$": "$.s3ListResult.Contents[0].Key",
+          "farmes":"&.1"
         }
       },
       "ResultPath": "$.lambda1Result",
