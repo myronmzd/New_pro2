@@ -18,15 +18,22 @@ resource "random_string" "suffix" {
 }
 
 
-resource "aws_s3_bucket" "raw" {
-  bucket        = "offline-video-raw-${random_string.suffix.result}"
+resource "aws_s3_bucket" "Input_bucket" {
+  bucket        = "input-bucket-${random_string.suffix.result}"
   force_destroy = true
   tags = local.common_tags
 }
 
+resource "aws_s3_object" "Input_bucket" {
+  bucket = aws_s3_bucket.Input_bucket.bucket
+  key    = "raw/"
+  content = ""
+}
+
+
 # Enable EventBridge notifications for the raw bucket
-resource "aws_s3_bucket_notification" "raw_bucket_notification" {
-  bucket = aws_s3_bucket.raw.id
+resource "aws_s3_bucket_notification" "Input_bucket_notification" {
+  bucket = aws_s3_bucket.Input_bucket.id
 
   eventbridge = true
 }
@@ -37,12 +44,23 @@ resource "aws_s3_bucket" "dump_bucket" {
   tags = local.common_tags
 }
 
+resource "aws_s3_object" "folder2" {
+  bucket = aws_s3_bucket.dump_bucket.bucket
+  key    = "processing/"
+  content = ""
+}
+resource "aws_s3_object" "folder3" {
+  bucket = aws_s3_bucket.dump_bucket.bucket
+  key    = "results/"
+  content = "" 
+}
+
 # --------------------------------------------------------------------
 # Block all public access – strongly recommended for private pipelines
 # --------------------------------------------------------------------
 
-resource "aws_s3_bucket_public_access_block" "raw" {
-  bucket                  = aws_s3_bucket.raw.id
+resource "aws_s3_bucket_public_access_block" "Input_bucket_block" {
+  bucket                  = aws_s3_bucket.Input_bucket.id
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
@@ -63,8 +81,8 @@ resource "aws_s3_bucket_public_access_block" "dump" {
 # ############################################
 #   IAM ROLES                                 #
 # ############################################
-resource "aws_iam_role" "s3_raw_role" {
-  name = "s3_raw_role"
+resource "aws_iam_role" "s3_Input_role" {
+  name = "s3_Input_role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
@@ -98,9 +116,9 @@ resource "aws_iam_role" "s3_dump_role" {
 # ############################################
 #   IAM POLICIES                               #
 # ############################################
-resource "aws_iam_policy" "s3_raw_policy" {
-  name        = "s3_raw_policy"
-  description = "Policy for accessing raw S3 bucket"
+resource "aws_iam_policy" "s3_Input_policy" {
+  name        = "s3_Input_policy"
+  description = "Policy for accessing Input S3 bucket"
   policy      = jsonencode({
     Version = "2012-10-17"
     Statement = [{
@@ -112,8 +130,8 @@ resource "aws_iam_policy" "s3_raw_policy" {
         "s3:DeleteObject"
       ]
       Resource = [
-        aws_s3_bucket.raw.arn,    
-        "${aws_s3_bucket.raw.arn}/*"
+        aws_s3_bucket.Input_bucket.arn,    
+        "${aws_s3_bucket.Input_bucket.arn}/*"
       ]
     }]
   })
@@ -143,11 +161,12 @@ resource "aws_iam_policy" "s3_dump_policy" {
 # ############################################
 #   IAM ROLE POLICIES                          #
 # ############################################
-resource "aws_iam_role_policy_attachment" "s3_raw_role_policy" {
-  role       = aws_iam_role.s3_raw_role.name        
-  policy_arn = aws_iam_policy.s3_raw_policy.arn
+resource "aws_iam_role_policy_attachment" "s3_Input_role_policy" {
+  role       = aws_iam_role.s3_Input_role.name        
+  policy_arn = aws_iam_policy.s3_Input_policy.arn
   
 }
+
 
 resource "aws_iam_role_policy_attachment" "s3_dump_role_policy" {
   role       = aws_iam_role.s3_dump_role.name        

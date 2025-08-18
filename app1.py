@@ -1,56 +1,63 @@
 import boto3
+import cv2
 import os
+import tempfile
 
-ses_client = boto3.client('ses')
+# AWS clients
+s3 = boto3.client("s3")
 
-# Replace with your verified sender and recipient email
-SENDER_EMAIL = os.environ.get("SENDER_EMAIL")  # e.g., alerts@yourdomain.com
-RECIPIENT_EMAIL = os.environ.get("RECIPIENT_EMAIL")  # e.g., admin@yourdomain.com
+
+# Read env variables
+INPUT_BUCKET = os.environ.get("S3_BUCKET_R")   # Raw bucket (video source)
+OUTPUT_BUCKET = os.environ.get("S3_BUCKET_D")  # Dump bucket (frames)
+FRAME_RATE = int(os.environ.get("FRAME_RATE", "1"))  # 1 frame per second by default
 
 def lambda_handler(event, context):
-    print("Received event:", event)
-
-    # Extract info from Step Function input
-    video_key = event.get("video_key")
-    bucket = event.get("bucket")
-    details = event.get("details", {})
-
-    if not video_key or not bucket:
-        raise ValueError("Missing required input: video_key or bucket")
-
-    # Generate a public or internal S3 URL (if public access is granted)
-    video_url = f"https://s3.amazonaws.com/{bucket}/{video_key}"
-
-    subject = "🚨 Video Alert: Crash or Crime Event Detected"
-    body = f"""
-A new event has been detected in a processed video.
-
-📂 S3 Bucket: {bucket}
-🎥 Video Key: {video_key}
-🔗 Video URL: {video_url}
-
-📝 Additional Info:
-{details}
-
-This message was automatically sent by your Step Function workflow.
     """
+    Lambda handler triggered by S3 upload (new video).
+    Splits video into frames and stores them in output bucket.
+    """
+    # Get S3 event info
+    input_key = event['Records'][0]['s3']['object']['key']
+    print(f"Processing video: s3://{INPUT_BUCKET}/raw/{input_key}")
 
-    try:
-        response = ses_client.send_email(
-            Source=SENDER_EMAIL,
-            Destination={
-                'ToAddresses': [RECIPIENT_EMAIL]
-            },
-            Message={
-                'Subject': {'Data': subject},
-                'Body': {
-                    'Text': {'Data': body}
-                }
-            }
-        )
-        print("Email sent! Message ID:", response['MessageId'])
-        return {"status": "success", "message_id": response['MessageId']}
+    # Temp file to store video
+    tmp_video = tempfile.NamedTemporaryFile(delete=False)
+    local_video_path = tmp_video.name
 
-    except Exception as e:
-        print("Error sending email:", str(e))
-        raise
+    # Download from input bucket
+    s3.download_file(INPUT_BUCKET, input_key, local_video_path)
+
+    # Process video with OpenCV
+    cap = cv2.VideoCapture(local_video_path)
+    fps = int(cap.get(cv2.CAP_PROP_FPS)) or 30
+    interval = max(1, fps // FRAME_RATE)  # how many frames to skip
+
+    frame_count = 0
+    saved_count = 0
+
+    while cap.isOpened():
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        if frame_count % interval == 0:
+            frame_filename = f"{os.path.splitext(os.path.basename(input_key))[0]}_frame_{saved_count:05d}.jpg"
+            local_frame_path = os.path.join(tempfile.gettempdir(), frame_filename)
+            cv2.imwrite(local_frame_path, frame)
+
+            # Upload to output bucket
+            s3.upload_file(local_frame_path, OUTPUT_BUCKET, frame_filename)
+            print(f"Uploaded {frame_filename} to {OUTPUT_BUCKET}")
+
+            saved_count += 1
+
+        frame_count += 1
+
+    cap.release()
+    os.remove(local_video_path)
+
+    return {
+        "statusCode": 200,
+        "body": f"Processed {saved_count} frames from {input_key}"
+    }

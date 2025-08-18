@@ -115,9 +115,7 @@ resource "aws_lambda_function" "function1" {
   variables = {
     S3_BUCKET_R     = var.s3_bucket_raw_name
     S3_BUCKET_D     = var.s3_bucket_dump_name
-    SNS_TOPIC_ARN   = var.sns_arn
     FRAME_RATE      = "1"
-    MIN_CONFIDENCE  = "80"
   }
   }
   tags = merge(
@@ -140,11 +138,8 @@ resource "aws_lambda_function" "function2" {
 
   environment {
   variables = {
-    S3_BUCKET_R     = var.s3_bucket_raw_name
     S3_BUCKET_D     = var.s3_bucket_dump_name
     SNS_TOPIC_ARN   = var.sns_arn
-    FRAME_RATE      = "1"
-    MIN_CONFIDENCE  = "80"
   }
   }
   tags = merge(

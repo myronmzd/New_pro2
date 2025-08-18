@@ -17,8 +17,7 @@
       "Type": "Choice",
       "Choices": [
         {
-          "Variable": "$.s3ListResult.Contents[0].Key",
-          "StringMatches": "*.mp4",
+          "Variable": "$.input_key", "StringMatches": "*.mp4",
           "Next": "LambdaSplitVideo"
         }
       ],
