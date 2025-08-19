@@ -35,7 +35,6 @@
         "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:${LambdaFunctionName1}",
         "Payload": {
           "bucket_Input.$": "$.input_bucket",
-          "bucket_Output.$": "$.dump_bucket",
           "key.$": "$.s3ListResult.Contents[0].Key",
           "farmes":"&.1"
         }
