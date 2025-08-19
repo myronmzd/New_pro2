@@ -119,6 +119,44 @@ resource "aws_cloudwatch_log_group" "fargate_logs" {
 }
 
 # Fargate task definition
+
+resource "aws_ecs_task_definition" "video_splitter" {
+  family                   = "${var.project_name}-video_splitter"
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = "2048"
+  memory                   = "4096"
+  execution_role_arn       = aws_iam_role.fargate_execution_role.arn
+  task_role_arn           = aws_iam_role.fargate_task_role.arn
+
+  container_definitions = jsonencode([{
+    name  = "video-processor"
+    image = var.ecr_repository_url
+    
+    environment = [
+      {
+        name  = "INPUT_BUCKET"
+        value = var.s3_bucket_raw
+      },
+      {
+        name  = "OUTPUT_BUCKET"
+        value = var.s3_bucket_dump
+      }
+    ]
+    
+    logConfiguration = {
+      logDriver = "awslogs"
+      options = {
+        "awslogs-group"         = aws_cloudwatch_log_group.fargate_logs.name
+        "awslogs-region"        = var.aws_region
+        "awslogs-stream-prefix" = "ecs"
+      }
+    }
+    
+    essential = true
+  }])
+}
+
 resource "aws_ecs_task_definition" "video_processor" {
   family                   = "${var.project_name}-video-processor"
   network_mode             = "awsvpc"

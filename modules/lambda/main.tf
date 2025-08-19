@@ -95,41 +95,7 @@ resource "archive_file" "app1" {
   output_path = "modules/lambda/app1.zip"
   output_file_mode = "0644"
 }
-
-resource "archive_file" "app2" {
-  type        = "zip"
-  source_file = "/workspaces/New_pro2/app2.py"
-  output_path = "modules/lambda/app2.zip"
-  output_file_mode = "0644"
-}
-
-
 resource "aws_lambda_function" "function1" {
-  function_name = "${var.project_name}-function1"
-  handler       = var.lambda_handler
-  role          = aws_iam_role.lambda_exec.arn
-  runtime       = var.lambda_runtime
-  filename      = "${path.module}/app1.zip"
-
-  environment {
-  variables = {
-    S3_BUCKET_R     = var.s3_bucket_raw_name
-    S3_BUCKET_D     = var.s3_bucket_dump_name
-    FRAME_RATE      = "1"
-  }
-  }
-  tags = merge(
-  var.default_tags,
-  local.common_tags,
-  {
-    Environment = var.environment
-    Project     = var.project_name
-  }
-  )
-}
-
-
-resource "aws_lambda_function" "function2" {
   function_name = "${var.project_name}-function2"
   handler       = "app2.handler"
   role          = aws_iam_role.lambda_exec.arn

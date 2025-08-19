@@ -25,8 +25,6 @@ locals {
       input_bucket         = var.s3bucket_raw_arn
       LambdaFunctionName1  = var.LambdaFunction1Name
       Function1InvokeArns  = var.function1_invoke_arns  
-      LambdaFunctionName2  = var.LambdaFunction2Name
-      Function2InvokeArns  = var.function2_invoke_arns
     }
   )
 }

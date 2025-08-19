@@ -1,70 +1,68 @@
 import boto3
-import cv2
 import os
-import tempfile
 
-# AWS clients
+ses_client = boto3.client("ses")
 s3 = boto3.client("s3")
 
-# Read env variables
-INPUT_BUCKET = os.environ.get("S3_BUCKET_R")   # Raw bucket (video source)
-OUTPUT_BUCKET = os.environ.get("S3_BUCKET_D")  # Dump bucket (frames)
-FRAME_RATE = int(os.environ.get("FRAME_RATE", "1"))  # 1 frame per second by default
+# Environment variables
+OUTPUT_BUCKET = os.environ.get("S3_BUCKET_D")  # Dump bucket (contains results/images)
+SENDER_EMAIL = os.environ.get("SENDER_EMAIL")
+RECIPIENT_EMAIL = os.environ.get("RECIPIENT_EMAIL")
 
 def lambda_handler(event, context):
-    """
-    Lambda handler triggered by S3 upload (new video).
-    Splits video into frames and stores them in output bucket.
-    """
+    print("Received event:", event)
 
-    # Get bucket & key from event (Step Function or S3 trigger)
-    input_bucket = event.get("input_bucket", INPUT_BUCKET)  # from step funtion "input-bucket-77wmhh3q"
-    key = event.get("key")  # from step funtion "raw/Untitled.mp4"
+    # List objects in /results folder
+    prefix = "results/"
+    try:
+        response = s3.list_objects_v2(
+            Bucket=OUTPUT_BUCKET,
+            Prefix=prefix
+        )
 
-    if not input_bucket or not key:
-        return {"statusCode": 400, "body": "Missing input_bucket or key"}
+        if "Contents" not in response:
+            print("No images found in results folder.")
+            return {"status": "no_results"}
 
-    print(f"Processing video: s3://{input_bucket}/{key}")
+        image_keys = [obj["Key"] for obj in response["Contents"] if obj["Key"].lower().endswith((".jpg", ".png"))]
 
-    # Temp file to store video
-    tmp_video = tempfile.NamedTemporaryFile(delete=False)
-    local_video_path = tmp_video.name
-    tmp_video.close()
+        if not image_keys:
+            print("No images found in results folder.")
+            return {"status": "no_images"}
 
-    # Download from input bucket
-    s3.download_file(input_bucket, key, local_video_path)
+        # Generate S3 URLs (public-style; switch to presigned if bucket is private)
+        image_urls = [
+            f"https://{OUTPUT_BUCKET}.s3.amazonaws.com/{key}"
+            for key in image_keys
+        ]
 
-    # Process video with OpenCV
-    cap = cv2.VideoCapture(local_video_path)
-    fps = int(cap.get(cv2.CAP_PROP_FPS)) or 30
-    interval = max(1, fps // FRAME_RATE)  # how many frames to skip
+        # Email content
+        subject = "🚨 Alert: Car Crash Detected"
+        body = f"""
+A potential car crash event was detected.
 
-    frame_count = 0
-    saved_count = 0
+📂 S3 Bucket: {OUTPUT_BUCKET}
+📁 Folder: results/
 
-    while cap.isOpened():
-        ret, frame = cap.read()
-        if not ret:
-            break
+🖼️ Detected Images:
+{chr(10).join(image_urls)}
 
-        if frame_count % interval == 0:
-            frame_filename = f"{os.path.splitext(os.path.basename(key))[0]}_frame_{saved_count:05d}.jpg"
-            local_frame_path = os.path.join(tempfile.gettempdir(), frame_filename)
-            cv2.imwrite(local_frame_path, frame)
+This is an automated alert.
+        """
 
-            # Upload to output bucket
-            s3.upload_file(local_frame_path, OUTPUT_BUCKET, frame_filename)
-            print(f"Uploaded {frame_filename} to {OUTPUT_BUCKET}")
+        # Send email via SES
+        response = ses_client.send_email(
+            Source=SENDER_EMAIL,
+            Destination={"ToAddresses": [RECIPIENT_EMAIL]},
+            Message={
+                "Subject": {"Data": subject},
+                "Body": {"Text": {"Data": body}}
+            }
+        )
 
-            os.remove(local_frame_path)  # ✅ cleanup frame
-            saved_count += 1
+        print("Email sent! Message ID:", response["MessageId"])
+        return {"status": "success", "message_id": response["MessageId"]}
 
-        frame_count += 1
-
-    cap.release()
-    os.remove(local_video_path)
-
-    return {
-        "statusCode": 200,
-        "body": f"Processed {saved_count} frames from {key}"
-    }
+    except Exception as e:
+        print("Error:", str(e))
+        raise

@@ -17,8 +17,9 @@
       "Type": "Choice",
       "Choices": [
         {
-          "Variable": "$.input_key", "StringMatches": "*.mp4",
-          "Next": "LambdaSplitVideo"
+          "Variable": "$.input_key",
+          "StringMatches": "*.mp4",
+          "Next": "ECS RunTask LambdaSplitVideo"
         }
       ],
       "Default": "FailVideo"
@@ -28,18 +29,14 @@
       "Error": "NotVideoFormat",
       "Cause": "Only .mp4 allowed"
     },
-    "LambdaSplitVideo": {
+    "ECS RunTask LambdaSplitVideo": {
       "Type": "Task",
-      "Resource": "arn:aws:states:::lambda:invoke",
+      "Resource": "arn:aws:states:::ecs:runTask",
       "Parameters": {
-        "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:${LambdaFunctionName1}",
-        "Payload": {
-          "bucket_Input.$": "$.input_bucket",
-          "key.$": "$.s3ListResult.Contents[0].Key",
-          "farmes":"&.1"
-        }
+        "LaunchType": "FARGATE",
+        "Cluster": "arn:aws:ecs:REGION:ACCOUNT_ID:cluster/MyECSCluster",
+        "TaskDefinition": "arn:aws:ecs:REGION:ACCOUNT_ID:task-definition/MyTaskDefinition:1"
       },
-      "ResultPath": "$.lambda1Result",
       "Next": "CheckProcessingImages"
     },
     "CheckProcessingImages": {
@@ -58,7 +55,7 @@
         {
           "Variable": "$.processingResult.Contents",
           "IsPresent": true,
-          "Next": "ECS RunTask"
+          "Next": "ECS RunTask CrashDetection"
         }
       ],
       "Default": "FailProcessing"
@@ -68,13 +65,13 @@
       "Error": "NoProcessingImages",
       "Cause": "LambdaSplitVideo did not generate images"
     },
-    "ECS RunTask": {
+    "ECS RunTask CrashDetection": {
       "Type": "Task",
       "Resource": "arn:aws:states:::ecs:runTask",
       "Parameters": {
         "LaunchType": "FARGATE",
         "Cluster": "arn:aws:ecs:REGION:ACCOUNT_ID:cluster/MyECSCluster",
-        "TaskDefinition": "arn:aws:ecs:REGION:ACCOUNT_ID:task-definition/MyTaskDefinition:1"
+        "TaskDefinition": "arn:aws:ecs:REGION:ACCOUNT_ID:task-definition/MyTaskDefinition:2"
       },
       "Next": "SaveResults"
     },
@@ -119,7 +116,7 @@
       "Resource": "arn:aws:states:::lambda:invoke",
       "OutputPath": "$.Payload",
       "Parameters": {
-        "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:${LambdaFunctionName2}",
+        "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:${LambdaFunctionName1}",
         "Payload.$": "$"
       },
       "Retry": [

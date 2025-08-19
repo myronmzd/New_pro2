@@ -22,13 +22,3 @@ variable "function1_invoke_arns" {
   description = "ARN of the first Lambda function for invocation"
   type        = string
 }
-
-variable "LambdaFunction2Name" {
-  description = "Name of the second Lambda function"
-  type        = string
-}
-
-variable "function2_invoke_arns" {
-  description = "ARN of the second Lambda function for invocation"
-  type        = string
-}

@@ -40,8 +40,6 @@ module "stepfunctions" {
   sns_stepfunctions   = module.events_sns.aws_sns_topic_arn
   LambdaFunction1Name  = module.lambda.lambda_function1_name
   function1_invoke_arns    = module.lambda.function1_invoke_arns
-  LambdaFunction2Name  = module.lambda.lambda_function2_name
-  function2_invoke_arns    = module.lambda.function2_invoke_arns
 }
 
 module "events_sns" {
@@ -55,3 +53,22 @@ module "events_sns" {
 }
 
 
+module "compute" {
+  source = "./modules/compute"
+
+  aws_region           = var.aws_region
+  project_name         = "CarCrashApp"
+  s3_bucket_raw        = module.s3.raw_bucket_name
+  s3_bucket_dump       = module.s3.dump_bucket_name
+  input_bucket_arn     = module.s3.raw_bucket_arn
+  output_bucket_arn    = module.s3.dump_bucket_arn
+  ecr_repository_url   = "236024603923.dkr.ecr.ap-south-1.amazonaws.com/yolov8-video-processor:lateset"
+  
+  default_tags = {
+    Project     = "CarCrashApp"
+    Environment = "Dev"
+  }
+
+  lambda_function_name = module.lambda.lambda_function_name
+  function_invoke_arns = module.lambda.function_invoke_arns
+}
