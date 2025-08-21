@@ -37,16 +37,12 @@ variable "output_bucket_arn" {
   description = "ARN of the output (dump) bucket for frames"
   type        = string
 }
-variable "lambda_function_name" {
-  type        = string
-}   
-variable "function_invoke_arns" {
-  description = ""
-  type        = string
-}
 
-variable "ecr_repository_url" {
+variable "ecr_repository_url1" {
   description = "ECR repository URL for the video processor image"
   type        = string
-  default     = "your-account.dkr.ecr.us-east-1.amazonaws.com/video-processor:latest"
+}
+variable "ecr_repository_url2" {
+  description = "ECR repository URL for the video processor image"
+  type        = string
 }

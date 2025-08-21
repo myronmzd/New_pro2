@@ -40,6 +40,11 @@ module "stepfunctions" {
   sns_stepfunctions   = module.events_sns.aws_sns_topic_arn
   LambdaFunction1Name  = module.lambda.lambda_function1_name
   function1_invoke_arns    = module.lambda.function1_invoke_arns
+  ecs_cluster    = module.compute.ecs_cluster_arn
+  video_splitter_arn = module.compute.fargate_video_splitter_arn
+  image_processor_arn = module.compute.fargate_Image_processor_arn
+  ecs_network_config = module.compute.fargate_network_configuration
+
 }
 
 module "events_sns" {
@@ -62,13 +67,10 @@ module "compute" {
   s3_bucket_dump       = module.s3.dump_bucket_name
   input_bucket_arn     = module.s3.raw_bucket_arn
   output_bucket_arn    = module.s3.dump_bucket_arn
-  ecr_repository_url   = "236024603923.dkr.ecr.ap-south-1.amazonaws.com/yolov8-video-processor:lateset"
-  
+  ecr_repository_url1   = "236024603923.dkr.ecr.ap-south-1.amazonaws.com/video-splitter"
+  ecr_repository_url2   = "236024603923.dkr.ecr.ap-south-1.amazonaws.com/video-processor"  
   default_tags = {
     Project     = "CarCrashApp"
     Environment = "Dev"
   }
-
-  lambda_function_name = module.lambda.lambda_function_name
-  function_invoke_arns = module.lambda.function_invoke_arns
 }

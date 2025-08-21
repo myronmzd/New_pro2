@@ -1,19 +1,21 @@
 output "ecs_cluster_arn" {
-  value = aws_ecs_cluster.video_processing.arn
+  value = aws_ecs_cluster.crash_video_cluster.arn
+}
+output "fargate_video_splitter_arn" {
+  value = aws_ecs_task_definition.video_splitter.arn
 }
 
-output "ecs_cluster_name" {
-  value = aws_ecs_cluster.video_processing.name
+output "fargate_video_splitter_family" {
+  value = aws_ecs_task_definition.video_splitter.family
 }
 
-output "fargate_task_definition_arn" {
-  value = aws_ecs_task_definition.video_processor.arn
+output "fargate_Image_processor_arn" {
+  value = aws_ecs_task_definition.image_processor.arn
 }
 
-output "fargate_task_definition_family" {
-  value = aws_ecs_task_definition.video_processor.family
+output "fargate_Image_processor_family" {
+  value = aws_ecs_task_definition.image_processor.family
 }
-
 output "fargate_task_role_arn" {
   value = aws_iam_role.fargate_task_role.arn
 }
@@ -24,4 +26,16 @@ output "default_subnets" {
 
 output "fargate_security_group_id" {
   value = aws_security_group.fargate_sg.id
+}
+
+
+# network configuration for Fargate tasks
+
+output "fargate_network_configuration" {
+  value = {
+    subnets          = data.aws_subnets.default.ids
+    security_groups  = [aws_security_group.fargate_sg.id]
+    assign_public_ip = "ENABLED"
+  }
+  
 }

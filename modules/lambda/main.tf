@@ -97,10 +97,10 @@ resource "archive_file" "app1" {
 }
 resource "aws_lambda_function" "function1" {
   function_name = "${var.project_name}-function2"
-  handler       = "app2.handler"
+  handler       = "app1.handler"
   role          = aws_iam_role.lambda_exec.arn
   runtime       = var.lambda_runtime
-  filename      = "${path.module}/app2.zip"
+  filename      = "${path.module}/app1.zip"
 
   environment {
   variables = {

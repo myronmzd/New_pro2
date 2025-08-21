@@ -37,9 +37,10 @@ resource "aws_security_group" "fargate_sg" {
   tags = merge(var.default_tags, local.common_tags)
 }
 
+
 # ECS Cluster
-resource "aws_ecs_cluster" "video_processing" {
-  name = "${var.project_name}-video-processing"
+resource "aws_ecs_cluster" "crash_video_cluster" {
+  name = "${var.project_name}-crash_video_cluster"
   tags = merge(var.default_tags, local.common_tags)
 }
 
@@ -118,10 +119,10 @@ resource "aws_cloudwatch_log_group" "fargate_logs" {
   retention_in_days = 7
 }
 
-# Fargate task definition
 
+# Fargate task definition
 resource "aws_ecs_task_definition" "video_splitter" {
-  family                   = "${var.project_name}-video_splitter"
+  family                   = "${var.project_name}-Image-processor"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = "2048"
@@ -131,7 +132,7 @@ resource "aws_ecs_task_definition" "video_splitter" {
 
   container_definitions = jsonencode([{
     name  = "video-processor"
-    image = var.ecr_repository_url
+    image = var.ecr_repository_url1
     
     environment = [
       {
@@ -157,8 +158,25 @@ resource "aws_ecs_task_definition" "video_splitter" {
   }])
 }
 
-resource "aws_ecs_task_definition" "video_processor" {
-  family                   = "${var.project_name}-video-processor"
+resource "aws_ecs_service" "video_splitter" {
+  name            = "video-service"
+  cluster         = aws_ecs_cluster.crash_video_cluster.id
+  task_definition = aws_ecs_task_definition.video_splitter.arn
+  launch_type     = "FARGATE"
+
+  network_configuration {
+    subnets          = [data.aws_subnets.default.ids[0]] # Use the first default subnet
+    security_groups  = [aws_security_group.fargate_sg.id] 
+    assign_public_ip = true   
+    # farget does not need public IP but to talk to other pulling 
+    # Docker images from Docker Hub, calling an external API
+  }
+}
+
+
+
+resource "aws_ecs_task_definition" "image_processor" {
+  family                   = "${var.project_name}-image-processor"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = "2048"
@@ -167,8 +185,8 @@ resource "aws_ecs_task_definition" "video_processor" {
   task_role_arn           = aws_iam_role.fargate_task_role.arn
 
   container_definitions = jsonencode([{
-    name  = "video-processor"
-    image = var.ecr_repository_url
+    name  = "Image-processor"
+    image = var.ecr_repository_url2
     
     environment = [
       {
@@ -192,4 +210,20 @@ resource "aws_ecs_task_definition" "video_processor" {
     
     essential = true
   }])
+}
+
+
+resource "aws_ecs_service" "image_processor" {
+  name            = "video-service"
+  cluster         = aws_ecs_cluster.crash_video_cluster.id
+  task_definition = aws_ecs_task_definition.image_processor.arn
+  launch_type     = "FARGATE"
+
+  network_configuration {
+    subnets          = [data.aws_subnets.default.ids[0]] # Use the first default subnet
+    security_groups  = [aws_security_group.fargate_sg.id] 
+    assign_public_ip = true   
+    # farget does not need public IP but to talk to other pulling 
+    # Docker images from Docker Hub, calling an external API
+  }
 }

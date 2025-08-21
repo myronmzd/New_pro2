@@ -31,11 +31,16 @@
     },
     "ECS RunTask LambdaSplitVideo": {
       "Type": "Task",
-      "Resource": "arn:aws:states:::ecs:runTask",
+      "Resource": "arn:aws:states:::ecs:runTask.sync",
       "Parameters": {
         "LaunchType": "FARGATE",
-        "Cluster": "arn:aws:ecs:REGION:ACCOUNT_ID:cluster/MyECSCluster",
-        "TaskDefinition": "arn:aws:ecs:REGION:ACCOUNT_ID:task-definition/MyTaskDefinition:1"
+        "Cluster": "${ecs_cluster}",
+        "TaskDefinition": "${video_splitter_arn}",
+        "NetworkConfiguration": {
+          "NetworkConfiguration": {
+            "AwsvpcConfiguration": ${ecs_network_config_json}
+        }
+      }
       },
       "Next": "CheckProcessingImages"
     },
@@ -43,7 +48,7 @@
       "Type": "Task",
       "Resource": "arn:aws:states:::aws-sdk:s3:listObjectsV2",
       "Parameters": {
-        "Bucket": "${dump_bucket}",
+        "Bucket.$": "$.dump_bucket",
         "Prefix": "processing/"
       },
       "ResultPath": "$.processingResult",
@@ -70,8 +75,8 @@
       "Resource": "arn:aws:states:::ecs:runTask",
       "Parameters": {
         "LaunchType": "FARGATE",
-        "Cluster": "arn:aws:ecs:REGION:ACCOUNT_ID:cluster/MyECSCluster",
-        "TaskDefinition": "arn:aws:ecs:REGION:ACCOUNT_ID:task-definition/MyTaskDefinition:2"
+        "Cluster": "${ecs_cluster}",
+        "TaskDefinition": "${image_processor_arn}"
       },
       "Next": "SaveResults"
     },
@@ -79,7 +84,7 @@
       "Type": "Task",
       "Resource": "arn:aws:states:::aws-sdk:s3:putObject",
       "Parameters": {
-        "Bucket": "${dump_bucket}",
+        "Bucket.$": "$.dump_bucket",
         "Key": "results/detection.json",
         "Body.$": "$.Results"
       },
@@ -89,7 +94,7 @@
       "Type": "Task",
       "Resource": "arn:aws:states:::aws-sdk:s3:listObjectsV2",
       "Parameters": {
-        "Bucket": "${dump_bucket}",
+        "Bucket.$": "$.dump_bucket",
         "Prefix": "results/"
       },
       "ResultPath": "$.resultsList",
@@ -116,7 +121,7 @@
       "Resource": "arn:aws:states:::lambda:invoke",
       "OutputPath": "$.Payload",
       "Parameters": {
-        "FunctionName": "arn:aws:lambda:${Region}:${AccountId}:function:${LambdaFunctionName1}",
+        "FunctionName": "${Function1InvokeArns}",
         "Payload.$": "$"
       },
       "Retry": [
@@ -139,7 +144,7 @@
       "Type": "Task",
       "Resource": "arn:aws:states:::aws-sdk:s3:deleteObject",
       "Parameters": {
-        "Bucket": "MyData",
+        "Bucket.$": "$.dump_bucket",
         "Key": "processing/status.txt"
       },
       "End": true

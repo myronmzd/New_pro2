@@ -66,7 +66,7 @@ This project enables users to **upload video files to S3**, automatically trigge
 │    - S3 ListObjectsV2                     │
 │    - Choice: is file video (.mp4/.mkv)?   │
 │                                           │
-│ 2️⃣ **LambdaSplitVideo**                  │
+│ 2️⃣ **ECS RunTask1= Splits video**         │
 │    - Splits video into frames (images)    │
 │    - Uploads frames to S3                 │
 │                                           │
@@ -74,7 +74,8 @@ This project enables users to **upload video files to S3**, automatically trigge
 │    - S3 ListObjectsV2                     │
 │    - Choice: are processing images ready? │
 │                                           │
-│ 4️⃣ **ECS RunTask**                       │
+│ 4️⃣ **ECS RunTask2 = runs Rekognition      │
+│       on images   **                       │
 │    - Runs container task for Rekognition  │
 │    - Saves inference results              │
 │                                           │
