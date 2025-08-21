@@ -76,7 +76,11 @@
       "Parameters": {
         "LaunchType": "FARGATE",
         "Cluster": "${ecs_cluster}",
-        "TaskDefinition": "${image_processor_arn}"
+        "TaskDefinition": "${image_processor_arn}",
+        "NetworkConfiguration": {
+          "NetworkConfiguration": {
+            "AwsvpcConfiguration": ${ecs_network_config_json}
+        }
       },
       "Next": "SaveResults"
     },

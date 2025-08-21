@@ -12,12 +12,7 @@ provider "aws" {
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
-data "aws_subnets" "default1" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.default.id]
-  }
-}
+
 
 locals {
   state_machine_definition = templatefile(
@@ -33,9 +28,7 @@ locals {
       ecs_cluster          = var.ecs_cluster
       video_splitter_arn   = var.video_splitter_arn
       image_processor_arn  = var.image_processor_arn
-      ecs_subnets          = data.aws_subnets.default1.ids
-      ecs_security_groups  = [aws_security_group.fargate_sg.id]
-      ecs_assign_public_ip = "ENABLED"
+      ecs_network_config_json = var.ecs_network_config
     }
   )
 }
