@@ -31,7 +31,6 @@ variable "aws_region" {
 variable "s3_bucket_dump_name" {
   description = "S3 bucket name"
   type        = string
-  default     = ""
 }
 
 variable "s3_bucket_raw_name" {
