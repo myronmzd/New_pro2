@@ -31,11 +31,9 @@ output "fargate_security_group_id" {
 
 # network configuration for Fargate tasks
 
-output "fargate_network_configuration" {
-  value = {
-    subnets          = data.aws_subnets.default.ids
-    security_groups  = [aws_security_group.fargate_sg.id]
-    assign_public_ip = "ENABLED"
-  }
-  
+output "subnets" {
+  value = [data.aws_subnets.default.ids[0]]
+}
+output "security_groups" {
+  value = [aws_security_group.fargate_sg.id]
 }

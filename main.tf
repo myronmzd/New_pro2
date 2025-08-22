@@ -41,10 +41,10 @@ module "stepfunctions" {
   LambdaFunction1Name  = module.lambda.lambda_function1_name
   function1_invoke_arns    = module.lambda.function1_invoke_arns
   ecs_cluster    = module.compute.ecs_cluster_arn
-  video_splitter_arn = module.compute.fargate_video_splitter_arn
+  video_splitter_arn  = module.compute.fargate_video_splitter_arn
   image_processor_arn = module.compute.fargate_Image_processor_arn
-  ecs_network_config = module.compute.fargate_network_configuration
-
+  fargatesubnet   =  module.compute.subnets
+  fargatesecurity =  module.compute.security_groups
 }
 
 module "events_sns" {

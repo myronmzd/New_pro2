@@ -28,7 +28,8 @@ locals {
       ecs_cluster          = var.ecs_cluster
       video_splitter_arn   = var.video_splitter_arn
       image_processor_arn  = var.image_processor_arn
-      ecs_network_config_json = var.ecs_network_config
+      fargateSUB           = jsonencode(var.fargatesubnet)
+      fargateSG            = jsonencode(var.fargatesecurity)
     }
   )
 }

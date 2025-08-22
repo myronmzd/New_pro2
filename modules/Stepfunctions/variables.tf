@@ -37,10 +37,11 @@ variable "image_processor_arn" {
   type        = string
 }
 
-variable "ecs_network_config" {
-  type = object({
-    subnets          = list(string)
-    security_groups  = list(string)
-    assign_public_ip = string
-  })
+variable "fargatesubnet" {
+  description = "List of subnet IDs for Fargate tasks"
+  type        = list(string)
+}
+variable "fargatesecurity" {
+  description = "List of security group IDs for Fargate tasks"
+  type        = list(string)
 }

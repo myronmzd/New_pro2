@@ -38,7 +38,9 @@
         "TaskDefinition": "${video_splitter_arn}",
         "NetworkConfiguration": {
           "NetworkConfiguration": {
-            "AwsvpcConfiguration": ${ecs_network_config_json}
+            "subnet": ${fargateSUB},
+            "securityGroups": ${fargateSG},   
+            "assignPublicIp": "ENABLED"
         }
       }
       },
@@ -79,8 +81,11 @@
         "TaskDefinition": "${image_processor_arn}",
         "NetworkConfiguration": {
           "NetworkConfiguration": {
-            "AwsvpcConfiguration": ${ecs_network_config_json}
+            "subnet": ${fargateSUB},
+            "securityGroups": ${fargateSG},   
+            "assignPublicIp": "ENABLED"
         }
+      }
       },
       "Next": "SaveResults"
     },
