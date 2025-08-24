@@ -19,7 +19,7 @@
         {
           "Variable": "$.input_key",
           "StringMatches": "*.mp4",
-          "Next": "ECS RunTask LambdaSplitVideo"
+          "Next": "ECS_RunTask_LambdaSplitVideo"
         }
       ],
       "Default": "FailVideo"
@@ -29,7 +29,7 @@
       "Error": "NotVideoFormat",
       "Cause": "Only .mp4 allowed"
     },
-    "ECS RunTask LambdaSplitVideo": {
+    "ECS_RunTask_LambdaSplitVideo": {
       "Type": "Task",
       "Resource": "arn:aws:states:::ecs:runTask.sync",
       "Parameters": {
@@ -45,24 +45,29 @@
         },
         "Overrides": {
           "ContainerOverrides": [{
-            "Name": "video-splitter",
+            "Name": "video-processor",
             "Environment": [
               {
                 "Name": "S3_BUCKET_R",
-                "Value.$": "$.input_bucket"
+                "Value": "${input_bucket}"
               },
               {
                 "Name": "S3_BUCKET_D",
-                "Value.$": "$.dump_bucket"
+                "Value": "${dump_bucket}"
               },
               {
                 "Name": "FRAME_RATE",
                 "Value": "1"
+              },
+              {
+                "Name": "RESULT_PATH",
+                "Value": "${ecsResult}"
               }
             ]
           }]
         }
       },
+      "ResultPath": "$.ecsResult",
       "Next": "CheckProcessingImages"
     },
     "CheckProcessingImages": {
@@ -81,7 +86,7 @@
         {
           "Variable": "$.processingResult.Contents",
           "IsPresent": true,
-          "Next": "ECS RunTask CrashDetection"
+          "Next": "ECS_RunTask_CrashDetection"
         }
       ],
       "Default": "FailProcessing"
@@ -91,7 +96,7 @@
       "Error": "NoProcessingImages",
       "Cause": "LambdaSplitVideo did not generate images"
     },
-    "ECS RunTask CrashDetection": {
+    "ECS_RunTask_CrashDetection": {
       "Type": "Task",
       "Resource": "arn:aws:states:::ecs:runTask",
       "Parameters": {
@@ -162,8 +167,7 @@
           ],
           "IntervalSeconds": 1,
           "MaxAttempts": 3,
-          "BackoffRate": 2,
-          "JitterStrategy": "FULL"
+          "BackoffRate": 2
         }
       ],
       "Next": "Cleanup"

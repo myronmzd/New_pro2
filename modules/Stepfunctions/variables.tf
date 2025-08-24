@@ -45,3 +45,4 @@ variable "fargatesecurity" {
   description = "List of security group IDs for Fargate tasks"
   type        = list(string)
 }
+

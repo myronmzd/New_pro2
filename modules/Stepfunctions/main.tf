@@ -30,9 +30,12 @@ locals {
       image_processor_arn  = var.image_processor_arn
       fargateSUB           = var.fargatesubnet
       fargateSG            = var.fargatesecurity
+      ecsResult            = "${var.s3bucket_dump_arn}/results/"
     }
   )
 }
+
+
 
 # IAM Role for Step Functions
 resource "aws_iam_role" "sfn_exec" {
