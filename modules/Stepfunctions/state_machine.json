@@ -38,10 +38,29 @@
         "TaskDefinition": "${video_splitter_arn}",
         "NetworkConfiguration": {
           "AwsvpcConfiguration": {
-            "Subnets.$": "States.Array($.fargateSUB)",
-            "SecurityGroups.$": "States.Array($.fargateSG)",
+            "Subnets": ${jsonencode(fargateSUB)},
+            "SecurityGroups": ${jsonencode(fargateSG)},
             "AssignPublicIp": "ENABLED"
           }
+        },
+        "Overrides": {
+          "ContainerOverrides": [{
+            "Name": "video-splitter",
+            "Environment": [
+              {
+                "Name": "S3_BUCKET_R",
+                "Value.$": "$.input_bucket"
+              },
+              {
+                "Name": "S3_BUCKET_D",
+                "Value.$": "$.dump_bucket"
+              },
+              {
+                "Name": "FRAME_RATE",
+                "Value": "1"
+              }
+            ]
+          }]
         }
       },
       "Next": "CheckProcessingImages"
@@ -81,8 +100,8 @@
         "TaskDefinition": "${image_processor_arn}",
         "NetworkConfiguration": {
           "AwsvpcConfiguration": {
-            "Subnets.$": "States.Array($.fargateSUB)",
-            "SecurityGroups.$": "States.Array($.fargateSG)",
+            "Subnets": ${jsonencode(fargateSUB)},
+            "SecurityGroups": ${jsonencode(fargateSG)},
             "AssignPublicIp": "ENABLED"
           }
         }
