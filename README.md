@@ -178,7 +178,7 @@ This project enables users to **upload video files to S3**, automatically trigge
    terraform fmt
 
    # 11. Show Terraform state
-   terraform show
+   terraform show tfplan
 
    # 12. List the current workspace
    terraform workspace show

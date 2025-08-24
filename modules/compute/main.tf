@@ -159,7 +159,7 @@ resource "aws_ecs_task_definition" "video_splitter" {
 }
 
 resource "aws_ecs_service" "video_splitter" {
-  name            = "video-service"
+  name            = "video-service-video-splitter"
   cluster         = aws_ecs_cluster.crash_video_cluster.id
   task_definition = aws_ecs_task_definition.video_splitter.arn
   launch_type     = "FARGATE"
@@ -214,7 +214,7 @@ resource "aws_ecs_task_definition" "image_processor" {
 
 
 resource "aws_ecs_service" "image_processor" {
-  name            = "video-service"
+  name            = "video-service-image-processor"
   cluster         = aws_ecs_cluster.crash_video_cluster.id
   task_definition = aws_ecs_task_definition.image_processor.arn
   launch_type     = "FARGATE"

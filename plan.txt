@@ -1,931 +1,1067 @@
 
 Terraform used the selected providers to generate the following execution
 plan. Resource actions are indicated with the following symbols:
-  + create
- <= read (data resources)
+  [32m+[0m create[0m
+ [36m<=[0m read (data resources)[0m
 
 Terraform will perform the following actions:
 
-  # module.compute.aws_cloudwatch_log_group.fargate_logs will be created
-  + resource "aws_cloudwatch_log_group" "fargate_logs" {
-      + arn               = (known after apply)
-      + id                = (known after apply)
-      + log_group_class   = (known after apply)
-      + name              = "/ecs/CarCrashApp-video-processor"
-      + name_prefix       = (known after apply)
-      + retention_in_days = 7
-      + skip_destroy      = false
-      + tags_all          = (known after apply)
+[1m  # module.compute.aws_cloudwatch_log_group.fargate_logs[0m will be created
+[0m  [32m+[0m[0m resource "aws_cloudwatch_log_group" "fargate_logs" {
+      [32m+[0m[0m arn               = (known after apply)
+      [32m+[0m[0m id                = (known after apply)
+      [32m+[0m[0m log_group_class   = (known after apply)
+      [32m+[0m[0m name              = "/ecs/CarCrashApp-video-processor"
+      [32m+[0m[0m name_prefix       = (known after apply)
+      [32m+[0m[0m retention_in_days = 7
+      [32m+[0m[0m skip_destroy      = false
+      [32m+[0m[0m tags_all          = (known after apply)
     }
 
-  # module.compute.aws_ecs_cluster.video_processing will be created
-  + resource "aws_ecs_cluster" "video_processing" {
-      + arn      = (known after apply)
-      + id       = (known after apply)
-      + name     = "CarCrashApp-video-processing"
-      + tags     = {
-          + "Application" = "video-crash-detector"
-          + "Environment" = "Dev"
-          + "Owner"       = "bob"
-          + "Project"     = "CarCrashApp"
+[1m  # module.compute.aws_ecs_cluster.crash_video_cluster[0m will be created
+[0m  [32m+[0m[0m resource "aws_ecs_cluster" "crash_video_cluster" {
+      [32m+[0m[0m arn      = (known after apply)
+      [32m+[0m[0m id       = (known after apply)
+      [32m+[0m[0m name     = "CarCrashApp-crash_video_cluster"
+      [32m+[0m[0m tags     = {
+          [32m+[0m[0m "Application" = "video-crash-detector"
+          [32m+[0m[0m "Environment" = "Dev"
+          [32m+[0m[0m "Owner"       = "bob"
+          [32m+[0m[0m "Project"     = "CarCrashApp"
         }
-      + tags_all = {
-          + "Application" = "video-crash-detector"
-          + "Environment" = "Dev"
-          + "Owner"       = "bob"
-          + "Project"     = "CarCrashApp"
+      [32m+[0m[0m tags_all = {
+          [32m+[0m[0m "Application" = "video-crash-detector"
+          [32m+[0m[0m "Environment" = "Dev"
+          [32m+[0m[0m "Owner"       = "bob"
+          [32m+[0m[0m "Project"     = "CarCrashApp"
         }
 
-      + setting (known after apply)
+      [32m+[0m[0m setting (known after apply)
     }
 
-  # module.compute.aws_ecs_task_definition.video_processor will be created
-  + resource "aws_ecs_task_definition" "video_processor" {
-      + arn                      = (known after apply)
-      + arn_without_revision     = (known after apply)
-      + container_definitions    = (known after apply)
-      + cpu                      = "2048"
-      + enable_fault_injection   = (known after apply)
-      + execution_role_arn       = (known after apply)
-      + family                   = "CarCrashApp-video-processor"
-      + id                       = (known after apply)
-      + memory                   = "4096"
-      + network_mode             = "awsvpc"
-      + requires_compatibilities = [
-          + "FARGATE",
+[1m  # module.compute.aws_ecs_service.image_processor[0m will be created
+[0m  [32m+[0m[0m resource "aws_ecs_service" "image_processor" {
+      [32m+[0m[0m availability_zone_rebalancing      = "DISABLED"
+      [32m+[0m[0m cluster                            = (known after apply)
+      [32m+[0m[0m deployment_maximum_percent         = 200
+      [32m+[0m[0m deployment_minimum_healthy_percent = 100
+      [32m+[0m[0m enable_ecs_managed_tags            = false
+      [32m+[0m[0m enable_execute_command             = false
+      [32m+[0m[0m iam_role                           = (known after apply)
+      [32m+[0m[0m id                                 = (known after apply)
+      [32m+[0m[0m launch_type                        = "FARGATE"
+      [32m+[0m[0m name                               = "video-service"
+      [32m+[0m[0m platform_version                   = (known after apply)
+      [32m+[0m[0m scheduling_strategy                = "REPLICA"
+      [32m+[0m[0m tags_all                           = (known after apply)
+      [32m+[0m[0m task_definition                    = (known after apply)
+      [32m+[0m[0m triggers                           = (known after apply)
+      [32m+[0m[0m wait_for_steady_state              = false
+
+      [32m+[0m[0m network_configuration {
+          [32m+[0m[0m assign_public_ip = true
+          [32m+[0m[0m security_groups  = (known after apply)
+          [32m+[0m[0m subnets          = [
+              [32m+[0m[0m "subnet-03819e478ff2357f5",
+            ]
+        }
+    }
+
+[1m  # module.compute.aws_ecs_service.video_splitter[0m will be created
+[0m  [32m+[0m[0m resource "aws_ecs_service" "video_splitter" {
+      [32m+[0m[0m availability_zone_rebalancing      = "DISABLED"
+      [32m+[0m[0m cluster                            = (known after apply)
+      [32m+[0m[0m deployment_maximum_percent         = 200
+      [32m+[0m[0m deployment_minimum_healthy_percent = 100
+      [32m+[0m[0m enable_ecs_managed_tags            = false
+      [32m+[0m[0m enable_execute_command             = false
+      [32m+[0m[0m iam_role                           = (known after apply)
+      [32m+[0m[0m id                                 = (known after apply)
+      [32m+[0m[0m launch_type                        = "FARGATE"
+      [32m+[0m[0m name                               = "video-service"
+      [32m+[0m[0m platform_version                   = (known after apply)
+      [32m+[0m[0m scheduling_strategy                = "REPLICA"
+      [32m+[0m[0m tags_all                           = (known after apply)
+      [32m+[0m[0m task_definition                    = (known after apply)
+      [32m+[0m[0m triggers                           = (known after apply)
+      [32m+[0m[0m wait_for_steady_state              = false
+
+      [32m+[0m[0m network_configuration {
+          [32m+[0m[0m assign_public_ip = true
+          [32m+[0m[0m security_groups  = (known after apply)
+          [32m+[0m[0m subnets          = [
+              [32m+[0m[0m "subnet-03819e478ff2357f5",
+            ]
+        }
+    }
+
+[1m  # module.compute.aws_ecs_task_definition.image_processor[0m will be created
+[0m  [32m+[0m[0m resource "aws_ecs_task_definition" "image_processor" {
+      [32m+[0m[0m arn                      = (known after apply)
+      [32m+[0m[0m arn_without_revision     = (known after apply)
+      [32m+[0m[0m container_definitions    = (known after apply)
+      [32m+[0m[0m cpu                      = "2048"
+      [32m+[0m[0m enable_fault_injection   = (known after apply)
+      [32m+[0m[0m execution_role_arn       = (known after apply)
+      [32m+[0m[0m family                   = "CarCrashApp-image-processor"
+      [32m+[0m[0m id                       = (known after apply)
+      [32m+[0m[0m memory                   = "4096"
+      [32m+[0m[0m network_mode             = "awsvpc"
+      [32m+[0m[0m requires_compatibilities = [
+          [32m+[0m[0m "FARGATE",
         ]
-      + revision                 = (known after apply)
-      + skip_destroy             = false
-      + tags_all                 = (known after apply)
-      + task_role_arn            = (known after apply)
-      + track_latest             = false
+      [32m+[0m[0m revision                 = (known after apply)
+      [32m+[0m[0m skip_destroy             = false
+      [32m+[0m[0m tags_all                 = (known after apply)
+      [32m+[0m[0m task_role_arn            = (known after apply)
+      [32m+[0m[0m track_latest             = false
     }
 
-  # module.compute.aws_iam_role.fargate_execution_role will be created
-  + resource "aws_iam_role" "fargate_execution_role" {
-      + arn                   = (known after apply)
-      + assume_role_policy    = jsonencode(
+[1m  # module.compute.aws_ecs_task_definition.video_splitter[0m will be created
+[0m  [32m+[0m[0m resource "aws_ecs_task_definition" "video_splitter" {
+      [32m+[0m[0m arn                      = (known after apply)
+      [32m+[0m[0m arn_without_revision     = (known after apply)
+      [32m+[0m[0m container_definitions    = (known after apply)
+      [32m+[0m[0m cpu                      = "2048"
+      [32m+[0m[0m enable_fault_injection   = (known after apply)
+      [32m+[0m[0m execution_role_arn       = (known after apply)
+      [32m+[0m[0m family                   = "CarCrashApp-Image-processor"
+      [32m+[0m[0m id                       = (known after apply)
+      [32m+[0m[0m memory                   = "4096"
+      [32m+[0m[0m network_mode             = "awsvpc"
+      [32m+[0m[0m requires_compatibilities = [
+          [32m+[0m[0m "FARGATE",
+        ]
+      [32m+[0m[0m revision                 = (known after apply)
+      [32m+[0m[0m skip_destroy             = false
+      [32m+[0m[0m tags_all                 = (known after apply)
+      [32m+[0m[0m task_role_arn            = (known after apply)
+      [32m+[0m[0m track_latest             = false
+    }
+
+[1m  # module.compute.aws_iam_role.fargate_execution_role[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role" "fargate_execution_role" {
+      [32m+[0m[0m arn                   = (known after apply)
+      [32m+[0m[0m assume_role_policy    = jsonencode(
             {
-              + Statement = [
-                  + {
-                      + Action    = "sts:AssumeRole"
-                      + Effect    = "Allow"
-                      + Principal = {
-                          + Service = "ecs-tasks.amazonaws.com"
+              [32m+[0m[0m Statement = [
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action    = "sts:AssumeRole"
+                      [32m+[0m[0m Effect    = "Allow"
+                      [32m+[0m[0m Principal = {
+                          [32m+[0m[0m Service = "ecs-tasks.amazonaws.com"
                         }
                     },
                 ]
-              + Version   = "2012-10-17"
+              [32m+[0m[0m Version   = "2012-10-17"
             }
         )
-      + create_date           = (known after apply)
-      + force_detach_policies = false
-      + id                    = (known after apply)
-      + managed_policy_arns   = (known after apply)
-      + max_session_duration  = 3600
-      + name                  = "CarCrashApp-fargate-execution-role"
-      + name_prefix           = (known after apply)
-      + path                  = "/"
-      + tags_all              = (known after apply)
-      + unique_id             = (known after apply)
+      [32m+[0m[0m create_date           = (known after apply)
+      [32m+[0m[0m force_detach_policies = false
+      [32m+[0m[0m id                    = (known after apply)
+      [32m+[0m[0m managed_policy_arns   = (known after apply)
+      [32m+[0m[0m max_session_duration  = 3600
+      [32m+[0m[0m name                  = "CarCrashApp-fargate-execution-role"
+      [32m+[0m[0m name_prefix           = (known after apply)
+      [32m+[0m[0m path                  = "/"
+      [32m+[0m[0m tags_all              = (known after apply)
+      [32m+[0m[0m unique_id             = (known after apply)
 
-      + inline_policy (known after apply)
+      [32m+[0m[0m inline_policy (known after apply)
     }
 
-  # module.compute.aws_iam_role.fargate_task_role will be created
-  + resource "aws_iam_role" "fargate_task_role" {
-      + arn                   = (known after apply)
-      + assume_role_policy    = jsonencode(
+[1m  # module.compute.aws_iam_role.fargate_task_role[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role" "fargate_task_role" {
+      [32m+[0m[0m arn                   = (known after apply)
+      [32m+[0m[0m assume_role_policy    = jsonencode(
             {
-              + Statement = [
-                  + {
-                      + Action    = "sts:AssumeRole"
-                      + Effect    = "Allow"
-                      + Principal = {
-                          + Service = "ecs-tasks.amazonaws.com"
+              [32m+[0m[0m Statement = [
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action    = "sts:AssumeRole"
+                      [32m+[0m[0m Effect    = "Allow"
+                      [32m+[0m[0m Principal = {
+                          [32m+[0m[0m Service = "ecs-tasks.amazonaws.com"
                         }
                     },
                 ]
-              + Version   = "2012-10-17"
+              [32m+[0m[0m Version   = "2012-10-17"
             }
         )
-      + create_date           = (known after apply)
-      + force_detach_policies = false
-      + id                    = (known after apply)
-      + managed_policy_arns   = (known after apply)
-      + max_session_duration  = 3600
-      + name                  = "CarCrashApp-fargate-task-role"
-      + name_prefix           = (known after apply)
-      + path                  = "/"
-      + tags_all              = (known after apply)
-      + unique_id             = (known after apply)
+      [32m+[0m[0m create_date           = (known after apply)
+      [32m+[0m[0m force_detach_policies = false
+      [32m+[0m[0m id                    = (known after apply)
+      [32m+[0m[0m managed_policy_arns   = (known after apply)
+      [32m+[0m[0m max_session_duration  = 3600
+      [32m+[0m[0m name                  = "CarCrashApp-fargate-task-role"
+      [32m+[0m[0m name_prefix           = (known after apply)
+      [32m+[0m[0m path                  = "/"
+      [32m+[0m[0m tags_all              = (known after apply)
+      [32m+[0m[0m unique_id             = (known after apply)
 
-      + inline_policy (known after apply)
+      [32m+[0m[0m inline_policy (known after apply)
     }
 
-  # module.compute.aws_iam_role_policy.fargate_task_policy will be created
-  + resource "aws_iam_role_policy" "fargate_task_policy" {
-      + id          = (known after apply)
-      + name        = "CarCrashApp-fargate-task-policy"
-      + name_prefix = (known after apply)
-      + policy      = (known after apply)
-      + role        = (known after apply)
+[1m  # module.compute.aws_iam_role_policy.fargate_task_policy[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role_policy" "fargate_task_policy" {
+      [32m+[0m[0m id          = (known after apply)
+      [32m+[0m[0m name        = "CarCrashApp-fargate-task-policy"
+      [32m+[0m[0m name_prefix = (known after apply)
+      [32m+[0m[0m policy      = (known after apply)
+      [32m+[0m[0m role        = (known after apply)
     }
 
-  # module.compute.aws_iam_role_policy_attachment.fargate_execution_role_policy will be created
-  + resource "aws_iam_role_policy_attachment" "fargate_execution_role_policy" {
-      + id         = (known after apply)
-      + policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
-      + role       = "CarCrashApp-fargate-execution-role"
+[1m  # module.compute.aws_iam_role_policy_attachment.fargate_execution_role_policy[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role_policy_attachment" "fargate_execution_role_policy" {
+      [32m+[0m[0m id         = (known after apply)
+      [32m+[0m[0m policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+      [32m+[0m[0m role       = "CarCrashApp-fargate-execution-role"
     }
 
-  # module.events_sns.aws_cloudwatch_event_rule.s3_object_created will be created
-  + resource "aws_cloudwatch_event_rule" "s3_object_created" {
-      + arn            = (known after apply)
-      + description    = "Capture S3 object creation events"
-      + event_bus_name = "default"
-      + event_pattern  = (known after apply)
-      + force_destroy  = false
-      + id             = (known after apply)
-      + name           = "s3-object-created"
-      + name_prefix    = (known after apply)
-      + tags_all       = (known after apply)
+[1m  # module.compute.aws_security_group.fargate_sg[0m will be created
+[0m  [32m+[0m[0m resource "aws_security_group" "fargate_sg" {
+      [32m+[0m[0m arn                    = (known after apply)
+      [32m+[0m[0m description            = "Managed by Terraform"
+      [32m+[0m[0m egress                 = [
+          [32m+[0m[0m {
+              [32m+[0m[0m cidr_blocks      = [
+                  [32m+[0m[0m "0.0.0.0/0",
+                ]
+              [32m+[0m[0m from_port        = 0
+              [32m+[0m[0m ipv6_cidr_blocks = []
+              [32m+[0m[0m prefix_list_ids  = []
+              [32m+[0m[0m protocol         = "-1"
+              [32m+[0m[0m security_groups  = []
+              [32m+[0m[0m self             = false
+              [32m+[0m[0m to_port          = 0
+                [90m# (1 unchanged attribute hidden)[0m[0m
+            },
+        ]
+      [32m+[0m[0m id                     = (known after apply)
+      [32m+[0m[0m ingress                = (known after apply)
+      [32m+[0m[0m name                   = (known after apply)
+      [32m+[0m[0m name_prefix            = "CarCrashApp-fargate-"
+      [32m+[0m[0m owner_id               = (known after apply)
+      [32m+[0m[0m revoke_rules_on_delete = false
+      [32m+[0m[0m tags                   = {
+          [32m+[0m[0m "Application" = "video-crash-detector"
+          [32m+[0m[0m "Environment" = "Dev"
+          [32m+[0m[0m "Owner"       = "bob"
+          [32m+[0m[0m "Project"     = "CarCrashApp"
+        }
+      [32m+[0m[0m tags_all               = {
+          [32m+[0m[0m "Application" = "video-crash-detector"
+          [32m+[0m[0m "Environment" = "Dev"
+          [32m+[0m[0m "Owner"       = "bob"
+          [32m+[0m[0m "Project"     = "CarCrashApp"
+        }
+      [32m+[0m[0m vpc_id                 = "vpc-043aa264bbdd65d4d"
     }
 
-  # module.events_sns.aws_cloudwatch_event_target.stepfunction will be created
-  + resource "aws_cloudwatch_event_target" "stepfunction" {
-      + arn            = (known after apply)
-      + event_bus_name = "default"
-      + force_destroy  = false
-      + id             = (known after apply)
-      + role_arn       = (known after apply)
-      + rule           = "s3-object-created"
-      + target_id      = (known after apply)
+[1m  # module.events_sns.aws_cloudwatch_event_rule.s3_object_created[0m will be created
+[0m  [32m+[0m[0m resource "aws_cloudwatch_event_rule" "s3_object_created" {
+      [32m+[0m[0m arn            = (known after apply)
+      [32m+[0m[0m description    = "Capture S3 object creation events"
+      [32m+[0m[0m event_bus_name = "default"
+      [32m+[0m[0m event_pattern  = (known after apply)
+      [32m+[0m[0m force_destroy  = false
+      [32m+[0m[0m id             = (known after apply)
+      [32m+[0m[0m name           = "s3-object-created"
+      [32m+[0m[0m name_prefix    = (known after apply)
+      [32m+[0m[0m tags_all       = (known after apply)
+    }
 
-      + input_transformer {
-          + input_paths    = {
-              + "bucket" = "$.detail.bucket.name"
-              + "key"    = "$.detail.object.key"
+[1m  # module.events_sns.aws_cloudwatch_event_target.stepfunction[0m will be created
+[0m  [32m+[0m[0m resource "aws_cloudwatch_event_target" "stepfunction" {
+      [32m+[0m[0m arn            = (known after apply)
+      [32m+[0m[0m event_bus_name = "default"
+      [32m+[0m[0m force_destroy  = false
+      [32m+[0m[0m id             = (known after apply)
+      [32m+[0m[0m role_arn       = (known after apply)
+      [32m+[0m[0m rule           = "s3-object-created"
+      [32m+[0m[0m target_id      = (known after apply)
+
+      [32m+[0m[0m input_transformer {
+          [32m+[0m[0m input_paths    = {
+              [32m+[0m[0m "bucket" = "$.detail.bucket.name"
+              [32m+[0m[0m "key"    = "$.detail.object.key"
             }
-          + input_template = jsonencode(
+          [32m+[0m[0m input_template = jsonencode(
                 {
-                  + bucket = "<bucket>"
-                  + key    = "<key>"
+                  [32m+[0m[0m input_bucket = "<bucket>"
+                  [32m+[0m[0m input_key    = "<key>"
                 }
             )
         }
     }
 
-  # module.events_sns.aws_iam_role.events will be created
-  + resource "aws_iam_role" "events" {
-      + arn                   = (known after apply)
-      + assume_role_policy    = jsonencode(
+[1m  # module.events_sns.aws_iam_role.events[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role" "events" {
+      [32m+[0m[0m arn                   = (known after apply)
+      [32m+[0m[0m assume_role_policy    = jsonencode(
             {
-              + Statement = [
-                  + {
-                      + Action    = "sts:AssumeRole"
-                      + Effect    = "Allow"
-                      + Principal = {
-                          + Service = "events.amazonaws.com"
+              [32m+[0m[0m Statement = [
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action    = "sts:AssumeRole"
+                      [32m+[0m[0m Effect    = "Allow"
+                      [32m+[0m[0m Principal = {
+                          [32m+[0m[0m Service = "events.amazonaws.com"
                         }
                     },
                 ]
-              + Version   = "2012-10-17"
+              [32m+[0m[0m Version   = "2012-10-17"
             }
         )
-      + create_date           = (known after apply)
-      + force_detach_policies = false
-      + id                    = (known after apply)
-      + managed_policy_arns   = (known after apply)
-      + max_session_duration  = 3600
-      + name                  = "events_invoke_stepfunctions"
-      + name_prefix           = (known after apply)
-      + path                  = "/"
-      + tags                  = {
-          + "Application" = "video-crash-detector"
-          + "Owner"       = "bob"
+      [32m+[0m[0m create_date           = (known after apply)
+      [32m+[0m[0m force_detach_policies = false
+      [32m+[0m[0m id                    = (known after apply)
+      [32m+[0m[0m managed_policy_arns   = (known after apply)
+      [32m+[0m[0m max_session_duration  = 3600
+      [32m+[0m[0m name                  = "events_invoke_stepfunctions"
+      [32m+[0m[0m name_prefix           = (known after apply)
+      [32m+[0m[0m path                  = "/"
+      [32m+[0m[0m tags                  = {
+          [32m+[0m[0m "Application" = "video-crash-detector"
+          [32m+[0m[0m "Owner"       = "bob"
         }
-      + tags_all              = {
-          + "Application" = "video-crash-detector"
-          + "Owner"       = "bob"
+      [32m+[0m[0m tags_all              = {
+          [32m+[0m[0m "Application" = "video-crash-detector"
+          [32m+[0m[0m "Owner"       = "bob"
         }
-      + unique_id             = (known after apply)
+      [32m+[0m[0m unique_id             = (known after apply)
 
-      + inline_policy (known after apply)
+      [32m+[0m[0m inline_policy (known after apply)
     }
 
-  # module.events_sns.aws_iam_role_policy.allow_step_function will be created
-  + resource "aws_iam_role_policy" "allow_step_function" {
-      + id          = (known after apply)
-      + name        = "allow_start_execution"
-      + name_prefix = (known after apply)
-      + policy      = (known after apply)
-      + role        = (known after apply)
+[1m  # module.events_sns.aws_iam_role_policy.allow_step_function[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role_policy" "allow_step_function" {
+      [32m+[0m[0m id          = (known after apply)
+      [32m+[0m[0m name        = "allow_start_execution"
+      [32m+[0m[0m name_prefix = (known after apply)
+      [32m+[0m[0m policy      = (known after apply)
+      [32m+[0m[0m role        = (known after apply)
     }
 
-  # module.events_sns.aws_sns_topic.file_processing_topic will be created
-  + resource "aws_sns_topic" "file_processing_topic" {
-      + arn                         = (known after apply)
-      + beginning_archive_time      = (known after apply)
-      + content_based_deduplication = false
-      + fifo_throughput_scope       = (known after apply)
-      + fifo_topic                  = false
-      + id                          = (known after apply)
-      + name                        = "file-processing-topic"
-      + name_prefix                 = (known after apply)
-      + owner                       = (known after apply)
-      + policy                      = (known after apply)
-      + signature_version           = (known after apply)
-      + tags                        = {
-          + "Application" = "video-crash-detector"
-          + "Owner"       = "bob"
+[1m  # module.events_sns.aws_sns_topic.file_processing_topic[0m will be created
+[0m  [32m+[0m[0m resource "aws_sns_topic" "file_processing_topic" {
+      [32m+[0m[0m arn                         = (known after apply)
+      [32m+[0m[0m beginning_archive_time      = (known after apply)
+      [32m+[0m[0m content_based_deduplication = false
+      [32m+[0m[0m fifo_throughput_scope       = (known after apply)
+      [32m+[0m[0m fifo_topic                  = false
+      [32m+[0m[0m id                          = (known after apply)
+      [32m+[0m[0m name                        = "file-processing-topic"
+      [32m+[0m[0m name_prefix                 = (known after apply)
+      [32m+[0m[0m owner                       = (known after apply)
+      [32m+[0m[0m policy                      = (known after apply)
+      [32m+[0m[0m signature_version           = (known after apply)
+      [32m+[0m[0m tags                        = {
+          [32m+[0m[0m "Application" = "video-crash-detector"
+          [32m+[0m[0m "Owner"       = "bob"
         }
-      + tags_all                    = {
-          + "Application" = "video-crash-detector"
-          + "Owner"       = "bob"
+      [32m+[0m[0m tags_all                    = {
+          [32m+[0m[0m "Application" = "video-crash-detector"
+          [32m+[0m[0m "Owner"       = "bob"
         }
-      + tracing_config              = (known after apply)
+      [32m+[0m[0m tracing_config              = (known after apply)
     }
 
-  # module.events_sns.aws_sns_topic_subscription.email_subscription will be created
-  + resource "aws_sns_topic_subscription" "email_subscription" {
-      + arn                             = (known after apply)
-      + confirmation_timeout_in_minutes = 1
-      + confirmation_was_authenticated  = (known after apply)
-      + endpoint                        = "myronmzd22@gmail.com"
-      + endpoint_auto_confirms          = false
-      + filter_policy_scope             = (known after apply)
-      + id                              = (known after apply)
-      + owner_id                        = (known after apply)
-      + pending_confirmation            = (known after apply)
-      + protocol                        = "email"
-      + raw_message_delivery            = false
-      + topic_arn                       = (known after apply)
+[1m  # module.events_sns.aws_sns_topic_subscription.email_subscription[0m will be created
+[0m  [32m+[0m[0m resource "aws_sns_topic_subscription" "email_subscription" {
+      [32m+[0m[0m arn                             = (known after apply)
+      [32m+[0m[0m confirmation_timeout_in_minutes = 1
+      [32m+[0m[0m confirmation_was_authenticated  = (known after apply)
+      [32m+[0m[0m endpoint                        = "myronmzd22@gmail.com"
+      [32m+[0m[0m endpoint_auto_confirms          = false
+      [32m+[0m[0m filter_policy_scope             = (known after apply)
+      [32m+[0m[0m id                              = (known after apply)
+      [32m+[0m[0m owner_id                        = (known after apply)
+      [32m+[0m[0m pending_confirmation            = (known after apply)
+      [32m+[0m[0m protocol                        = "email"
+      [32m+[0m[0m raw_message_delivery            = false
+      [32m+[0m[0m topic_arn                       = (known after apply)
     }
 
-  # module.lambda.archive_file.app1 will be created
-  + resource "archive_file" "app1" {
-      + id                  = (known after apply)
-      + output_base64sha256 = (known after apply)
-      + output_base64sha512 = (known after apply)
-      + output_file_mode    = "0644"
-      + output_md5          = (known after apply)
-      + output_path         = "modules/lambda/app1.zip"
-      + output_sha          = (known after apply)
-      + output_sha256       = (known after apply)
-      + output_sha512       = (known after apply)
-      + output_size         = (known after apply)
-      + source_file         = "/workspaces/New_pro2/app1.go"
-      + type                = "zip"
+[1m  # module.lambda.archive_file.app1[0m will be created
+[0m  [32m+[0m[0m resource "archive_file" "app1" {
+      [32m+[0m[0m id                  = (known after apply)
+      [32m+[0m[0m output_base64sha256 = (known after apply)
+      [32m+[0m[0m output_base64sha512 = (known after apply)
+      [32m+[0m[0m output_file_mode    = "0644"
+      [32m+[0m[0m output_md5          = (known after apply)
+      [32m+[0m[0m output_path         = "modules/lambda/app1.zip"
+      [32m+[0m[0m output_sha          = (known after apply)
+      [32m+[0m[0m output_sha256       = (known after apply)
+      [32m+[0m[0m output_sha512       = (known after apply)
+      [32m+[0m[0m output_size         = (known after apply)
+      [32m+[0m[0m source_file         = "/workspaces/New_pro2/app1.py"
+      [32m+[0m[0m type                = "zip"
     }
 
-  # module.lambda.aws_iam_policy.lambda_exec_policy will be created
-  + resource "aws_iam_policy" "lambda_exec_policy" {
-      + arn              = (known after apply)
-      + attachment_count = (known after apply)
-      + id               = (known after apply)
-      + name             = "lambda_exec_policy"
-      + name_prefix      = (known after apply)
-      + path             = "/"
-      + policy           = (known after apply)
-      + policy_id        = (known after apply)
-      + tags             = {
-          + "Application" = "video-crash-detector"
-          + "Owner"       = "bob"
+[1m  # module.lambda.aws_iam_policy.lambda_exec_policy[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_policy" "lambda_exec_policy" {
+      [32m+[0m[0m arn              = (known after apply)
+      [32m+[0m[0m attachment_count = (known after apply)
+      [32m+[0m[0m id               = (known after apply)
+      [32m+[0m[0m name             = "lambda_exec_policy"
+      [32m+[0m[0m name_prefix      = (known after apply)
+      [32m+[0m[0m path             = "/"
+      [32m+[0m[0m policy           = (known after apply)
+      [32m+[0m[0m policy_id        = (known after apply)
+      [32m+[0m[0m tags             = {
+          [32m+[0m[0m "Application" = "video-crash-detector"
+          [32m+[0m[0m "Owner"       = "bob"
         }
-      + tags_all         = {
-          + "Application" = "video-crash-detector"
-          + "Owner"       = "bob"
+      [32m+[0m[0m tags_all         = {
+          [32m+[0m[0m "Application" = "video-crash-detector"
+          [32m+[0m[0m "Owner"       = "bob"
         }
     }
 
-  # module.lambda.aws_iam_role.lambda_exec will be created
-  + resource "aws_iam_role" "lambda_exec" {
-      + arn                   = (known after apply)
-      + assume_role_policy    = jsonencode(
+[1m  # module.lambda.aws_iam_role.lambda_exec[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role" "lambda_exec" {
+      [32m+[0m[0m arn                   = (known after apply)
+      [32m+[0m[0m assume_role_policy    = jsonencode(
             {
-              + Statement = [
-                  + {
-                      + Action    = "sts:AssumeRole"
-                      + Effect    = "Allow"
-                      + Principal = {
-                          + Service = "lambda.amazonaws.com"
+              [32m+[0m[0m Statement = [
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action    = "sts:AssumeRole"
+                      [32m+[0m[0m Effect    = "Allow"
+                      [32m+[0m[0m Principal = {
+                          [32m+[0m[0m Service = "lambda.amazonaws.com"
                         }
                     },
                 ]
-              + Version   = "2012-10-17"
+              [32m+[0m[0m Version   = "2012-10-17"
             }
         )
-      + create_date           = (known after apply)
-      + force_detach_policies = false
-      + id                    = (known after apply)
-      + managed_policy_arns   = (known after apply)
-      + max_session_duration  = 3600
-      + name                  = "lambda_exec_role"
-      + name_prefix           = (known after apply)
-      + path                  = "/"
-      + tags                  = {
-          + "Application" = "video-crash-detector"
-          + "Owner"       = "bob"
+      [32m+[0m[0m create_date           = (known after apply)
+      [32m+[0m[0m force_detach_policies = false
+      [32m+[0m[0m id                    = (known after apply)
+      [32m+[0m[0m managed_policy_arns   = (known after apply)
+      [32m+[0m[0m max_session_duration  = 3600
+      [32m+[0m[0m name                  = "lambda_exec_role"
+      [32m+[0m[0m name_prefix           = (known after apply)
+      [32m+[0m[0m path                  = "/"
+      [32m+[0m[0m tags                  = {
+          [32m+[0m[0m "Application" = "video-crash-detector"
+          [32m+[0m[0m "Owner"       = "bob"
         }
-      + tags_all              = {
-          + "Application" = "video-crash-detector"
-          + "Owner"       = "bob"
+      [32m+[0m[0m tags_all              = {
+          [32m+[0m[0m "Application" = "video-crash-detector"
+          [32m+[0m[0m "Owner"       = "bob"
         }
-      + unique_id             = (known after apply)
+      [32m+[0m[0m unique_id             = (known after apply)
 
-      + inline_policy (known after apply)
+      [32m+[0m[0m inline_policy (known after apply)
     }
 
-  # module.lambda.aws_iam_role_policy_attachment.lambda_policy_attachment will be created
-  + resource "aws_iam_role_policy_attachment" "lambda_policy_attachment" {
-      + id         = (known after apply)
-      + policy_arn = (known after apply)
-      + role       = "lambda_exec_role"
+[1m  # module.lambda.aws_iam_role_policy_attachment.lambda_policy_attachment[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role_policy_attachment" "lambda_policy_attachment" {
+      [32m+[0m[0m id         = (known after apply)
+      [32m+[0m[0m policy_arn = (known after apply)
+      [32m+[0m[0m role       = "lambda_exec_role"
     }
 
-  # module.lambda.aws_lambda_function.function1 will be created
-  + resource "aws_lambda_function" "function1" {
-      + architectures                  = (known after apply)
-      + arn                            = (known after apply)
-      + code_sha256                    = (known after apply)
-      + filename                       = "modules/lambda/app1.zip"
-      + function_name                  = "CarCrashApp"
-      + handler                        = "app1.handler"
-      + id                             = (known after apply)
-      + invoke_arn                     = (known after apply)
-      + last_modified                  = (known after apply)
-      + memory_size                    = 128
-      + package_type                   = "Zip"
-      + publish                        = false
-      + qualified_arn                  = (known after apply)
-      + qualified_invoke_arn           = (known after apply)
-      + reserved_concurrent_executions = -1
-      + role                           = (known after apply)
-      + runtime                        = "go1.x"
-      + signing_job_arn                = (known after apply)
-      + signing_profile_version_arn    = (known after apply)
-      + skip_destroy                   = false
-      + source_code_hash               = (known after apply)
-      + source_code_size               = (known after apply)
-      + tags                           = {
-          + "Application" = "video-crash-detector"
-          + "Environment" = "Production"
-          + "Owner"       = "bob"
-          + "Project"     = "CarCrashApp"
+[1m  # module.lambda.aws_lambda_function.function1[0m will be created
+[0m  [32m+[0m[0m resource "aws_lambda_function" "function1" {
+      [32m+[0m[0m architectures                  = (known after apply)
+      [32m+[0m[0m arn                            = (known after apply)
+      [32m+[0m[0m code_sha256                    = (known after apply)
+      [32m+[0m[0m filename                       = "modules/lambda/app1.zip"
+      [32m+[0m[0m function_name                  = "CarCrashApp-function1"
+      [32m+[0m[0m handler                        = "app1.handler"
+      [32m+[0m[0m id                             = (known after apply)
+      [32m+[0m[0m invoke_arn                     = (known after apply)
+      [32m+[0m[0m last_modified                  = (known after apply)
+      [32m+[0m[0m memory_size                    = 128
+      [32m+[0m[0m package_type                   = "Zip"
+      [32m+[0m[0m publish                        = false
+      [32m+[0m[0m qualified_arn                  = (known after apply)
+      [32m+[0m[0m qualified_invoke_arn           = (known after apply)
+      [32m+[0m[0m reserved_concurrent_executions = -1
+      [32m+[0m[0m role                           = (known after apply)
+      [32m+[0m[0m runtime                        = "python3.9"
+      [32m+[0m[0m signing_job_arn                = (known after apply)
+      [32m+[0m[0m signing_profile_version_arn    = (known after apply)
+      [32m+[0m[0m skip_destroy                   = false
+      [32m+[0m[0m source_code_hash               = (known after apply)
+      [32m+[0m[0m source_code_size               = (known after apply)
+      [32m+[0m[0m tags                           = {
+          [32m+[0m[0m "Application" = "video-crash-detector"
+          [32m+[0m[0m "Environment" = "Production"
+          [32m+[0m[0m "Owner"       = "bob"
+          [32m+[0m[0m "Project"     = "CarCrashApp"
         }
-      + tags_all                       = {
-          + "Application" = "video-crash-detector"
-          + "Environment" = "Production"
-          + "Owner"       = "bob"
-          + "Project"     = "CarCrashApp"
+      [32m+[0m[0m tags_all                       = {
+          [32m+[0m[0m "Application" = "video-crash-detector"
+          [32m+[0m[0m "Environment" = "Production"
+          [32m+[0m[0m "Owner"       = "bob"
+          [32m+[0m[0m "Project"     = "CarCrashApp"
         }
-      + timeout                        = 3
-      + version                        = (known after apply)
+      [32m+[0m[0m timeout                        = 3
+      [32m+[0m[0m version                        = (known after apply)
 
-      + environment {
-          + variables = (known after apply)
+      [32m+[0m[0m environment {
+          [32m+[0m[0m variables = (known after apply)
         }
 
-      + ephemeral_storage (known after apply)
+      [32m+[0m[0m ephemeral_storage (known after apply)
 
-      + logging_config (known after apply)
+      [32m+[0m[0m logging_config (known after apply)
 
-      + tracing_config (known after apply)
+      [32m+[0m[0m tracing_config (known after apply)
     }
 
-  # module.s3.aws_iam_policy.s3_dump_policy will be created
-  + resource "aws_iam_policy" "s3_dump_policy" {
-      + arn              = (known after apply)
-      + attachment_count = (known after apply)
-      + description      = "Policy for accessing dump S3 bucket"
-      + id               = (known after apply)
-      + name             = "s3_dump_policy"
-      + name_prefix      = (known after apply)
-      + path             = "/"
-      + policy           = (known after apply)
-      + policy_id        = (known after apply)
-      + tags             = {
-          + "Application" = "video-crash-detector"
-          + "Owner"       = "bob"
+[1m  # module.s3.aws_iam_policy.s3_Input_policy[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_policy" "s3_Input_policy" {
+      [32m+[0m[0m arn              = (known after apply)
+      [32m+[0m[0m attachment_count = (known after apply)
+      [32m+[0m[0m description      = "Policy for accessing Input S3 bucket"
+      [32m+[0m[0m id               = (known after apply)
+      [32m+[0m[0m name             = "s3_Input_policy"
+      [32m+[0m[0m name_prefix      = (known after apply)
+      [32m+[0m[0m path             = "/"
+      [32m+[0m[0m policy           = (known after apply)
+      [32m+[0m[0m policy_id        = (known after apply)
+      [32m+[0m[0m tags             = {
+          [32m+[0m[0m "Application" = "video-crash-detector"
+          [32m+[0m[0m "Owner"       = "bob"
         }
-      + tags_all         = {
-          + "Application" = "video-crash-detector"
-          + "Owner"       = "bob"
-        }
-    }
-
-  # module.s3.aws_iam_policy.s3_raw_policy will be created
-  + resource "aws_iam_policy" "s3_raw_policy" {
-      + arn              = (known after apply)
-      + attachment_count = (known after apply)
-      + description      = "Policy for accessing raw S3 bucket"
-      + id               = (known after apply)
-      + name             = "s3_raw_policy"
-      + name_prefix      = (known after apply)
-      + path             = "/"
-      + policy           = (known after apply)
-      + policy_id        = (known after apply)
-      + tags             = {
-          + "Application" = "video-crash-detector"
-          + "Owner"       = "bob"
-        }
-      + tags_all         = {
-          + "Application" = "video-crash-detector"
-          + "Owner"       = "bob"
+      [32m+[0m[0m tags_all         = {
+          [32m+[0m[0m "Application" = "video-crash-detector"
+          [32m+[0m[0m "Owner"       = "bob"
         }
     }
 
-  # module.s3.aws_iam_role.s3_dump_role will be created
-  + resource "aws_iam_role" "s3_dump_role" {
-      + arn                   = (known after apply)
-      + assume_role_policy    = jsonencode(
+[1m  # module.s3.aws_iam_policy.s3_dump_policy[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_policy" "s3_dump_policy" {
+      [32m+[0m[0m arn              = (known after apply)
+      [32m+[0m[0m attachment_count = (known after apply)
+      [32m+[0m[0m description      = "Policy for accessing dump S3 bucket"
+      [32m+[0m[0m id               = (known after apply)
+      [32m+[0m[0m name             = "s3_dump_policy"
+      [32m+[0m[0m name_prefix      = (known after apply)
+      [32m+[0m[0m path             = "/"
+      [32m+[0m[0m policy           = (known after apply)
+      [32m+[0m[0m policy_id        = (known after apply)
+      [32m+[0m[0m tags             = {
+          [32m+[0m[0m "Application" = "video-crash-detector"
+          [32m+[0m[0m "Owner"       = "bob"
+        }
+      [32m+[0m[0m tags_all         = {
+          [32m+[0m[0m "Application" = "video-crash-detector"
+          [32m+[0m[0m "Owner"       = "bob"
+        }
+    }
+
+[1m  # module.s3.aws_iam_role.s3_Input_role[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role" "s3_Input_role" {
+      [32m+[0m[0m arn                   = (known after apply)
+      [32m+[0m[0m assume_role_policy    = jsonencode(
             {
-              + Statement = [
-                  + {
-                      + Action    = "sts:AssumeRole"
-                      + Effect    = "Allow"
-                      + Principal = {
-                          + Service = [
-                              + "lambda.amazonaws.com",
-                              + "states.amazonaws.com",
+              [32m+[0m[0m Statement = [
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action    = "sts:AssumeRole"
+                      [32m+[0m[0m Effect    = "Allow"
+                      [32m+[0m[0m Principal = {
+                          [32m+[0m[0m Service = "ec2.amazonaws.com"
+                        }
+                    },
+                ]
+              [32m+[0m[0m Version   = "2012-10-17"
+            }
+        )
+      [32m+[0m[0m create_date           = (known after apply)
+      [32m+[0m[0m force_detach_policies = false
+      [32m+[0m[0m id                    = (known after apply)
+      [32m+[0m[0m managed_policy_arns   = (known after apply)
+      [32m+[0m[0m max_session_duration  = 3600
+      [32m+[0m[0m name                  = "s3_Input_role"
+      [32m+[0m[0m name_prefix           = (known after apply)
+      [32m+[0m[0m path                  = "/"
+      [32m+[0m[0m tags                  = {
+          [32m+[0m[0m "Application" = "video-crash-detector"
+          [32m+[0m[0m "Owner"       = "bob"
+        }
+      [32m+[0m[0m tags_all              = {
+          [32m+[0m[0m "Application" = "video-crash-detector"
+          [32m+[0m[0m "Owner"       = "bob"
+        }
+      [32m+[0m[0m unique_id             = (known after apply)
+
+      [32m+[0m[0m inline_policy (known after apply)
+    }
+
+[1m  # module.s3.aws_iam_role.s3_dump_role[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role" "s3_dump_role" {
+      [32m+[0m[0m arn                   = (known after apply)
+      [32m+[0m[0m assume_role_policy    = jsonencode(
+            {
+              [32m+[0m[0m Statement = [
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action    = "sts:AssumeRole"
+                      [32m+[0m[0m Effect    = "Allow"
+                      [32m+[0m[0m Principal = {
+                          [32m+[0m[0m Service = [
+                              [32m+[0m[0m "lambda.amazonaws.com",
+                              [32m+[0m[0m "states.amazonaws.com",
                             ]
                         }
                     },
                 ]
-              + Version   = "2012-10-17"
+              [32m+[0m[0m Version   = "2012-10-17"
             }
         )
-      + create_date           = (known after apply)
-      + force_detach_policies = false
-      + id                    = (known after apply)
-      + managed_policy_arns   = (known after apply)
-      + max_session_duration  = 3600
-      + name                  = "s3_dump_role"
-      + name_prefix           = (known after apply)
-      + path                  = "/"
-      + tags                  = {
-          + "Application" = "video-crash-detector"
-          + "Owner"       = "bob"
+      [32m+[0m[0m create_date           = (known after apply)
+      [32m+[0m[0m force_detach_policies = false
+      [32m+[0m[0m id                    = (known after apply)
+      [32m+[0m[0m managed_policy_arns   = (known after apply)
+      [32m+[0m[0m max_session_duration  = 3600
+      [32m+[0m[0m name                  = "s3_dump_role"
+      [32m+[0m[0m name_prefix           = (known after apply)
+      [32m+[0m[0m path                  = "/"
+      [32m+[0m[0m tags                  = {
+          [32m+[0m[0m "Application" = "video-crash-detector"
+          [32m+[0m[0m "Owner"       = "bob"
         }
-      + tags_all              = {
-          + "Application" = "video-crash-detector"
-          + "Owner"       = "bob"
+      [32m+[0m[0m tags_all              = {
+          [32m+[0m[0m "Application" = "video-crash-detector"
+          [32m+[0m[0m "Owner"       = "bob"
         }
-      + unique_id             = (known after apply)
+      [32m+[0m[0m unique_id             = (known after apply)
 
-      + inline_policy (known after apply)
+      [32m+[0m[0m inline_policy (known after apply)
     }
 
-  # module.s3.aws_iam_role.s3_raw_role will be created
-  + resource "aws_iam_role" "s3_raw_role" {
-      + arn                   = (known after apply)
-      + assume_role_policy    = jsonencode(
-            {
-              + Statement = [
-                  + {
-                      + Action    = "sts:AssumeRole"
-                      + Effect    = "Allow"
-                      + Principal = {
-                          + Service = "ec2.amazonaws.com"
-                        }
-                    },
-                ]
-              + Version   = "2012-10-17"
-            }
-        )
-      + create_date           = (known after apply)
-      + force_detach_policies = false
-      + id                    = (known after apply)
-      + managed_policy_arns   = (known after apply)
-      + max_session_duration  = 3600
-      + name                  = "s3_raw_role"
-      + name_prefix           = (known after apply)
-      + path                  = "/"
-      + tags                  = {
-          + "Application" = "video-crash-detector"
-          + "Owner"       = "bob"
+[1m  # module.s3.aws_iam_role_policy_attachment.s3_Input_role_policy[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role_policy_attachment" "s3_Input_role_policy" {
+      [32m+[0m[0m id         = (known after apply)
+      [32m+[0m[0m policy_arn = (known after apply)
+      [32m+[0m[0m role       = "s3_Input_role"
+    }
+
+[1m  # module.s3.aws_iam_role_policy_attachment.s3_dump_role_policy[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role_policy_attachment" "s3_dump_role_policy" {
+      [32m+[0m[0m id         = (known after apply)
+      [32m+[0m[0m policy_arn = (known after apply)
+      [32m+[0m[0m role       = "s3_dump_role"
+    }
+
+[1m  # module.s3.aws_s3_bucket.Input_bucket[0m will be created
+[0m  [32m+[0m[0m resource "aws_s3_bucket" "Input_bucket" {
+      [32m+[0m[0m acceleration_status         = (known after apply)
+      [32m+[0m[0m acl                         = (known after apply)
+      [32m+[0m[0m arn                         = (known after apply)
+      [32m+[0m[0m bucket                      = (known after apply)
+      [32m+[0m[0m bucket_domain_name          = (known after apply)
+      [32m+[0m[0m bucket_prefix               = (known after apply)
+      [32m+[0m[0m bucket_regional_domain_name = (known after apply)
+      [32m+[0m[0m force_destroy               = true
+      [32m+[0m[0m hosted_zone_id              = (known after apply)
+      [32m+[0m[0m id                          = (known after apply)
+      [32m+[0m[0m object_lock_enabled         = (known after apply)
+      [32m+[0m[0m policy                      = (known after apply)
+      [32m+[0m[0m region                      = (known after apply)
+      [32m+[0m[0m request_payer               = (known after apply)
+      [32m+[0m[0m tags                        = {
+          [32m+[0m[0m "Application" = "video-crash-detector"
+          [32m+[0m[0m "Owner"       = "bob"
         }
-      + tags_all              = {
-          + "Application" = "video-crash-detector"
-          + "Owner"       = "bob"
+      [32m+[0m[0m tags_all                    = {
+          [32m+[0m[0m "Application" = "video-crash-detector"
+          [32m+[0m[0m "Owner"       = "bob"
         }
-      + unique_id             = (known after apply)
+      [32m+[0m[0m website_domain              = (known after apply)
+      [32m+[0m[0m website_endpoint            = (known after apply)
 
-      + inline_policy (known after apply)
+      [32m+[0m[0m cors_rule (known after apply)
+
+      [32m+[0m[0m grant (known after apply)
+
+      [32m+[0m[0m lifecycle_rule (known after apply)
+
+      [32m+[0m[0m logging (known after apply)
+
+      [32m+[0m[0m object_lock_configuration (known after apply)
+
+      [32m+[0m[0m replication_configuration (known after apply)
+
+      [32m+[0m[0m server_side_encryption_configuration (known after apply)
+
+      [32m+[0m[0m versioning (known after apply)
+
+      [32m+[0m[0m website (known after apply)
     }
 
-  # module.s3.aws_iam_role_policy_attachment.s3_dump_role_policy will be created
-  + resource "aws_iam_role_policy_attachment" "s3_dump_role_policy" {
-      + id         = (known after apply)
-      + policy_arn = (known after apply)
-      + role       = "s3_dump_role"
-    }
-
-  # module.s3.aws_iam_role_policy_attachment.s3_raw_role_policy will be created
-  + resource "aws_iam_role_policy_attachment" "s3_raw_role_policy" {
-      + id         = (known after apply)
-      + policy_arn = (known after apply)
-      + role       = "s3_raw_role"
-    }
-
-  # module.s3.aws_s3_bucket.dump_bucket will be created
-  + resource "aws_s3_bucket" "dump_bucket" {
-      + acceleration_status         = (known after apply)
-      + acl                         = (known after apply)
-      + arn                         = (known after apply)
-      + bucket                      = (known after apply)
-      + bucket_domain_name          = (known after apply)
-      + bucket_prefix               = (known after apply)
-      + bucket_regional_domain_name = (known after apply)
-      + force_destroy               = true
-      + hosted_zone_id              = (known after apply)
-      + id                          = (known after apply)
-      + object_lock_enabled         = (known after apply)
-      + policy                      = (known after apply)
-      + region                      = (known after apply)
-      + request_payer               = (known after apply)
-      + tags                        = {
-          + "Application" = "video-crash-detector"
-          + "Owner"       = "bob"
+[1m  # module.s3.aws_s3_bucket.dump_bucket[0m will be created
+[0m  [32m+[0m[0m resource "aws_s3_bucket" "dump_bucket" {
+      [32m+[0m[0m acceleration_status         = (known after apply)
+      [32m+[0m[0m acl                         = (known after apply)
+      [32m+[0m[0m arn                         = (known after apply)
+      [32m+[0m[0m bucket                      = (known after apply)
+      [32m+[0m[0m bucket_domain_name          = (known after apply)
+      [32m+[0m[0m bucket_prefix               = (known after apply)
+      [32m+[0m[0m bucket_regional_domain_name = (known after apply)
+      [32m+[0m[0m force_destroy               = true
+      [32m+[0m[0m hosted_zone_id              = (known after apply)
+      [32m+[0m[0m id                          = (known after apply)
+      [32m+[0m[0m object_lock_enabled         = (known after apply)
+      [32m+[0m[0m policy                      = (known after apply)
+      [32m+[0m[0m region                      = (known after apply)
+      [32m+[0m[0m request_payer               = (known after apply)
+      [32m+[0m[0m tags                        = {
+          [32m+[0m[0m "Application" = "video-crash-detector"
+          [32m+[0m[0m "Owner"       = "bob"
         }
-      + tags_all                    = {
-          + "Application" = "video-crash-detector"
-          + "Owner"       = "bob"
+      [32m+[0m[0m tags_all                    = {
+          [32m+[0m[0m "Application" = "video-crash-detector"
+          [32m+[0m[0m "Owner"       = "bob"
         }
-      + website_domain              = (known after apply)
-      + website_endpoint            = (known after apply)
+      [32m+[0m[0m website_domain              = (known after apply)
+      [32m+[0m[0m website_endpoint            = (known after apply)
 
-      + cors_rule (known after apply)
+      [32m+[0m[0m cors_rule (known after apply)
 
-      + grant (known after apply)
+      [32m+[0m[0m grant (known after apply)
 
-      + lifecycle_rule (known after apply)
+      [32m+[0m[0m lifecycle_rule (known after apply)
 
-      + logging (known after apply)
+      [32m+[0m[0m logging (known after apply)
 
-      + object_lock_configuration (known after apply)
+      [32m+[0m[0m object_lock_configuration (known after apply)
 
-      + replication_configuration (known after apply)
+      [32m+[0m[0m replication_configuration (known after apply)
 
-      + server_side_encryption_configuration (known after apply)
+      [32m+[0m[0m server_side_encryption_configuration (known after apply)
 
-      + versioning (known after apply)
+      [32m+[0m[0m versioning (known after apply)
 
-      + website (known after apply)
+      [32m+[0m[0m website (known after apply)
     }
 
-  # module.s3.aws_s3_bucket.raw will be created
-  + resource "aws_s3_bucket" "raw" {
-      + acceleration_status         = (known after apply)
-      + acl                         = (known after apply)
-      + arn                         = (known after apply)
-      + bucket                      = (known after apply)
-      + bucket_domain_name          = (known after apply)
-      + bucket_prefix               = (known after apply)
-      + bucket_regional_domain_name = (known after apply)
-      + force_destroy               = true
-      + hosted_zone_id              = (known after apply)
-      + id                          = (known after apply)
-      + object_lock_enabled         = (known after apply)
-      + policy                      = (known after apply)
-      + region                      = (known after apply)
-      + request_payer               = (known after apply)
-      + tags                        = {
-          + "Application" = "video-crash-detector"
-          + "Owner"       = "bob"
-        }
-      + tags_all                    = {
-          + "Application" = "video-crash-detector"
-          + "Owner"       = "bob"
-        }
-      + website_domain              = (known after apply)
-      + website_endpoint            = (known after apply)
-
-      + cors_rule (known after apply)
-
-      + grant (known after apply)
-
-      + lifecycle_rule (known after apply)
-
-      + logging (known after apply)
-
-      + object_lock_configuration (known after apply)
-
-      + replication_configuration (known after apply)
-
-      + server_side_encryption_configuration (known after apply)
-
-      + versioning (known after apply)
-
-      + website (known after apply)
+[1m  # module.s3.aws_s3_bucket_notification.Input_bucket_notification[0m will be created
+[0m  [32m+[0m[0m resource "aws_s3_bucket_notification" "Input_bucket_notification" {
+      [32m+[0m[0m bucket      = (known after apply)
+      [32m+[0m[0m eventbridge = true
+      [32m+[0m[0m id          = (known after apply)
     }
 
-  # module.s3.aws_s3_bucket_notification.raw_bucket_notification will be created
-  + resource "aws_s3_bucket_notification" "raw_bucket_notification" {
-      + bucket      = (known after apply)
-      + eventbridge = true
-      + id          = (known after apply)
+[1m  # module.s3.aws_s3_bucket_public_access_block.Input_bucket_block[0m will be created
+[0m  [32m+[0m[0m resource "aws_s3_bucket_public_access_block" "Input_bucket_block" {
+      [32m+[0m[0m block_public_acls       = true
+      [32m+[0m[0m block_public_policy     = true
+      [32m+[0m[0m bucket                  = (known after apply)
+      [32m+[0m[0m id                      = (known after apply)
+      [32m+[0m[0m ignore_public_acls      = true
+      [32m+[0m[0m restrict_public_buckets = true
     }
 
-  # module.s3.aws_s3_bucket_public_access_block.dump will be created
-  + resource "aws_s3_bucket_public_access_block" "dump" {
-      + block_public_acls       = true
-      + block_public_policy     = true
-      + bucket                  = (known after apply)
-      + id                      = (known after apply)
-      + ignore_public_acls      = true
-      + restrict_public_buckets = true
+[1m  # module.s3.aws_s3_bucket_public_access_block.dump[0m will be created
+[0m  [32m+[0m[0m resource "aws_s3_bucket_public_access_block" "dump" {
+      [32m+[0m[0m block_public_acls       = true
+      [32m+[0m[0m block_public_policy     = true
+      [32m+[0m[0m bucket                  = (known after apply)
+      [32m+[0m[0m id                      = (known after apply)
+      [32m+[0m[0m ignore_public_acls      = true
+      [32m+[0m[0m restrict_public_buckets = true
     }
 
-  # module.s3.aws_s3_bucket_public_access_block.raw will be created
-  + resource "aws_s3_bucket_public_access_block" "raw" {
-      + block_public_acls       = true
-      + block_public_policy     = true
-      + bucket                  = (known after apply)
-      + id                      = (known after apply)
-      + ignore_public_acls      = true
-      + restrict_public_buckets = true
+[1m  # module.s3.aws_s3_object.Input_bucket[0m will be created
+[0m  [32m+[0m[0m resource "aws_s3_object" "Input_bucket" {
+      [32m+[0m[0m acl                    = (known after apply)
+      [32m+[0m[0m arn                    = (known after apply)
+      [32m+[0m[0m bucket                 = (known after apply)
+      [32m+[0m[0m bucket_key_enabled     = (known after apply)
+      [32m+[0m[0m checksum_crc32         = (known after apply)
+      [32m+[0m[0m checksum_crc32c        = (known after apply)
+      [32m+[0m[0m checksum_crc64nvme     = (known after apply)
+      [32m+[0m[0m checksum_sha1          = (known after apply)
+      [32m+[0m[0m checksum_sha256        = (known after apply)
+      [32m+[0m[0m content_type           = (known after apply)
+      [32m+[0m[0m etag                   = (known after apply)
+      [32m+[0m[0m force_destroy          = false
+      [32m+[0m[0m id                     = (known after apply)
+      [32m+[0m[0m key                    = "raw/"
+      [32m+[0m[0m kms_key_id             = (known after apply)
+      [32m+[0m[0m server_side_encryption = (known after apply)
+      [32m+[0m[0m storage_class          = (known after apply)
+      [32m+[0m[0m tags_all               = (known after apply)
+      [32m+[0m[0m version_id             = (known after apply)
+        [90m# (1 unchanged attribute hidden)[0m[0m
     }
 
-  # module.s3.random_string.suffix will be created
-  + resource "random_string" "suffix" {
-      + id          = (known after apply)
-      + length      = 8
-      + lower       = true
-      + min_lower   = 0
-      + min_numeric = 0
-      + min_special = 0
-      + min_upper   = 0
-      + number      = true
-      + numeric     = true
-      + result      = (known after apply)
-      + special     = false
-      + upper       = false
+[1m  # module.s3.aws_s3_object.folder2[0m will be created
+[0m  [32m+[0m[0m resource "aws_s3_object" "folder2" {
+      [32m+[0m[0m acl                    = (known after apply)
+      [32m+[0m[0m arn                    = (known after apply)
+      [32m+[0m[0m bucket                 = (known after apply)
+      [32m+[0m[0m bucket_key_enabled     = (known after apply)
+      [32m+[0m[0m checksum_crc32         = (known after apply)
+      [32m+[0m[0m checksum_crc32c        = (known after apply)
+      [32m+[0m[0m checksum_crc64nvme     = (known after apply)
+      [32m+[0m[0m checksum_sha1          = (known after apply)
+      [32m+[0m[0m checksum_sha256        = (known after apply)
+      [32m+[0m[0m content_type           = (known after apply)
+      [32m+[0m[0m etag                   = (known after apply)
+      [32m+[0m[0m force_destroy          = false
+      [32m+[0m[0m id                     = (known after apply)
+      [32m+[0m[0m key                    = "processing/"
+      [32m+[0m[0m kms_key_id             = (known after apply)
+      [32m+[0m[0m server_side_encryption = (known after apply)
+      [32m+[0m[0m storage_class          = (known after apply)
+      [32m+[0m[0m tags_all               = (known after apply)
+      [32m+[0m[0m version_id             = (known after apply)
+        [90m# (1 unchanged attribute hidden)[0m[0m
     }
 
-  # module.stepfunctions.data.aws_iam_policy_document.sfn_policy will be read during apply
+[1m  # module.s3.aws_s3_object.folder3[0m will be created
+[0m  [32m+[0m[0m resource "aws_s3_object" "folder3" {
+      [32m+[0m[0m acl                    = (known after apply)
+      [32m+[0m[0m arn                    = (known after apply)
+      [32m+[0m[0m bucket                 = (known after apply)
+      [32m+[0m[0m bucket_key_enabled     = (known after apply)
+      [32m+[0m[0m checksum_crc32         = (known after apply)
+      [32m+[0m[0m checksum_crc32c        = (known after apply)
+      [32m+[0m[0m checksum_crc64nvme     = (known after apply)
+      [32m+[0m[0m checksum_sha1          = (known after apply)
+      [32m+[0m[0m checksum_sha256        = (known after apply)
+      [32m+[0m[0m content_type           = (known after apply)
+      [32m+[0m[0m etag                   = (known after apply)
+      [32m+[0m[0m force_destroy          = false
+      [32m+[0m[0m id                     = (known after apply)
+      [32m+[0m[0m key                    = "results/"
+      [32m+[0m[0m kms_key_id             = (known after apply)
+      [32m+[0m[0m server_side_encryption = (known after apply)
+      [32m+[0m[0m storage_class          = (known after apply)
+      [32m+[0m[0m tags_all               = (known after apply)
+      [32m+[0m[0m version_id             = (known after apply)
+        [90m# (1 unchanged attribute hidden)[0m[0m
+    }
+
+[1m  # module.s3.random_string.suffix[0m will be created
+[0m  [32m+[0m[0m resource "random_string" "suffix" {
+      [32m+[0m[0m id          = (known after apply)
+      [32m+[0m[0m length      = 8
+      [32m+[0m[0m lower       = true
+      [32m+[0m[0m min_lower   = 0
+      [32m+[0m[0m min_numeric = 0
+      [32m+[0m[0m min_special = 0
+      [32m+[0m[0m min_upper   = 0
+      [32m+[0m[0m number      = true
+      [32m+[0m[0m numeric     = true
+      [32m+[0m[0m result      = (known after apply)
+      [32m+[0m[0m special     = false
+      [32m+[0m[0m upper       = false
+    }
+
+[1m  # module.stepfunctions.data.aws_iam_policy_document.sfn_policy[0m will be read during apply
   # (config refers to values not yet known)
- <= data "aws_iam_policy_document" "sfn_policy" {
-      + id            = (known after apply)
-      + json          = (known after apply)
-      + minified_json = (known after apply)
+[0m [36m<=[0m[0m data "aws_iam_policy_document" "sfn_policy" {
+      [32m+[0m[0m id            = (known after apply)
+      [32m+[0m[0m json          = (known after apply)
+      [32m+[0m[0m minified_json = (known after apply)
 
-      + statement {
-          + actions   = [
-              + "lambda:InvokeAsync",
-              + "lambda:InvokeFunction",
+      [32m+[0m[0m statement {
+          [32m+[0m[0m actions   = [
+              [32m+[0m[0m "lambda:InvokeAsync",
+              [32m+[0m[0m "lambda:InvokeFunction",
             ]
-          + resources = [
-              + "*",
+          [32m+[0m[0m resources = [
+              [32m+[0m[0m "*",
             ]
-          + sid       = "AllowLambdaInvoke"
+          [32m+[0m[0m sid       = "AllowLambdaInvoke"
         }
-      + statement {
-          + actions   = [
-              + "ecs:DescribeTasks",
-              + "ecs:RunTask",
+      [32m+[0m[0m statement {
+          [32m+[0m[0m actions   = [
+              [32m+[0m[0m "ecs:DescribeTasks",
+              [32m+[0m[0m "ecs:RunTask",
+              [32m+[0m[0m "ecs:StopTask",
             ]
-          + resources = [
-              + "arn:aws:ecs:ap-south-1:236024603923:task-definition/your-task-definition-name:*",
+          [32m+[0m[0m resources = [
+              [32m+[0m[0m "*",
             ]
-          + sid       = "AllowFargateRunOnly"
+          [32m+[0m[0m sid       = "AllowFargateRunOnly"
         }
-      + statement {
-          + actions   = [
-              + "iam:PassRole",
+      [32m+[0m[0m statement {
+          [32m+[0m[0m actions   = [
+              [32m+[0m[0m "iam:PassRole",
             ]
-          + resources = [
-              + "arn:aws:iam::236024603923:role/your-ecsTaskExecutionRole",
+          [32m+[0m[0m resources = [
+              [32m+[0m[0m "*",
             ]
-          + sid       = "AllowPassExecutionRole"
+          [32m+[0m[0m sid       = "AllowPassExecutionRole"
+
+          [32m+[0m[0m condition {
+              [32m+[0m[0m test     = "StringLike"
+              [32m+[0m[0m values   = [
+                  [32m+[0m[0m "ecs-tasks.amazonaws.com",
+                ]
+              [32m+[0m[0m variable = "iam:PassedToService"
+            }
         }
-      + statement {
-          + actions   = [
-              + "logs:CreateLogDelivery",
-              + "logs:DeleteLogDelivery",
-              + "logs:DescribeLogGroups",
-              + "logs:DescribeResourcePolicies",
-              + "logs:GetLogDelivery",
-              + "logs:GetResourcePolicy",
-              + "logs:ListLogDeliveries",
-              + "logs:PutResourcePolicy",
-              + "logs:UpdateLogDelivery",
+      [32m+[0m[0m statement {
+          [32m+[0m[0m actions   = [
+              [32m+[0m[0m "logs:CreateLogDelivery",
+              [32m+[0m[0m "logs:DeleteLogDelivery",
+              [32m+[0m[0m "logs:DescribeLogGroups",
+              [32m+[0m[0m "logs:DescribeResourcePolicies",
+              [32m+[0m[0m "logs:GetLogDelivery",
+              [32m+[0m[0m "logs:GetResourcePolicy",
+              [32m+[0m[0m "logs:ListLogDeliveries",
+              [32m+[0m[0m "logs:PutResourcePolicy",
+              [32m+[0m[0m "logs:UpdateLogDelivery",
             ]
-          + resources = [
-              + "*",
+          [32m+[0m[0m resources = [
+              [32m+[0m[0m "*",
             ]
-          + sid       = "AllowCloudWatchLogDelivery"
+          [32m+[0m[0m sid       = "AllowCloudWatchLogDelivery"
         }
-      + statement {
-          + actions   = [
-              + "logs:CreateLogGroup",
-              + "logs:CreateLogStream",
-              + "logs:PutLogEvents",
+      [32m+[0m[0m statement {
+          [32m+[0m[0m actions   = [
+              [32m+[0m[0m "logs:CreateLogGroup",
+              [32m+[0m[0m "logs:CreateLogStream",
+              [32m+[0m[0m "logs:PutLogEvents",
             ]
-          + resources = [
-              + "arn:aws:logs:ap-south-1:236024603923:log-group:/aws/stepfunctions/video-crash-detection:*",
+          [32m+[0m[0m resources = [
+              [32m+[0m[0m "arn:aws:logs:ap-south-1:236024603923:log-group:/aws/stepfunctions/video-crash-detection:*",
             ]
-          + sid       = "AllowCloudWatchLogging"
+          [32m+[0m[0m sid       = "AllowCloudWatchLogging"
         }
-      + statement {
-          + actions   = [
-              + "s3:DeleteObject",
-              + "s3:GetObject",
-              + "s3:ListBucket",
-              + "s3:PutObject",
+      [32m+[0m[0m statement {
+          [32m+[0m[0m actions   = [
+              [32m+[0m[0m "s3:DeleteObject",
+              [32m+[0m[0m "s3:GetObject",
+              [32m+[0m[0m "s3:ListBucket",
+              [32m+[0m[0m "s3:PutObject",
             ]
-          + resources = [
-              + (known after apply),
-              + (known after apply),
-              + (known after apply),
-              + (known after apply),
+          [32m+[0m[0m resources = [
+              [32m+[0m[0m (known after apply),
+              [32m+[0m[0m (known after apply),
+              [32m+[0m[0m (known after apply),
+              [32m+[0m[0m (known after apply),
             ]
-          + sid       = "AllowS3Access"
+          [32m+[0m[0m sid       = "AllowS3Access"
+        }
+      [32m+[0m[0m statement {
+          [32m+[0m[0m actions   = [
+              [32m+[0m[0m "events:DeleteRule",
+              [32m+[0m[0m "events:DescribeRule",
+              [32m+[0m[0m "events:PutRule",
+              [32m+[0m[0m "events:PutTargets",
+              [32m+[0m[0m "events:RemoveTargets",
+            ]
+          [32m+[0m[0m resources = [
+              [32m+[0m[0m "*",
+            ]
+          [32m+[0m[0m sid       = "AllowCloudWatchEvents"
         }
     }
 
-  # module.stepfunctions.aws_cloudwatch_log_group.sfn_logs will be created
-  + resource "aws_cloudwatch_log_group" "sfn_logs" {
-      + arn               = (known after apply)
-      + id                = (known after apply)
-      + log_group_class   = (known after apply)
-      + name              = "/aws/stepfunctions/video-crash-detection"
-      + name_prefix       = (known after apply)
-      + retention_in_days = 7
-      + skip_destroy      = false
-      + tags              = {
-          + "Application" = "video-crash-detector"
-          + "Owner"       = "bob"
+[1m  # module.stepfunctions.aws_cloudwatch_log_group.sfn_logs[0m will be created
+[0m  [32m+[0m[0m resource "aws_cloudwatch_log_group" "sfn_logs" {
+      [32m+[0m[0m arn               = (known after apply)
+      [32m+[0m[0m id                = (known after apply)
+      [32m+[0m[0m log_group_class   = (known after apply)
+      [32m+[0m[0m name              = "/aws/stepfunctions/video-crash-detection"
+      [32m+[0m[0m name_prefix       = (known after apply)
+      [32m+[0m[0m retention_in_days = 7
+      [32m+[0m[0m skip_destroy      = false
+      [32m+[0m[0m tags              = {
+          [32m+[0m[0m "Application" = "video-crash-detector"
+          [32m+[0m[0m "Owner"       = "bob"
         }
-      + tags_all          = {
-          + "Application" = "video-crash-detector"
-          + "Owner"       = "bob"
+      [32m+[0m[0m tags_all          = {
+          [32m+[0m[0m "Application" = "video-crash-detector"
+          [32m+[0m[0m "Owner"       = "bob"
         }
     }
 
-  # module.stepfunctions.aws_iam_role.sfn_exec will be created
-  + resource "aws_iam_role" "sfn_exec" {
-      + arn                   = (known after apply)
-      + assume_role_policy    = jsonencode(
+[1m  # module.stepfunctions.aws_iam_role.sfn_exec[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role" "sfn_exec" {
+      [32m+[0m[0m arn                   = (known after apply)
+      [32m+[0m[0m assume_role_policy    = jsonencode(
             {
-              + Statement = [
-                  + {
-                      + Action    = "sts:AssumeRole"
-                      + Effect    = "Allow"
-                      + Principal = {
-                          + Service = "states.amazonaws.com"
+              [32m+[0m[0m Statement = [
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action    = "sts:AssumeRole"
+                      [32m+[0m[0m Effect    = "Allow"
+                      [32m+[0m[0m Principal = {
+                          [32m+[0m[0m Service = "states.amazonaws.com"
                         }
                     },
                 ]
-              + Version   = "2012-10-17"
+              [32m+[0m[0m Version   = "2012-10-17"
             }
         )
-      + create_date           = (known after apply)
-      + force_detach_policies = false
-      + id                    = (known after apply)
-      + managed_policy_arns   = (known after apply)
-      + max_session_duration  = 3600
-      + name                  = "stepfunctions_exec_role"
-      + name_prefix           = (known after apply)
-      + path                  = "/"
-      + tags                  = {
-          + "Application" = "video-crash-detector"
-          + "Owner"       = "bob"
+      [32m+[0m[0m create_date           = (known after apply)
+      [32m+[0m[0m force_detach_policies = false
+      [32m+[0m[0m id                    = (known after apply)
+      [32m+[0m[0m managed_policy_arns   = (known after apply)
+      [32m+[0m[0m max_session_duration  = 3600
+      [32m+[0m[0m name                  = "stepfunctions_exec_role"
+      [32m+[0m[0m name_prefix           = (known after apply)
+      [32m+[0m[0m path                  = "/"
+      [32m+[0m[0m tags                  = {
+          [32m+[0m[0m "Application" = "video-crash-detector"
+          [32m+[0m[0m "Owner"       = "bob"
         }
-      + tags_all              = {
-          + "Application" = "video-crash-detector"
-          + "Owner"       = "bob"
+      [32m+[0m[0m tags_all              = {
+          [32m+[0m[0m "Application" = "video-crash-detector"
+          [32m+[0m[0m "Owner"       = "bob"
         }
-      + unique_id             = (known after apply)
+      [32m+[0m[0m unique_id             = (known after apply)
 
-      + inline_policy (known after apply)
+      [32m+[0m[0m inline_policy (known after apply)
     }
 
-  # module.stepfunctions.aws_iam_role_policy.sfn_policy will be created
-  + resource "aws_iam_role_policy" "sfn_policy" {
-      + id          = (known after apply)
-      + name        = "stepfunctions_policy"
-      + name_prefix = (known after apply)
-      + policy      = (known after apply)
-      + role        = (known after apply)
+[1m  # module.stepfunctions.aws_iam_role_policy.sfn_policy[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role_policy" "sfn_policy" {
+      [32m+[0m[0m id          = (known after apply)
+      [32m+[0m[0m name        = "stepfunctions_policy"
+      [32m+[0m[0m name_prefix = (known after apply)
+      [32m+[0m[0m policy      = (known after apply)
+      [32m+[0m[0m role        = (known after apply)
     }
 
-  # module.stepfunctions.aws_sfn_state_machine.video_crash_detection will be created
-  + resource "aws_sfn_state_machine" "video_crash_detection" {
-      + arn                       = (known after apply)
-      + creation_date             = (known after apply)
-      + definition                = jsonencode(
-            {
-              + Comment = "Video Analysis Workflow"
-              + StartAt = "Run Fargate Task"
-              + States  = {
-                  + "Fail State"            = {
-                      + Cause = "Error running ECS Fargate Task"
-                      + Error = "FargateTaskFailed"
-                      + Type  = "Fail"
-                    }
-                  + "Publish SNS"           = {
-                      + End        = true
-                      + Parameters = {
-                          + "Message.$" = "$"
-                          + TopicArn    = "arn:aws:sns:region:account-id:your-topic-name"
-                        }
-                      + Resource   = "arn:aws:states:::sns:publish"
-                      + Type       = "Task"
-                    }
-                  + "Run Fargate Task"      = {
-                      + Catch      = [
-                          + {
-                              + ErrorEquals = [
-                                  + "States.ALL",
-                                ]
-                              + Next        = "Fail State"
-                              + ResultPath  = "$.error"
-                            },
-                        ]
-                      + Next       = "Send Email via Lambda"
-                      + Parameters = {
-                          + Cluster              = "your-ecs-cluster-name"
-                          + LaunchType           = "FARGATE"
-                          + NetworkConfiguration = {
-                              + AwsvpcConfiguration = {
-                                  + AssignPublicIp = "ENABLED"
-                                  + SecurityGroups = [
-                                      + "sg-xxxxxxxx",
-                                    ]
-                                  + Subnets        = [
-                                      + "subnet-xxxxxxxx",
-                                    ]
-                                }
-                            }
-                          + Overrides            = {
-                              + ContainerOverrides = [
-                                  + {
-                                      + Environment = [
-                                          + {
-                                              + Name      = "INPUT_S3_BUCKET"
-                                              + "Value.$" = "$.input_bucket"
-                                            },
-                                          + {
-                                              + Name      = "INPUT_S3_KEY"
-                                              + "Value.$" = "$.input_key"
-                                            },
-                                        ]
-                                      + Name        = "your-container-name"
-                                    },
-                                ]
-                            }
-                          + TaskDefinition       = "your-task-definition-name"
-                        }
-                      + Resource   = "arn:aws:states:::ecs:runTask.sync"
-                      + Type       = "Task"
-                    }
-                  + "Send Email via Lambda" = {
-                      + Next       = "Publish SNS"
-                      + Parameters = {
-                          + FunctionName = "arn:aws:lambda:region:account-id:function:your-ses-lambda"
-                          + Payload      = {
-                              + "bucket.$"    = "$.input_bucket"
-                              + "details.$"   = "$"
-                              + "video_key.$" = "$.input_key"
-                            }
-                        }
-                      + Resource   = "arn:aws:states:::lambda:invoke"
-                      + Type       = "Task"
-                    }
-                }
-            }
-        )
-      + description               = (known after apply)
-      + id                        = (known after apply)
-      + name                      = "video-crash-detection"
-      + name_prefix               = (known after apply)
-      + publish                   = false
-      + revision_id               = (known after apply)
-      + role_arn                  = (known after apply)
-      + state_machine_version_arn = (known after apply)
-      + status                    = (known after apply)
-      + tags                      = {
-          + "Application" = "video-crash-detector"
-          + "Owner"       = "bob"
+[1m  # module.stepfunctions.aws_sfn_state_machine.video_crash_detection[0m will be created
+[0m  [32m+[0m[0m resource "aws_sfn_state_machine" "video_crash_detection" {
+      [32m+[0m[0m arn                       = (known after apply)
+      [32m+[0m[0m creation_date             = (known after apply)
+      [32m+[0m[0m definition                = (known after apply)
+      [32m+[0m[0m description               = (known after apply)
+      [32m+[0m[0m id                        = (known after apply)
+      [32m+[0m[0m name                      = "video-crash-detection"
+      [32m+[0m[0m name_prefix               = (known after apply)
+      [32m+[0m[0m publish                   = false
+      [32m+[0m[0m revision_id               = (known after apply)
+      [32m+[0m[0m role_arn                  = (known after apply)
+      [32m+[0m[0m state_machine_version_arn = (known after apply)
+      [32m+[0m[0m status                    = (known after apply)
+      [32m+[0m[0m tags                      = {
+          [32m+[0m[0m "Application" = "video-crash-detector"
+          [32m+[0m[0m "Owner"       = "bob"
         }
-      + tags_all                  = {
-          + "Application" = "video-crash-detector"
-          + "Owner"       = "bob"
+      [32m+[0m[0m tags_all                  = {
+          [32m+[0m[0m "Application" = "video-crash-detector"
+          [32m+[0m[0m "Owner"       = "bob"
         }
-      + type                      = "STANDARD"
-      + version_description       = (known after apply)
+      [32m+[0m[0m type                      = "STANDARD"
+      [32m+[0m[0m version_description       = (known after apply)
 
-      + encryption_configuration (known after apply)
+      [32m+[0m[0m encryption_configuration (known after apply)
 
-      + logging_configuration {
-          + include_execution_data = true
-          + level                  = "ALL"
-          + log_destination        = "arn:aws:logs:ap-south-1:236024603923:log-group:/aws/stepfunctions/video-crash-detection:*"
+      [32m+[0m[0m logging_configuration {
+          [32m+[0m[0m include_execution_data = true
+          [32m+[0m[0m level                  = "ALL"
+          [32m+[0m[0m log_destination        = "arn:aws:logs:ap-south-1:236024603923:log-group:/aws/stepfunctions/video-crash-detection:*"
         }
 
-      + tracing_configuration (known after apply)
+      [32m+[0m[0m tracing_configuration (known after apply)
     }
 
-Plan: 34 to add, 0 to change, 0 to destroy.
+[1mPlan:[0m 41 to add, 0 to change, 0 to destroy.
+[0m
+Changes to Outputs:
+  [32m+[0m[0m s3_dump_bucket_name = (known after apply)
+  [32m+[0m[0m s3_raw_bucket_name  = (known after apply)
+  [32m+[0m[0m stepfunction_arn    = (known after apply)

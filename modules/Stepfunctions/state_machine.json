@@ -38,12 +38,8 @@
         "TaskDefinition": "${video_splitter_arn}",
         "NetworkConfiguration": {
           "AwsvpcConfiguration": {
-            "Subnets.$": [
-              "States.Array($.{fargateSUB})"
-            ],
-            "securityGroups.$": [
-              "$.{fargateSG}"
-            ],
+            "Subnets.$": "States.Array($.fargateSUB)",
+            "SecurityGroups.$": "States.Array($.fargateSG)",
             "AssignPublicIp": "ENABLED"
           }
         }
@@ -85,15 +81,11 @@
         "TaskDefinition": "${image_processor_arn}",
         "NetworkConfiguration": {
           "AwsvpcConfiguration": {
-            "Subnets.$": [
-              "States.Array($.{fargateSUB})"
-            ],
-            "securityGroups.$": [
-              "$.{fargateSG}"
-            ],
+            "Subnets.$": "States.Array($.fargateSUB)",
+            "SecurityGroups.$": "States.Array($.fargateSG)",
             "AssignPublicIp": "ENABLED"
+          }
         }
-      }
       },
       "Next": "SaveResults"
     },
