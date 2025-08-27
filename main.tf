@@ -36,6 +36,10 @@ module "stepfunctions" {
   source = "./modules/Stepfunctions"
   s3bucket_raw_arn    = module.s3.raw_bucket_arn
   s3bucket_dump_arn   = module.s3.dump_bucket_arn
+  raw_path            = module.s3.s3_input_raw_urls
+  processing_path     = module.s3.s3_dump_processing_urls
+  results_path        = module.s3.s3_dump_results_urls
+
   aws_region          = var.aws_region
   sns_stepfunctions   = module.events_sns.aws_sns_topic_arn
   LambdaFunction1Name  = module.lambda.lambda_function1_name

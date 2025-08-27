@@ -114,10 +114,16 @@ resource "aws_iam_role_policy" "fargate_task_policy" {
 }
 
 # CloudWatch log group
-resource "aws_cloudwatch_log_group" "fargate_logs" {
+resource "aws_cloudwatch_log_group" "fargate_logs_1" {
   name              = "/ecs/${var.project_name}-video-processor"
   retention_in_days = 7
 }
+
+resource "aws_cloudwatch_log_group" "fargate_logs_2" {
+  name              = "/ecs/${var.project_name}-Image-processor"
+  retention_in_days = 7
+}
+
 
 
 # Fargate task definition
@@ -134,23 +140,12 @@ resource "aws_ecs_task_definition" "video_splitter" {
     name  = "video-processor"
     image = var.ecr_repository_url1
     
-    environment = [
-      {
-        name  = "INPUT_BUCKET"
-        value = var.s3_bucket_raw
-      },
-      {
-        name  = "OUTPUT_BUCKET"
-        value = var.s3_bucket_dump
-      }
-    ]
-    
     logConfiguration = {
       logDriver = "awslogs"
       options = {
-        "awslogs-group"         = aws_cloudwatch_log_group.fargate_logs.name
+        "awslogs-group"         = aws_cloudwatch_log_group.fargate_logs_1.name
         "awslogs-region"        = var.aws_region
-        "awslogs-stream-prefix" = "ecs"
+        "awslogs-stream-prefix" = "video_splitter_ecs"
       }
     }
     
@@ -187,24 +182,14 @@ resource "aws_ecs_task_definition" "image_processor" {
   container_definitions = jsonencode([{
     name  = "Image-processor"
     image = var.ecr_repository_url2
-    
-    environment = [
-      {
-        name  = "INPUT_BUCKET"
-        value = var.s3_bucket_raw
-      },
-      {
-        name  = "OUTPUT_BUCKET"
-        value = var.s3_bucket_dump
-      }
-    ]
+
     
     logConfiguration = {
       logDriver = "awslogs"
       options = {
-        "awslogs-group"         = aws_cloudwatch_log_group.fargate_logs.name
+        "awslogs-group"         = aws_cloudwatch_log_group.fargate_logs_2.name
         "awslogs-region"        = var.aws_region
-        "awslogs-stream-prefix" = "ecs"
+        "awslogs-stream-prefix" = "image_processor_ecs"
       }
     }
     

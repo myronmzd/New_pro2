@@ -35,7 +35,7 @@
       "Parameters": {
         "LaunchType": "FARGATE",
         "Cluster": "${ecs_cluster}",
-        "TaskDefinition": "${video_splitter_arn}",
+        "TaskDefinition": "${video_splitter_arn_1}",
         "NetworkConfiguration": {
           "AwsvpcConfiguration": {
             "Subnets": ${jsonencode(fargateSUB)},
@@ -49,25 +49,16 @@
             "Environment": [
               {
                 "Name": "S3_BUCKET_R",
-                "Value": "${input_bucket}"
+                "Value": "${raw_path_url}"
               },
               {
                 "Name": "S3_BUCKET_D",
-                "Value": "${dump_bucket}"
-              },
-              {
-                "Name": "FRAME_RATE",
-                "Value": "1"
-              },
-              {
-                "Name": "RESULT_PATH",
-                "Value": "${ecsResult}"
+                "Value": "${processing_path_url}"
               }
             ]
           }]
         }
       },
-      "ResultPath": "$.ecsResult",
       "Next": "CheckProcessingImages"
     },
     "CheckProcessingImages": {
@@ -75,7 +66,7 @@
       "Resource": "arn:aws:states:::aws-sdk:s3:listObjectsV2",
       "Parameters": {
         "Bucket.$": "$.dump_bucket",
-        "Prefix": "processing/"
+        "Prefix": "processing/*.png"
       },
       "ResultPath": "$.processingResult",
       "Next": "Choice2"
@@ -83,9 +74,9 @@
     "Choice2": {
       "Type": "Choice",
       "Choices": [
-        {
-          "Variable": "$.processingResult.Contents",
-          "IsPresent": true,
+         {
+          "Variable": "$.input_key",
+          "StringMatches": "*.jpg",
           "Next": "ECS_RunTask_CrashDetection"
         }
       ],
@@ -102,7 +93,7 @@
       "Parameters": {
         "LaunchType": "FARGATE",
         "Cluster": "${ecs_cluster}",
-        "TaskDefinition": "${image_processor_arn}",
+        "TaskDefinition": "${image_processor_arn_2}",
         "NetworkConfiguration": {
           "AwsvpcConfiguration": {
             "Subnets": ${jsonencode(fargateSUB)},
@@ -111,6 +102,7 @@
           }
         }
       },
+      "ResultPath": "$.crashDetectionResult",
       "Next": "SaveResults"
     },
     "SaveResults": {
@@ -119,7 +111,7 @@
       "Parameters": {
         "Bucket.$": "$.dump_bucket",
         "Key": "results/detection.json",
-        "Body.$": "$.Results"
+        "Body": "Detection completed"
       },
       "Next": "CheckResultsFiles"
     },

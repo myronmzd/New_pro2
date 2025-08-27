@@ -23,14 +23,16 @@ locals {
       SnsTopicArn          = var.sns_stepfunctions
       dump_bucket          = var.s3bucket_dump_arn 
       input_bucket         = var.s3bucket_raw_arn
+      raw_path_url         = var.raw_path
+      processing_path_url  = var.processing_path  
+      results_path_url     = var.results_path
       LambdaFunctionName1  = var.LambdaFunction1Name
       Function1InvokeArns  = var.function1_invoke_arns  
       ecs_cluster          = var.ecs_cluster
-      video_splitter_arn   = var.video_splitter_arn
-      image_processor_arn  = var.image_processor_arn
+      video_splitter_arn_1  = var.video_splitter_arn
+      image_processor_arn_2 = var.image_processor_arn
       fargateSUB           = var.fargatesubnet
       fargateSG            = var.fargatesecurity
-      ecsResult            = "${var.s3bucket_dump_arn}/results/"
     }
   )
 }

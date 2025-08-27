@@ -46,3 +46,19 @@ variable "fargatesecurity" {
   type        = list(string)
 }
 
+
+variable "raw_path" {
+  description = "Raw path URL in the input S3 bucket"
+  type        = string
+  
+}
+variable "processing_path" {
+  description = "Processing path URL in the dump S3 bucket"
+  type        = string
+  
+}
+variable "results_path" {
+  description = "Results path URL in the dump S3 bucket"
+  type        = string
+  
+}

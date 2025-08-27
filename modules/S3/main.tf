@@ -55,6 +55,7 @@ resource "aws_s3_object" "folder3" {
   content = "" 
 }
 
+
 # --------------------------------------------------------------------
 # Block all public access – strongly recommended for private pipelines
 # --------------------------------------------------------------------
