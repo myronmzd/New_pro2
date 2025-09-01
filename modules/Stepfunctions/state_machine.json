@@ -59,6 +59,7 @@
           }]
         }
       },
+      "ResultPath": "$.ecsTaskResult",
       "Next": "CheckProcessingImages"
     },
     "CheckProcessingImages": {
@@ -66,7 +67,7 @@
       "Resource": "arn:aws:states:::aws-sdk:s3:listObjectsV2",
       "Parameters": {
         "Bucket.$": "$.dump_bucket",
-        "Prefix": "processing/*.png"
+        "Prefix": "processing/"
       },
       "ResultPath": "$.processingResult",
       "Next": "Choice2"
@@ -74,9 +75,9 @@
     "Choice2": {
       "Type": "Choice",
       "Choices": [
-         {
-          "Variable": "$.input_key",
-          "StringMatches": "*.jpg",
+        {
+          "Variable": "$.processingResult.KeyCount",
+          "NumericGreaterThan": 0,
           "Next": "ECS_RunTask_CrashDetection"
         }
       ],
@@ -85,7 +86,7 @@
     "FailProcessing": {
       "Type": "Fail",
       "Error": "NoProcessingImages",
-      "Cause": "LambdaSplitVideo did not generate images"
+      "Cause": "No files in /processing/"
     },
     "ECS_RunTask_CrashDetection": {
       "Type": "Task",
@@ -113,6 +114,7 @@
         "Key": "results/detection.json",
         "Body": "Detection completed"
       },
+      "ResultPath": "$.saveResult",
       "Next": "CheckResultsFiles"
     },
     "CheckResultsFiles": {

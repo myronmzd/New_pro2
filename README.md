@@ -210,8 +210,9 @@ dos2unix /workspaces/New_pro2/.devcontainer/setup.sh
 
 ## use this again and again in test so 
 
-aws s3 rm s3://input-bucket-j6olf61a/raw/ --recursive
-aws s3 cp m2-res_360p.mp4 s3://input-bucket-j6olf61a/raw/
+aws s3 rm s3://input-bucket-06n5r3t7/raw/ --recursive
+aws s3 rm s3://dump-video-image-06n5r3t7/processing/ --recursive
+aws s3 cp m2-res_360p.mp4 s3://input-bucket-06n5r3t7/raw/
 
 aws stepfunctions delete-state-machine --state-machine-arn arn:aws:states:ap-south-1:236024603923:stateMachine:video-crash-detection
 
