@@ -74,9 +74,10 @@ This project enables users to **upload video files to S3**, automatically trigge
 │    - S3 ListObjectsV2                     │
 │    - Choice: are processing images ready? │
 │                                           │
-│ 4️⃣ **ECS RunTask2 = runs Rekognition      │
+│ 4️⃣ **ECS RunTask2 = runs ultralytics      |
+|        import YOLO                         │
 │       on images   **                       │
-│    - Runs container task for Rekognition  │
+│    - Runs container task for ultralytics  │
 │    - Saves inference results              │
 │                                           │
 │ 5️⃣ **SaveResults**                       │
@@ -145,6 +146,22 @@ This project enables users to **upload video files to S3**, automatically trigge
 
 ---
 
+
+##  Cost Estimation (with GPU)
+
+| Service Component           | Details                                     | Estimated Cost (₹)    |
+|----------------------------|---------------------------------------------|------------------------|
+| S3 Storage                 | Video + frames + results                    | 150–200                |
+| ECS Fargate (CPU tasks)    | Frame splitting, orchestration               | 400–800                |
+| GPU EC2 (YOLO inference)   | G5.xlarge instance (~$1.01/hr) × 10 hrs      | ~800                   |
+| Step Functions, Lambda, SNS, SES | Orchestration, notifications           | Negligible             |
+| **Total Estimated Cost**   | For processing a 10-hour video              | **~₹2,200 – ₹2,800**   |
+
+###  Notes:
+- **Current limitation**: AWS Fargate doesn’t support GPU. GPU inference requires GPU EC2 instances (e.g., G5, P3 series).
+- **GPU choice**: G5.xlarge can reduce inference time while keeping cost modest (~₹800 for 10 hours). Higher-end P3 instances cost more but offer faster performance.
+- All costs are approximate and **subject to change**. Check AWS pricing for your region before planning.
+
 ## Terraform
 
    # 1. Initialize the working directory
@@ -210,9 +227,9 @@ dos2unix /workspaces/New_pro2/.devcontainer/setup.sh
 
 ## use this again and again in test so 
 
-aws s3 rm s3://input-bucket-06n5r3t7/raw/ --recursive
-aws s3 rm s3://dump-video-image-06n5r3t7/processing/ --recursive
-aws s3 cp m2-res_360p.mp4 s3://input-bucket-06n5r3t7/raw/
+aws s3 rm s3://input-bucket-0imos5eg/raw/ --recursive
+aws s3 rm s3://dump-video-image-0imos5eg/processing/ --recursive
+aws s3 cp m2-res_360p.mp4 s3://input-bucket-0imos5eg/raw/
 
 aws stepfunctions delete-state-machine --state-machine-arn arn:aws:states:ap-south-1:236024603923:stateMachine:video-crash-detection
 

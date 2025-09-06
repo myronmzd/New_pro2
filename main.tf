@@ -72,7 +72,7 @@ module "compute" {
   input_bucket_arn     = module.s3.raw_bucket_arn
   output_bucket_arn    = module.s3.dump_bucket_arn
   ecr_repository_url1   = "236024603923.dkr.ecr.ap-south-1.amazonaws.com/video-splitter"
-  ecr_repository_url2   = "236024603923.dkr.ecr.ap-south-1.amazonaws.com/video-processor"  
+  ecr_repository_url2   = "236024603923.dkr.ecr.ap-south-1.amazonaws.com/s3-crash-detector"  
   default_tags = {
     Project     = "CarCrashApp"
     Environment = "Dev"
