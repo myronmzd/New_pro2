@@ -90,7 +90,7 @@
     },
     "ECS_RunTask_CrashDetection": {
       "Type": "Task",
-      "Resource": "arn:aws:states:::ecs:runTask",
+      "Resource": "arn:aws:states:::ecs:runTask.sync",
       "Parameters": {
         "LaunchType": "FARGATE",
         "Cluster": "${ecs_cluster}",
@@ -102,24 +102,6 @@
             "AssignPublicIp": "ENABLED"
           }
         }
-        "Overrides": {
-          "ContainerOverrides": [{
-            "Name": "video-processor",
-            "Environment": [
-              {
-                "Name": "S3_BUCKET_results",
-                "Value": "${results_path_url}"
-              },
-              {
-                "Name": "S3_BUCKET_processing",
-                "Value": "${processing_path_url}"
-              }
-            ]
-          }]
-        }
-      },
-      "ResultPath": "$.ecsTaskResult",
-      "Next": "CheckProcessingImages"
       },
       "ResultPath": "$.crashDetectionResult",
       "Next": "SaveResults"
