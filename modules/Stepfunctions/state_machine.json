@@ -102,6 +102,24 @@
             "AssignPublicIp": "ENABLED"
           }
         }
+        "Overrides": {
+          "ContainerOverrides": [{
+            "Name": "video-processor",
+            "Environment": [
+              {
+                "Name": "S3_BUCKET_results",
+                "Value": "${results_path_url}"
+              },
+              {
+                "Name": "S3_BUCKET_processing",
+                "Value": "${processing_path_url}"
+              }
+            ]
+          }]
+        }
+      },
+      "ResultPath": "$.ecsTaskResult",
+      "Next": "CheckProcessingImages"
       },
       "ResultPath": "$.crashDetectionResult",
       "Next": "SaveResults"
