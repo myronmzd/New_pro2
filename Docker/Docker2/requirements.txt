@@ -1,0 +1,6 @@
+ultralytics==8.3.0
+torch==2.3.0+cpu
+torchvision==0.18.0+cpu
+boto3
+opencv-python-headless
+Pillow
