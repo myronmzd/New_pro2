@@ -49,6 +49,7 @@ resource "aws_s3_object" "folder2" {
   key    = "processing/"
   content = ""
 }
+
 resource "aws_s3_object" "folder3" {
   bucket = aws_s3_bucket.dump_bucket.bucket
   key    = "results/"

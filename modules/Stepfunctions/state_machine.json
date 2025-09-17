@@ -67,7 +67,8 @@
       "Resource": "arn:aws:states:::aws-sdk:s3:listObjectsV2",
       "Parameters": {
         "Bucket.$": "$.dump_bucket",
-        "Prefix": "processing/"
+        "Prefix": "processing/",
+        "MaxKeys": 1
       },
       "ResultPath": "$.processingResult",
       "Next": "Choice2"
@@ -89,33 +90,35 @@
       "Cause": "No files in /processing/"
     },
     "ECS_RunTask_CrashDetection": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::ecs:runTask.sync",
-      "Parameters": {
-        "LaunchType": "FARGATE",
-        "Cluster": "${ecs_cluster}",
-        "TaskDefinition": "${image_processor_arn_2}",
-        "NetworkConfiguration": {
-          "AwsvpcConfiguration": {
-            "Subnets": ${jsonencode(fargateSUB)},
-            "SecurityGroups": ${jsonencode(fargateSG)},
-            "AssignPublicIp": "ENABLED"
-          }
+    "Type": "Task",
+    "Resource": "arn:aws:states:::ecs:runTask.sync",
+    "Parameters": {
+      "LaunchType": "FARGATE",
+      "Cluster": "${ecs_cluster}",
+      "TaskDefinition": "${image_processor_arn_2}",
+      "NetworkConfiguration": {
+        "AwsvpcConfiguration": {
+          "Subnets": ${jsonencode(fargateSUB)},
+          "SecurityGroups": ${jsonencode(fargateSG)},
+          "AssignPublicIp": "ENABLED"
         }
       },
-      "ResultPath": "$.crashDetectionResult",
-      "Next": "SaveResults"
+      "Overrides": {
+        "ContainerOverrides": [
+          {
+            "Name": "Image-processor",
+            "Environment": [
+              {
+                "Name": "S3_BUCKET",
+                "Value": "${dumpbucket_name}"
+              }
+            ]
+          }
+        ]
+      }
     },
-    "SaveResults": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::aws-sdk:s3:putObject",
-      "Parameters": {
-        "Bucket.$": "$.dump_bucket",
-        "Key": "results/detection.json",
-        "Body": "Detection completed"
-      },
-      "ResultPath": "$.saveResult",
-      "Next": "CheckResultsFiles"
+    "ResultPath": "$.crashDetectionResult",
+    "Next": "CheckResultsFiles"
     },
     "CheckResultsFiles": {
       "Type": "Task",
@@ -146,7 +149,6 @@
     "Lambda Invoke": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
-      "OutputPath": "$.Payload",
       "Parameters": {
         "FunctionName": "${Function1InvokeArns}",
         "Payload.$": "$"

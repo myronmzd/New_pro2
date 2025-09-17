@@ -36,6 +36,7 @@ module "stepfunctions" {
   source = "./modules/Stepfunctions"
   s3bucket_raw_arn    = module.s3.raw_bucket_arn
   s3bucket_dump_arn   = module.s3.dump_bucket_arn
+  dump_bucket_n       = module.s3.dump_bucket_name
   raw_path            = module.s3.s3_input_raw_urls
   processing_path     = module.s3.s3_dump_processing_urls
   results_path        = module.s3.s3_dump_results_urls
@@ -72,7 +73,7 @@ module "compute" {
   input_bucket_arn     = module.s3.raw_bucket_arn
   output_bucket_arn    = module.s3.dump_bucket_arn
   ecr_repository_url1   = "236024603923.dkr.ecr.ap-south-1.amazonaws.com/video-splitter"
-  ecr_repository_url2   = "236024603923.dkr.ecr.ap-south-1.amazonaws.com/s3-crash-detector"  
+  ecr_repository_url2   = "236024603923.dkr.ecr.ap-south-1.amazonaws.com/carcrash-detector"  
   default_tags = {
     Project     = "CarCrashApp"
     Environment = "Dev"

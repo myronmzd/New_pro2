@@ -5,6 +5,13 @@ variable "s3bucket_raw_arn" {
 variable "s3bucket_dump_arn" {
   type = string
 }
+
+variable "dump_bucket_n" {
+  description = "Name of the dump S3 bucket"
+  type        = string
+  
+}
+
 variable "aws_region" {
   description = "AWS region"
   type        = string

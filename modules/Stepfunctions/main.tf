@@ -22,6 +22,7 @@ locals {
       AccountId            = data.aws_caller_identity.current.account_id
       SnsTopicArn          = var.sns_stepfunctions
       dump_bucket          = var.s3bucket_dump_arn 
+      dumpbucket_name      = var.dump_bucket_n
       input_bucket         = var.s3bucket_raw_arn
       raw_path_url         = var.raw_path
       processing_path_url  = var.processing_path  

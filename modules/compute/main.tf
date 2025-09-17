@@ -93,21 +93,24 @@ resource "aws_iam_role_policy" "fargate_task_policy" {
       {
         Effect = "Allow"
         Action = [
-          "s3:GetObject",
-          "s3:PutObject"
+          "s3:ListBucket"
         ]
         Resource = [
-          "${var.input_bucket_arn}/*",
-          "${var.output_bucket_arn}/*"
+          "${var.input_bucket_arn}",
+          "${var.output_bucket_arn}"
         ]
       },
       {
         Effect = "Allow"
         Action = [
-          "rekognition:DetectLabels",
-          "rekognition:DetectCustomLabels"
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
         ]
-        Resource = "*"
+        Resource = [
+          "${var.input_bucket_arn}/*",
+          "${var.output_bucket_arn}/*"
+        ]
       }
     ]
   })
