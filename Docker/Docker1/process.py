@@ -31,7 +31,7 @@ def upload_to_s3(local_path, bucket, key):
 def split_video_to_frames(video_path, bucket, prefix, video_name):
     print(f"Opening video {video_path}...")
     cap = cv2.VideoCapture(video_path)
-    fps = int(cap.get(cv2.CAP_PROP_FPS)) or 0.2
+    fps = int(cap.get(cv2.CAP_PROP_FPS)) or 0.25
     frame_interval = fps  # 1 frame per second
     frame_count = 0
     saved_count = 0

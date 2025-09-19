@@ -8,7 +8,7 @@ S3_BUCKET = os.getenv("S3_BUCKET")  # default bucket
 PROCESSING_PREFIX = "processing/"
 RESULTS_PREFIX = "results/"
 MODEL_PATH = "best.pt"  # model included in Docker image
-CONFIDENCE_THRESHOLD = 0.98  # minimum confidence to be considered high
+CONFIDENCE_THRESHOLD = 0.99  # minimum confidence to be considered high
 # -----------------------------------
 
 s3 = boto3.client("s3")

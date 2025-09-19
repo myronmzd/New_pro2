@@ -230,7 +230,7 @@ dos2unix /workspaces/New_pro2/.devcontainer/setup.sh
 aws s3 rm s3://input-bucket-90ra8acf/raw/ --recursive
 aws s3 rm s3://dump-video-image-90ra8acf/processing/ --recursive
 aws s3 rm s3://dump-video-image-90ra8acf/results/ --recursive
-aws s3 cp crash2.mp4 s3://input-bucket-90ra8acf/raw/   # nocrash 
+aws s3 cp crash4.mp4 s3://input-bucket-90ra8acf/raw/   # nocrash 
 aws s3 cp crash1.mp4 s3://input-bucket-90ra8acf/raw/                 # crash
 
 aws stepfunctions delete-state-machine --state-machine-arn arn:aws:states:ap-south-1:236024603923:stateMachine:video-crash-detection
