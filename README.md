@@ -35,7 +35,6 @@ This project enables users to **upload video files to S3**, automatically trigge
 ### Diagram
 
 ```text
-
 ┌─────────────────┐
 │      User       │
 │  Uploads Video  │
@@ -66,33 +65,33 @@ This project enables users to **upload video files to S3**, automatically trigge
 │    - S3 ListObjectsV2                     │
 │    - Choice: is file video (.mp4/.mkv)?   │
 │                                           │
-│ 2️⃣ **ECS RunTask1= Splits video**         │
+│ 2️⃣ **ECS RunTask1 = Split Video**         │
 │    - Splits video into frames (images)    │
 │    - Uploads frames to S3                 │
 │                                           │
 │ 3️⃣ **CheckProcessingImages**             │
 │    - S3 ListObjectsV2                     │
-│    - Choice: are processing images ready? │
+│    - Choice: are frames available?        │
 │                                           │
-│ 4️⃣ **ECS RunTask2 = runs ultralytics      |
-|        import YOLO                         │
-│       on images   **                       │
-│    - Runs container task for ultralytics  │
-│    - Saves inference results              │
+│ 4️⃣ **Invoke SageMaker Endpoint**         │
+│    - Sends frames to SageMaker inference  │
+│    - Uses pretrained object detection     │
+│    - Saves predictions (JSON) to S3       │
 │                                           │
 │ 5️⃣ **SaveResults**                       │
-│    - Writes output JSON/results to S3     │
+│    - Organizes output JSON + summary      │
+│    - Writes to processed/ folder          │
 │                                           │
 │ 6️⃣ **CheckResultsFiles**                 │
 │    - S3 ListObjectsV2                     │
 │    - Choice: are results available?       │
 │                                           │
 │ 7️⃣ **Lambda (Send Email)**               │
-│    - Formats results                      │
-│    - Calls SES to send summary            │
+│    - Formats results summary              │
+│    - Uses SES to send report to user      │
 │                                           │
 │ 8️⃣ **Cleanup**                           │
-│    - Deletes temporary objects            │
+│    - Deletes temporary frames and files   │
 │                                           │
 │ 🔴 Fail States: FailVideo, FailProcessing,│
 │    FailResults handle errors at each step │
@@ -101,7 +100,7 @@ This project enables users to **upload video files to S3**, automatically trigge
          ▼
 ┌──────────────────────────────────┐
 │              SNS                 │
-│  - Publishes processing alert    │
+│  - Publishes processing alerts   │
 │  - Notifies subscribers          │
 └──────────────────────────────────┘
          │
