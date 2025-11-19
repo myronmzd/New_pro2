@@ -1,10 +1,10 @@
-# 📊 AWS Sentiment Analysis Pipeline
+#  AWS Sentiment Analysis Pipeline
 
 This project enables users to **upload text or image files to S3**, automatically trigger **ECS Fargate via Step Functions** for sentiment analysis, and receive an email notification with results and a report via **SES**.
 
 ---
 
-## 🧭 Architecture Overview
+##  Architecture Overview
 
 ### Workflow
 
@@ -108,7 +108,7 @@ This project enables users to **upload text or image files to S3**, automaticall
 └─────────────────────────────────────────────┘
 ```
 
-## 🚀 Features
+##  Features
 
 - Upload text files (`.txt`) and image files (`.png`, `.jpg`) to S3
 - Sentiment analysis for text using NLP models on ECS Fargate
@@ -120,7 +120,7 @@ This project enables users to **upload text or image files to S3**, automaticall
 
 ---
 
-## 🛠️ Requirements
+##  Requirements
 
 - AWS Account with S3, ECS Fargate, SES, Lambda, Step Functions, EventBridge, SNS permissions
 - Python 3.11 for Lambda functions and ECS tasks
@@ -129,7 +129,7 @@ This project enables users to **upload text or image files to S3**, automaticall
 
 ---
 
-## 📦 Usage
+##  Usage
 
 1. Upload a text file (`.txt`) or image file (`.png`, `.jpg`) to the S3 bucket under the `raw/` prefix.
 2. The pipeline automatically detects file type and runs appropriate sentiment analysis.
@@ -137,7 +137,7 @@ This project enables users to **upload text or image files to S3**, automaticall
 
 ---
 
-## 💰 Cost Estimation
+##  Cost Estimation
 
 | Service Component           | Details                                     | Estimated Cost (₹)    |
 |----------------------------|---------------------------------------------|------------------------|
@@ -225,6 +225,6 @@ aws s3 cp image.jpg s3://input-bucket-s05breji/raw/   # image file
 
 aws stepfunctions delete-state-machine --state-machine-arn arn:aws:states:ap-south-1:236024603923:stateMachine:sentiment-analysis-pipeline
 
-## 📄 License
+##  License
 
 MIT License - See LICENSE file for details.
